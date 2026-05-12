@@ -1,0 +1,2 @@
+echo "🧪 Running unit tests before push..."
+npm run test -w backend && npm run test -w frontend
