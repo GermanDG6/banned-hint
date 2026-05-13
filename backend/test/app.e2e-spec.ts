@@ -23,4 +23,20 @@ describe('AppController (e2e)', () => {
   it('/api/health (GET)', () => {
     return request(app.getHttpServer()).get('/api/health').expect(200).expect({ status: 'ok' });
   });
+
+  it('/api/cards/random (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/api/cards/random')
+      .expect(200)
+      .expect((res) => {
+        expect(res.body).toHaveProperty('id');
+        expect(res.body).toHaveProperty('word');
+        expect(res.body).toHaveProperty('bannedWords');
+        expect(typeof res.body.id).toBe('string');
+        expect(typeof res.body.word).toBe('string');
+        expect(Array.isArray(res.body.bannedWords)).toBe(true);
+        expect(res.body.word.length).toBeGreaterThan(0);
+        expect(res.body.bannedWords.length).toBeGreaterThan(0);
+      });
+  });
 });
