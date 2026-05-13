@@ -104,6 +104,7 @@ backend/
 - Tipado explícito en firmas de funciones públicas y métodos de clases.
 - Value Objects deben ser clases inmutables con validación en el constructor; lanza excepciones de dominio ante valores inválidos.
 - Usa `readonly` en propiedades de entidades y value objects que no deban mutar.
+- **Convención de nombres**: no uses prefijos (`I`, `Abstract`) ni sufijos (`Impl`, `Service`, `Repository`) artificiales. El nombre debe reflejar el concepto de dominio; el contexto (ubicación en capas) distingue la interfaz de la implementación.
 
 ---
 
