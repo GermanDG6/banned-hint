@@ -1,14 +1,17 @@
 # AGENTS.md
 
 ## Propósito
+
 Este repositorio es un monorepo con npm workspaces. Aplica reglas globales para todo el código. Los archivos `AGENTS.md` más cercanos a cada proyecto pueden añadir o refinar estas normas.
 
 ## Alcance y precedencia
+
 - Estas reglas aplican a todo el repositorio.
 - Si existe un `AGENTS.md` dentro de un paquete o aplicación, sus instrucciones complementan estas reglas y prevalecen en ese contexto.
 - No contradigas estas normas globales salvo que el subproyecto lo justifique explícitamente.
 
 ## Trabajo en monorepo
+
 - Antes de hacer cambios, identifica el workspace afectado y limita el alcance a ese workspace.
 - Evita cambios transversales innecesarios en varios paquetes.
 - Reutiliza paquetes compartidos antes de duplicar lógica.
@@ -23,15 +26,19 @@ Cuando trabajes en este repositorio, **NO** deduzcas el dominio solo a partir de
 Sigue siempre este orden de prioridad para entender el contexto de negocio:
 
 1. Documentación de dominio en `docs/`:
-  - `docs/overview.md`
-  - `docs/ubiquitous-language.md`
-  - Cualquier otro archivo bajo `docs/`
+
+- `docs/overview.md`
+- `docs/ubiquitous-language.md`
+- Cualquier otro archivo bajo `docs/`
+
 2. Documentación de cada aplicación:
-  - `backend/README.md`
-  - `frontend/README.md`
+
+- `backend/README.md`
+- `frontend/README.md`
+
 3. Código fuente:
-    - Entidades de dominio en `backend/src/modules/**/domain/**` (arquitectura objetivo).
-    - Resto de capas (`application`, `infrastructure`, `interfaces`, componentes de React, etc.).
+   - Entidades de dominio en `backend/src/modules/**/domain/**` (arquitectura objetivo).
+   - Resto de capas (`application`, `infrastructure`, `interfaces`, componentes de React, etc.).
 
 ## Uso de la carpeta `docs/`
 
@@ -50,32 +57,34 @@ Sigue siempre este orden de prioridad para entender el contexto de negocio:
   - Actualiza la documentación correspondiente en `docs/`.
 - No introduzcas nuevos conceptos de dominio (nombres o significados) sin añadirlos al lenguaje ubicuo.
 
-
 ## Arquitectura
+
 - Diseña el código siguiendo **DDD** siempre que el problema de negocio lo justifique.
 - Organiza el código con separación explícita entre:
-    - Dominio
-    - Aplicación
-    - Infraestructura
-    - Interfaces/entrega
+  - Dominio
+  - Aplicación
+  - Infraestructura
+  - Interfaces/entrega
 - El dominio debe contener la lógica de negocio y no depender de frameworks, APIs externas, bases de datos ni detalles de infraestructura.
 - Modela el dominio con lenguaje ubicuo: usa nombres que reflejen conceptos de negocio reales.
 - Favorece agregados, entidades, value objects, servicios de dominio y repositorios cuando aporten claridad.
 - Define contratos en capas internas e implementaciones en capas externas.
 - Las dependencias deben apuntar hacia dentro: infraestructura depende de aplicación/dominio, nunca al revés.
 - Límites actuales del sistema:
-    - `backend/`: API REST con NestJS (prefijo global `/api`, ver `backend/src/main.ts`).
-    - `frontend/`: SPA React/Vite y enrutado en `frontend/src/routes/index.tsx`.
-    - `e2e/`: suite Playwright de extremo a extremo contra la UI (`e2e/playwright.config.ts`, `e2e/tests/`).
+  - `backend/`: API REST con NestJS (prefijo global `/api`, ver `backend/src/main.ts`).
+  - `frontend/`: SPA React/Vite y enrutado en `frontend/src/routes/index.tsx`.
+  - `e2e/`: suite Playwright de extremo a extremo contra la UI (`e2e/playwright.config.ts`, `e2e/tests/`).
 
 ## Diseño de código
+
 Aplica estos principios en todo cambio:
+
 - **SOLID**
-    - Single Responsibility: cada módulo debe tener una única razón de cambio.
-    - Open/Closed: extiende mediante composición o nuevas implementaciones, evita modificar comportamiento estable sin necesidad.
-    - Liskov Substitution: las abstracciones deben poder sustituirse sin comportamientos inesperados.
-    - Interface Segregation: usa interfaces pequeñas y orientadas al caso de uso.
-    - Dependency Inversion: depende de abstracciones, no de detalles.
+  - Single Responsibility: cada módulo debe tener una única razón de cambio.
+  - Open/Closed: extiende mediante composición o nuevas implementaciones, evita modificar comportamiento estable sin necesidad.
+  - Liskov Substitution: las abstracciones deben poder sustituirse sin comportamientos inesperados.
+  - Interface Segregation: usa interfaces pequeñas y orientadas al caso de uso.
+  - Dependency Inversion: depende de abstracciones, no de detalles.
 - **DRY**: evita duplicación de lógica, reglas de negocio y conocimiento accidental.
 - **KISS**: prefiere la solución más simple que cumpla el caso de uso.
 - **Ley de Demeter**: evita cadenas largas de navegación y acoplamiento innecesario entre objetos o módulos.
@@ -84,6 +93,7 @@ Aplica estos principios en todo cambio:
 - Evita utilidades genéricas sin contexto de dominio si ocultan intención de negocio.
 
 ## Testing
+
 - Aplica **TDD** siempre que sea razonable: escribe primero una prueba que defina el comportamiento esperado, implementa lo mínimo para pasarla y luego refactoriza.
 - Todo cambio de comportamiento debe ir acompañado de pruebas.
 - Los tests deben centrarse en comportamiento observable, no en detalles de implementación.
@@ -92,6 +102,7 @@ Aplica estos principios en todo cambio:
 - No des por terminado un cambio con tests rotos, incompletos o pendientes.
 
 ## Calidad y mantenibilidad
+
 - Refactoriza cuando detectes complejidad accidental.
 - Evita “quick fixes” que aumenten deuda técnica.
 - No mezcles lógica de negocio con detalles de UI, transporte, persistencia o framework.
@@ -99,11 +110,13 @@ Aplica estos principios en todo cambio:
 - Documenta decisiones arquitectónicas relevantes cuando introduzcan nuevos patrones, límites de contexto o contratos compartidos.
 
 ## Cambios y dependencias
+
 - No añadas dependencias nuevas sin necesidad clara.
 - Antes de crear una abstracción, verifica que resuelve una duplicación real o un límite de dominio claro.
 - Si rompes una convención global, explica el motivo en el cambio.
 
 ## Validación
+
 - Ejecuta los checks del workspace afectado antes de dar por terminado el trabajo.
 - Corrige errores de lint, tipos y tests antes de cerrar una tarea.
 - Si un subproyecto define comandos específicos en su propio `AGENTS.md`, usa esos comandos.
@@ -113,16 +126,19 @@ Aplica estos principios en todo cambio:
 ## Reglas de trabajo para agentes IA
 
 - Siempre que generes o modifiques código:
+
   - Usa el lenguaje y los conceptos definidos en `docs/ubiquitous-language.md`.
   - Evita introducir nombres que entren en conflicto con ese lenguaje.
 
 - Si encuentras inconsistencias entre:
+
   - `docs/**`
   - `backend/README.md`
   - `frontend/README.md`
   - código
 
   entonces:
+
   - Propón cambios para alinear la documentación y el código, priorizando lo que diga `docs/**`.
 
 - No borres ni ignores documentación de dominio sin actualizar el comportamiento del sistema en consecuencia.

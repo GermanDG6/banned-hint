@@ -21,11 +21,11 @@ Monorepo con backend en NestJS y frontend en React, gestionado con npm workspace
 
 ## Requisitos previos
 
-| Herramienta | Versión mínima |
-|---|---|
-| Node.js | 24 (LTS "Krypton") |
-| npm | 10+ |
-| MongoDB | 7+ (instancia local o remota) |
+| Herramienta | Versión mínima                |
+| ----------- | ----------------------------- |
+| Node.js     | 24 (LTS "Krypton")            |
+| npm         | 10+                           |
+| MongoDB     | 7+ (instancia local o remota) |
 
 Se recomienda usar [nvm](https://github.com/nvm-sh/nvm) para gestionar la versión de Node:
 
@@ -81,9 +81,9 @@ banned-hint/
 
 El directorio `docs/` contiene la documentación del dominio del juego Banned Hint:
 
-| Archivo | Contenido |
-|---|---|
-| [`docs/overview.md`](docs/overview.md) | Objetivo del juego, flujo de una ronda y reglas principales |
+| Archivo                                                      | Contenido                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------------- |
+| [`docs/overview.md`](docs/overview.md)                       | Objetivo del juego, flujo de una ronda y reglas principales   |
 | [`docs/ubiquitous-language.md`](docs/ubiquitous-language.md) | Definición de términos: Card, Word, Banned word, Round, Timer |
 
 > **Importante**: Antes de implementar o modificar lógica de negocio, consulta estos documentos para entender el contexto y usar el lenguaje ubicuo definido.
@@ -94,40 +94,40 @@ El directorio `docs/` contiene la documentación del dominio del juego Banned Hi
 
 ### Backend (`/backend`)
 
-| Paquete | Rol |
-|---|---|
-| [NestJS](https://nestjs.com/) `^10` | Framework principal |
-| [Mongoose](https://mongoosejs.com/) `^8` + `@nestjs/mongoose` | ODM para MongoDB |
-| [Jest](https://jestjs.io/) `^29` + `ts-jest` | Tests unitarios |
-| [Supertest](https://github.com/ladjs/supertest) | Tests e2e del API |
-| TypeScript `^5` | Lenguaje |
+| Paquete                                                       | Rol                 |
+| ------------------------------------------------------------- | ------------------- |
+| [NestJS](https://nestjs.com/) `^10`                           | Framework principal |
+| [Mongoose](https://mongoosejs.com/) `^8` + `@nestjs/mongoose` | ODM para MongoDB    |
+| [Jest](https://jestjs.io/) `^29` + `ts-jest`                  | Tests unitarios     |
+| [Supertest](https://github.com/ladjs/supertest)               | Tests e2e del API   |
+| TypeScript `^5`                                               | Lenguaje            |
 
 ### Frontend (`/frontend`)
 
-| Paquete | Rol |
-|---|---|
-| [React](https://react.dev/) `^18` + [Vite](https://vitejs.dev/) `^5` | UI + bundler |
-| [React Router](https://reactrouter.com/) `^6` | Enrutamiento |
-| [Tailwind CSS](https://tailwindcss.com/) `^3` | Estilos |
-| [shadcn/ui](https://ui.shadcn.com/) | Componentes accesibles (Radix UI) |
-| [Vitest](https://vitest.dev/) `^1` | Test runner |
-| [Testing Library](https://testing-library.com/docs/react-testing-library/intro/) `^15` | Utilidades de testing |
-| TypeScript `^5` | Lenguaje |
+| Paquete                                                                                | Rol                               |
+| -------------------------------------------------------------------------------------- | --------------------------------- |
+| [React](https://react.dev/) `^18` + [Vite](https://vitejs.dev/) `^5`                   | UI + bundler                      |
+| [React Router](https://reactrouter.com/) `^6`                                          | Enrutamiento                      |
+| [Tailwind CSS](https://tailwindcss.com/) `^3`                                          | Estilos                           |
+| [shadcn/ui](https://ui.shadcn.com/)                                                    | Componentes accesibles (Radix UI) |
+| [Vitest](https://vitest.dev/) `^1`                                                     | Test runner                       |
+| [Testing Library](https://testing-library.com/docs/react-testing-library/intro/) `^15` | Utilidades de testing             |
+| TypeScript `^5`                                                                        | Lenguaje                          |
 
 ### E2E (`/e2e`)
 
-| Paquete | Rol |
-|---|---|
+| Paquete                                       | Rol                                   |
+| --------------------------------------------- | ------------------------------------- |
 | [Playwright](https://playwright.dev/) `^1.44` | Tests end-to-end (Chromium + Firefox) |
 
 ### Raíz
 
-| Paquete | Rol |
-|---|---|
-| [Husky](https://typicode.github.io/husky/) `^9` | Git hooks |
+| Paquete                                                         | Rol                           |
+| --------------------------------------------------------------- | ----------------------------- |
+| [Husky](https://typicode.github.io/husky/) `^9`                 | Git hooks                     |
 | [lint-staged](https://github.com/lint-staged/lint-staged) `^15` | Linting sobre archivos staged |
-| [ESLint](https://eslint.org/) `^9` + `typescript-eslint` | Linting (flat config) |
-| [Prettier](https://prettier.io/) `^3` | Formateo de código |
+| [ESLint](https://eslint.org/) `^9` + `typescript-eslint`        | Linting (flat config)         |
+| [Prettier](https://prettier.io/) `^3`                           | Formateo de código            |
 
 ---
 
@@ -139,11 +139,11 @@ El backend requiere un archivo `.env` en `backend/`. Copia el ejemplo y ajusta l
 cp backend/.env.example backend/.env
 ```
 
-| Variable | Descripción | Valor por defecto |
-|---|---|---|
-| `PORT` | Puerto en el que escucha el servidor | `3000` |
-| `MONGODB_URI` | URI de conexión a MongoDB | `mongodb://localhost:27017/banned-hint` |
-| `NODE_ENV` | Entorno de ejecución | `development` |
+| Variable      | Descripción                          | Valor por defecto                       |
+| ------------- | ------------------------------------ | --------------------------------------- |
+| `PORT`        | Puerto en el que escucha el servidor | `3000`                                  |
+| `MONGODB_URI` | URI de conexión a MongoDB            | `mongodb://localhost:27017/banned-hint` |
+| `NODE_ENV`    | Entorno de ejecución                 | `development`                           |
 
 ---
 
@@ -189,21 +189,21 @@ docker run -d -p 27017:27017 --name mongo mongo:7
 
 Todos los scripts se ejecutan desde la raíz del monorepo:
 
-| Script | Descripción |
-|---|---|
-| `npm run dev:backend` | Inicia NestJS en modo watch |
-| `npm run dev:frontend` | Inicia Vite dev server |
-| `npm run build` | Compila backend y frontend |
-| `npm run build:backend` | Compila solo el backend |
-| `npm run build:frontend` | Compila solo el frontend |
-| `npm run test` | Ejecuta tests unitarios (Jest + Vitest) |
-| `npm run test:backend` | Tests unitarios del backend (Jest) |
-| `npm run test:frontend` | Tests unitarios del frontend (Vitest) |
-| `npm run test:e2e` | Tests end-to-end (Playwright) |
-| `npm run lint` | Analiza el código con ESLint |
-| `npm run lint:fix` | Analiza y corrige automáticamente |
-| `npm run format` | Formatea todo el código con Prettier |
-| `npm run format:check` | Verifica el formato sin modificar archivos |
+| Script                   | Descripción                                |
+| ------------------------ | ------------------------------------------ |
+| `npm run dev:backend`    | Inicia NestJS en modo watch                |
+| `npm run dev:frontend`   | Inicia Vite dev server                     |
+| `npm run build`          | Compila backend y frontend                 |
+| `npm run build:backend`  | Compila solo el backend                    |
+| `npm run build:frontend` | Compila solo el frontend                   |
+| `npm run test`           | Ejecuta tests unitarios (Jest + Vitest)    |
+| `npm run test:backend`   | Tests unitarios del backend (Jest)         |
+| `npm run test:frontend`  | Tests unitarios del frontend (Vitest)      |
+| `npm run test:e2e`       | Tests end-to-end (Playwright)              |
+| `npm run lint`           | Analiza el código con ESLint               |
+| `npm run lint:fix`       | Analiza y corrige automáticamente          |
+| `npm run format`         | Formatea todo el código con Prettier       |
+| `npm run format:check`   | Verifica el formato sin modificar archivos |
 
 Los scripts de cada paquete también se pueden ejecutar de forma aislada:
 

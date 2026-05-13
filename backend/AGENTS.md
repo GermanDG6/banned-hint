@@ -6,7 +6,7 @@
 
 API REST construida con **NestJS** y **TypeScript**, persistencia con **Mongoose** (MongoDB) y tests con **Jest** + **Supertest**.
 
-***
+---
 
 ## Comandos del workspace
 
@@ -34,7 +34,7 @@ npm run test:cov -w backend
 
 Antes de dar por terminado cualquier cambio: `lint` + `test` + `test:e2e` del workspace deben pasar sin errores.
 
-***
+---
 
 ## Estructura de carpetas
 
@@ -75,7 +75,7 @@ backend/
 └── nest-cli.json
 ```
 
-***
+---
 
 ## Arquitectura y NestJS
 
@@ -85,7 +85,7 @@ backend/
 - Evita inyectar repositorios directamente en controllers; pásalos siempre a través de un caso de uso o servicio de aplicación.
 - No uses decoradores de NestJS (ni Mongoose) dentro de la capa de dominio; esos detalles pertenecen a infraestructura.
 
-***
+---
 
 ## Mongoose
 
@@ -95,7 +95,7 @@ backend/
 - Las migraciones o seeds no van en los schemas; crea scripts separados en `scripts/`.
 - Valida datos de entrada con DTOs + `class-validator` en la capa de interfaces, no con lógica dentro de los schemas.
 
-***
+---
 
 ## TypeScript
 
@@ -105,11 +105,12 @@ backend/
 - Value Objects deben ser clases inmutables con validación en el constructor; lanza excepciones de dominio ante valores inválidos.
 - Usa `readonly` en propiedades de entidades y value objects que no deban mutar.
 
-***
+---
 
 ## Testing con Jest y Supertest
 
 ### Unitarios
+
 - Crea el archivo de test junto al archivo fuente: `<nombre>.spec.ts`.
 - Testea **comportamiento**, no implementación: una clase de dominio se prueba mediante sus métodos públicos.
 - Mockea dependencias de infraestructura (repositorios, servicios externos) con `jest.fn()` o `createMock()`.
@@ -117,34 +118,39 @@ backend/
 - Nombra los tests con el patrón: `should <comportamiento esperado> when <condición>`.
 
 ### E2E
+
 - Los tests e2e viven en `test/` y usan **Supertest** sobre la app compilada con `createNestApplication()`.
 - Usa una base de datos MongoDB de test (en memoria con `mongodb-memory-server` o una instancia aislada).
 - Limpia el estado de la base de datos antes o después de cada test (`beforeEach`/`afterEach`).
 - Testea los contratos HTTP (status codes, forma del body, headers) y no los detalles internos.
 
 ### Cobertura
+
 - Mantén cobertura de líneas y ramas por encima del umbral definido en `jest.config.ts`.
 - No aumentes umbrales sin añadir tests reales; no bajes umbrales para que el CI pase.
 
-***
+---
 
 ## Instrucciones para cambios en el backend
 
 - Antes de tocar código en `backend/`:
-    - Revisa `docs/` para entender las reglas de negocio relevantes.
-    - Revisa `backend/README.md` para conocer la arquitectura (DDD, capas, módulos).
+
+  - Revisa `docs/` para entender las reglas de negocio relevantes.
+  - Revisa `backend/README.md` para conocer la arquitectura (DDD, capas, módulos).
 
 - Las reglas de negocio se deben implementar principalmente en:
-    - `backend/src/domain/**` (entidades, value objects, reglas).
-    - `backend/src/application/**` (casos de uso).
+
+  - `backend/src/domain/**` (entidades, value objects, reglas).
+  - `backend/src/application/**` (casos de uso).
 
 - No añadas reglas de negocio nuevas directamente en:
-    - Controllers (`backend/src/api/**`).
-    - Adaptadores de infraestructura (`backend/src/infrastructure/**`).
-      sin reflejarlas primero en `docs/` y, si aplica, en `backend/README.md`.
+
+  - Controllers (`backend/src/api/**`).
+  - Adaptadores de infraestructura (`backend/src/infrastructure/**`).
+    sin reflejarlas primero en `docs/` y, si aplica, en `backend/README.md`.
 
 - Si el contrato de un endpoint cambia (por ejemplo, `/cards/random`):
-    - Asegúrate de que el cambio respeta las definiciones de `Card` y flujo de juego en `docs/`.
+  - Asegúrate de que el cambio respeta las definiciones de `Card` y flujo de juego en `docs/`.
 
 ## Reglas adicionales
 

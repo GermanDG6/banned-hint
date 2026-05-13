@@ -6,7 +6,7 @@
 
 SPA construida con **React**, **TypeScript** y **Vite**, estilos con **Tailwind CSS**, enrutado con **React Router** y tests con **Vitest**.
 
-***
+---
 
 ## Comandos del workspace
 
@@ -34,7 +34,7 @@ npm run test:cov -w frontend
 
 Antes de dar por terminado cualquier cambio: `lint` + `test` del workspace deben pasar sin errores.
 
-***
+---
 
 ## Estructura de carpetas
 
@@ -68,7 +68,7 @@ frontend/
 └── vite.config.ts                  # Incluye la configuración de Vitest en `test`
 ```
 
-***
+---
 
 ## Arquitectura y React
 
@@ -79,7 +79,7 @@ frontend/
 - No pongas lógica de transformación de datos dentro del JSX; extráela a funciones o hooks.
 - Aplica la **Ley de Demeter**: un componente solo conoce a sus props directas y a los hooks que usa, no navega por objetos profundamente anidados.
 
-***
+---
 
 ## React Router
 
@@ -89,7 +89,7 @@ frontend/
 - Protege rutas privadas con un componente guard; no repitas la lógica de autenticación en cada página.
 - Usa `useNavigate` y `Link` para navegación; no manipules `window.location` directamente.
 
-***
+---
 
 ## Tailwind CSS
 
@@ -98,7 +98,7 @@ frontend/
 - No dupliques conjuntos de clases: si el mismo patrón visual aparece más de dos veces, extráelo a un componente o a una clase semántica en `globals.css` con `@apply`.
 - Sigue el sistema de diseño definido en `tailwind.config.ts` (colores, tipografía, espaciados); no uses valores arbitrarios (`[valor]`) para propiedades que ya tienen token.
 
-***
+---
 
 ## TypeScript
 
@@ -108,17 +108,19 @@ frontend/
 - Usa tipos del dominio (`features/<feature>/domain/models/`) en lugar de tipos derivados de la respuesta de la API; mapea en la capa de infraestructura.
 - Los formularios usan `react-hook-form` con validación tipada mediante `zod`; no gestiones estado de formulario manualmente.
 
-***
+---
 
 ## Testing con Vitest
 
 ### Unitarios (lógica de dominio y utils)
+
 - Crea el archivo de test junto al archivo fuente: `<nombre>.test.ts`.
 - Testea funciones puras y hooks sin dependencias de UI.
 - No uses `describe` anidado más de dos niveles.
 - Nombra los tests: `should <comportamiento esperado> when <condición>`.
 
 ### Componentes
+
 - Usa **React Testing Library** (`@testing-library/react`) para testear componentes.
 - Testea **comportamiento visible** para el usuario: qué se renderiza, qué ocurre al interactuar.
 - No testees detalles de implementación (estado interno, nombres de métodos privados).
@@ -127,24 +129,27 @@ frontend/
 - Evita `waitFor` anidados; si un test es difícil de escribir, el componente tiene demasiada responsabilidad.
 
 ### Cobertura
+
 - Mantén cobertura de líneas y ramas por encima del umbral definido en `vite.config.ts` (sección `test`) o en un `vitest.config.ts` si se separa en el futuro.
 - No introduzcas código sin tests cuando añadas lógica de dominio o casos de uso nuevos.
 
-***
+---
 
 ## Instrucciones para cambios en el frontend
 
 - Antes de tocar código en `frontend/`:
-    - Revisa `docs/` para entender qué significan `Card`, `Round`, `Timer`, etc.
-    - Revisa `frontend/README.md` para entender cómo se reflejan esas ideas en la UI.
+
+  - Revisa `docs/` para entender qué significan `Card`, `Round`, `Timer`, etc.
+  - Revisa `frontend/README.md` para entender cómo se reflejan esas ideas en la UI.
 
 - El frontend:
-    - Debe respetar el significado de los conceptos definidos en `docs/`.
-    - No debe cambiar la semántica de `Card`, `Round`, etc. en la interfaz.
+
+  - Debe respetar el significado de los conceptos definidos en `docs/`.
+  - No debe cambiar la semántica de `Card`, `Round`, etc. en la interfaz.
 
 - Cualquier lógica de negocio que se añada en el frontend:
-    - Debe estar alineada con las reglas descritas en `docs/`.
-    - Si introduce nuevas reglas, actualiza primero `docs/` y anótalo en `frontend/README.md`.
+  - Debe estar alineada con las reglas descritas en `docs/`.
+  - Si introduce nuevas reglas, actualiza primero `docs/` y anótalo en `frontend/README.md`.
 
 ## Reglas adicionales
 

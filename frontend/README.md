@@ -31,11 +31,11 @@ Proporcionar la interfaz para jugar a Banned Hint:
 
 ## Componentes previstos
 
-| Componente     | Descripción                                        |
-|----------------|----------------------------------------------------|
-| `GamePage`     | Pantalla principal del juego                       |
-| `CardView`     | Muestra la carta (`word` + `bannedWords`)          |
-| `Timer`        | Muestra el tiempo restante de la ronda             |
+| Componente | Descripción                               |
+| ---------- | ----------------------------------------- |
+| `GamePage` | Pantalla principal del juego              |
+| `CardView` | Muestra la carta (`word` + `bannedWords`) |
+| `Timer`    | Muestra el tiempo restante de la ronda    |
 
 ## Reglas de negocio manejadas en el frontend (MVP)
 

@@ -8,12 +8,7 @@ import prettierConfig from 'eslint-config-prettier';
 export default tseslint.config(
   // Ignores globales
   {
-    ignores: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/build/**',
-      'frontend/src/components/ui/**',
-    ],
+    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**', 'frontend/src/components/ui/**'],
   },
 
   // ── Backend ──────────────────────────────────────────────
