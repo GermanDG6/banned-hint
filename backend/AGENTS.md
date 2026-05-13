@@ -128,9 +128,27 @@ backend/
 
 ***
 
+## Instrucciones para cambios en el backend
+
+- Antes de tocar código en `backend/`:
+    - Revisa `docs/` para entender las reglas de negocio relevantes.
+    - Revisa `backend/README.md` para conocer la arquitectura (DDD, capas, módulos).
+
+- Las reglas de negocio se deben implementar principalmente en:
+    - `backend/src/domain/**` (entidades, value objects, reglas).
+    - `backend/src/application/**` (casos de uso).
+
+- No añadas reglas de negocio nuevas directamente en:
+    - Controllers (`backend/src/api/**`).
+    - Adaptadores de infraestructura (`backend/src/infrastructure/**`).
+      sin reflejarlas primero en `docs/` y, si aplica, en `backend/README.md`.
+
+- Si el contrato de un endpoint cambia (por ejemplo, `/cards/random`):
+    - Asegúrate de que el cambio respeta las definiciones de `Card` y flujo de juego en `docs/`.
+
 ## Reglas adicionales
 
-- No importes nada de `frontend` ni de otros paquetes que no sean `packages/shared` o similares explícitamente definidos como shared.
+- No importes nada de `frontend`. Si en el futuro se crea un paquete compartido (ej. `shared/`), será el único importable entre workspaces.
 - Lanza excepciones tipadas del dominio (extiende `Error`) en lugar de strings o códigos genéricos.
 - Centraliza el manejo de errores HTTP en un `ExceptionFilter` global; no manejes errores HTTP dentro de los casos de uso.
 - Los logs de producción usan el `Logger` de NestJS; no uses `console.log` en código no relacionado con scripts o debug temporal.

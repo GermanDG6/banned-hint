@@ -132,9 +132,23 @@ frontend/
 
 ***
 
+## Instrucciones para cambios en el frontend
+
+- Antes de tocar código en `frontend/`:
+    - Revisa `docs/` para entender qué significan `Card`, `Round`, `Timer`, etc.
+    - Revisa `frontend/README.md` para entender cómo se reflejan esas ideas en la UI.
+
+- El frontend:
+    - Debe respetar el significado de los conceptos definidos en `docs/`.
+    - No debe cambiar la semántica de `Card`, `Round`, etc. en la interfaz.
+
+- Cualquier lógica de negocio que se añada en el frontend:
+    - Debe estar alineada con las reglas descritas en `docs/`.
+    - Si introduce nuevas reglas, actualiza primero `docs/` y anótalo en `frontend/README.md`.
+
 ## Reglas adicionales
 
-- No importes nada de `backend`; usa los tipos compartidos de `packages/shared` si los hay.
+- No importes nada de `backend`. Si en el futuro se crea un paquete compartido (ej. `shared/`), será el único importable entre workspaces.
 - Las llamadas a la API van exclusivamente en `infrastructure/api/`; nunca hagas `fetch` dentro de un componente o página.
 - Gestión de estado global solo cuando sea imprescindible y la feature lo justifique explícitamente; preferir estado local y composición.
 - Accesibilidad mínima: elementos interactivos con atributos ARIA cuando sean necesarios, imágenes con `alt`, formularios con `label` asociado.

@@ -16,6 +16,41 @@ Este repositorio es un monorepo con npm workspaces. Aplica reglas globales para 
 - Workspaces actuales del monorepo: `backend/`, `frontend/` y `e2e/` (definidos en `package.json`).
 - Para ejecutar scripts por workspace usa `-w <workspace>` con los nombres reales (`backend`, `frontend`, `e2e`), no rutas legacy tipo `apps/*`.
 
+## Prioridad de fuentes de verdad
+
+Cuando trabajes en este repositorio, **NO** deduzcas el dominio solo a partir del código.
+
+Sigue siempre este orden de prioridad para entender el contexto de negocio:
+
+1. Documentación de dominio en `docs/`:
+  - `docs/overview.md`
+  - `docs/ubiquitous-language.md`
+  - Cualquier otro archivo bajo `docs/`
+2. Documentación de cada aplicación:
+  - `backend/README.md`
+  - `frontend/README.md`
+3. Código fuente:
+    - Entidades de dominio en `backend/src/modules/**/domain/**` (arquitectura objetivo).
+    - Resto de capas (`application`, `infrastructure`, `interfaces`, componentes de React, etc.).
+
+## Uso de la carpeta `docs/`
+
+- `docs/overview.md` describe:
+  - Objetivo del juego.
+  - Flujo de una ronda.
+  - Reglas de negocio generales.
+- `docs/ubiquitous-language.md` define el **lenguaje ubicuo**:
+  - Significado exacto de términos como `Card`, `Round`, `Timer`, etc.
+
+### Reglas para agentes
+
+- Antes de modificar o añadir lógica de juego:
+  - Lee `docs/overview.md` y `docs/ubiquitous-language.md`.
+- Si cambias una regla de negocio:
+  - Actualiza la documentación correspondiente en `docs/`.
+- No introduzcas nuevos conceptos de dominio (nombres o significados) sin añadirlos al lenguaje ubicuo.
+
+
 ## Arquitectura
 - Diseña el código siguiendo **DDD** siempre que el problema de negocio lo justifique.
 - Organiza el código con separación explícita entre:
@@ -74,3 +109,20 @@ Aplica estos principios en todo cambio:
 - Si un subproyecto define comandos específicos en su propio `AGENTS.md`, usa esos comandos.
 - Comandos raíz disponibles para validación rápida: `npm run lint`, `npm run test`, `npm run test:e2e`, `npm run build`.
 - Si el cambio es aislado, prioriza comandos del workspace: `npm run <script> -w backend|frontend|e2e`.
+
+## Reglas de trabajo para agentes IA
+
+- Siempre que generes o modifiques código:
+  - Usa el lenguaje y los conceptos definidos en `docs/ubiquitous-language.md`.
+  - Evita introducir nombres que entren en conflicto con ese lenguaje.
+
+- Si encuentras inconsistencias entre:
+  - `docs/**`
+  - `backend/README.md`
+  - `frontend/README.md`
+  - código
+
+  entonces:
+  - Propón cambios para alinear la documentación y el código, priorizando lo que diga `docs/**`.
+
+- No borres ni ignores documentación de dominio sin actualizar el comportamiento del sistema en consecuencia.

@@ -51,6 +51,9 @@ banned-hint/
 │   ├── nest-cli.json
 │   ├── tsconfig.json
 │   └── .env.example
+├── docs/                     # Documentación de dominio (lenguaje ubicuo, reglas)
+│   ├── overview.md           # Objetivo y flujo del juego
+│   └── ubiquitous-language.md # Definición de términos de dominio
 ├── frontend/                 # SPA — React + Vite + Tailwind + shadcn/ui
 │   ├── src/
 │   │   ├── components/ui/    # Componentes generados por shadcn/ui
@@ -71,6 +74,19 @@ banned-hint/
 ├── .prettierrc
 └── package.json              # Raíz del workspace
 ```
+
+---
+
+## Documentación de dominio
+
+El directorio `docs/` contiene la documentación del dominio del juego Banned Hint:
+
+| Archivo | Contenido |
+|---|---|
+| [`docs/overview.md`](docs/overview.md) | Objetivo del juego, flujo de una ronda y reglas principales |
+| [`docs/ubiquitous-language.md`](docs/ubiquitous-language.md) | Definición de términos: Card, Word, Banned word, Round, Timer |
+
+> **Importante**: Antes de implementar o modificar lógica de negocio, consulta estos documentos para entender el contexto y usar el lenguaje ubicuo definido.
 
 ---
 
