@@ -10,7 +10,7 @@ export class Timer {
   }
 
   static create(minutes: number, seconds: number): Timer {
-    if (minutes < 0 || seconds < 0 || seconds > 59) {
+    if (minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59) {
       throw new InvalidTimerException();
     }
 
