@@ -1,7 +1,9 @@
 /* HomePage.module.css */
 
 .page {
-  @apply min-h-screen bg-background flex flex-col items-center justify-center px-4;
+  height: 100dvh;
+  overflow: hidden;
+  @apply bg-background flex flex-col items-center justify-center px-4;
 }
 
 .container {
@@ -9,11 +11,11 @@
 }
 
 .header {
-  @apply text-center mb-8;
+  @apply text-center mb-3;
 }
 
 .title {
-  @apply text-4xl font-bold text-brand mb-2;
+  @apply text-3xl font-bold text-brand mb-2;
 }
 
 .subtitle {
@@ -21,19 +23,19 @@
 }
 
 .illustrationWrapper {
-  @apply flex justify-center mb-8;
+  @apply flex justify-center mb-3;
 }
 
 .illustration {
-  @apply w-full max-w-sm object-contain;
+  @apply w-full max-w-sm max-h-48 object-cover;
 }
 
 .timerSection {
-  @apply mb-8 py-6;
+  @apply mb-3 py-3;
 }
 
 .timerLabel {
-  @apply text-sm font-semibold text-foreground mb-4 flex items-center gap-2;
+  @apply text-sm font-semibold text-foreground mb-2 flex items-center gap-2;
 }
 
 .timerIcon {
@@ -45,7 +47,7 @@
 }
 
 .timerInput {
-  @apply w-16 h-16 text-center text-3xl font-bold border-2 border-border rounded-lg;
+  @apply w-16 h-12 text-center text-2xl font-bold border-2 border-border rounded-lg;
   @apply focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand;
   @apply bg-background text-foreground;
 }

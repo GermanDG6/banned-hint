@@ -7,7 +7,7 @@ import { InvalidTimerException } from '@/features/round/domain/exceptions/invali
 import { RoundConfigSession } from '@/shared/session/round-config.session';
 
 export function HomePage() {
-  const [minutes, setMinutes] = useState(1);
+  const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(30);
   const navigate = useNavigate();
 
