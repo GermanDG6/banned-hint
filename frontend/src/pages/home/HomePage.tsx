@@ -69,6 +69,7 @@ export function HomePage() {
               <input
                 type="number"
                 min="0"
+                max="59"
                 value={String(minutes).padStart(2, '0')}
                 onChange={handleMinutesChange}
                 className={styles.timerInput}
