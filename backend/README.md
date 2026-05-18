@@ -20,7 +20,7 @@ El backend sigue un enfoque **Domain-Driven Design** con separación clara de ca
 - **Dominio** (`domain/`):
   - Entidades: `Card`
   - Value Objects: `CardId`, `Word`, `BannedWords`
-  - Excepciones: `EmptyWordException`, `InsufficientBannedWordsException`, `CardNotFoundException`
+  - Excepciones: `EmptyWordException`, `EmptyBannedWordsException`, `CardNotFoundException`
   - Repositorio (interfaz): `CardRepository`
   - Testing: `CardMother` (Object Mother para tests)
 
@@ -42,7 +42,7 @@ El backend sigue un enfoque **Domain-Driven Design** con separación clara de ca
 ### Reglas de negocio implementadas
 
 - `word` no puede estar vacía (validación en `Word` value object).
-- `bannedWords` debe contener al menos 4 palabras (validación en `BannedWords` value object).
+- `bannedWords` debe contener al menos una palabra (validación en `BannedWords` value object).
 - `GET /api/cards/random` devuelve `404 Not Found` si no hay cartas disponibles.
 
 ### Testing

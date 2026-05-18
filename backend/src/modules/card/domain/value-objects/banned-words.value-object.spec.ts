@@ -1,5 +1,5 @@
 import { BannedWords } from './banned-words.value-object';
-import { InsufficientBannedWordsException } from '../exceptions/insufficient-banned-words.exception';
+import { EmptyBannedWordsException } from '../exceptions/empty-banned-words.exception';
 
 describe('BannedWords', () => {
   describe('create', () => {
@@ -21,22 +21,20 @@ describe('BannedWords', () => {
       expect(words.values).toEqual(['apple', 'banana', 'cherry', 'date']);
     });
 
-    it('should throw InsufficientBannedWordsException when list is empty', () => {
-      expect(() => BannedWords.create([])).toThrow(InsufficientBannedWordsException);
+    it('should throw EmptyBannedWordsException when list is empty', () => {
+      expect(() => BannedWords.create([])).toThrow(EmptyBannedWordsException);
     });
 
-    it('should throw InsufficientBannedWordsException when all words are whitespace', () => {
-      expect(() => BannedWords.create(['   ', '  '])).toThrow(InsufficientBannedWordsException);
+    it('should throw EmptyBannedWordsException when all words are whitespace', () => {
+      expect(() => BannedWords.create(['   ', '  '])).toThrow(EmptyBannedWordsException);
     });
 
-    it('should throw InsufficientBannedWordsException when less than 4 valid words provided', () => {
+    it('should throw EmptyBannedWordsException when less than 4 valid words provided', () => {
       expect(() => BannedWords.create(['apple', 'banana', 'cherry'])).toThrow(
-        InsufficientBannedWordsException,
+        EmptyBannedWordsException,
       );
-      expect(() => BannedWords.create(['apple', 'banana'])).toThrow(
-        InsufficientBannedWordsException,
-      );
-      expect(() => BannedWords.create(['apple'])).toThrow(InsufficientBannedWordsException);
+      expect(() => BannedWords.create(['apple', 'banana'])).toThrow(EmptyBannedWordsException);
+      expect(() => BannedWords.create(['apple'])).toThrow(EmptyBannedWordsException);
     });
 
     it('should freeze the values array to ensure immutability', () => {

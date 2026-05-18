@@ -1,4 +1,4 @@
-import { InsufficientBannedWordsException } from '../exceptions/insufficient-banned-words.exception';
+import { EmptyBannedWordsException } from '../exceptions/empty-banned-words.exception';
 
 export class BannedWords {
   readonly values: readonly string[];
@@ -11,7 +11,7 @@ export class BannedWords {
     const trimmedValues = values.map((word) => word.trim()).filter((word) => word.length > 0);
 
     if (trimmedValues.length < 4) {
-      throw new InsufficientBannedWordsException();
+      throw new EmptyBannedWordsException(); // TODO Reemplazar por InsufficientBannedWordsException
     }
 
     return new BannedWords(trimmedValues);
