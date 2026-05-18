@@ -60,8 +60,10 @@ frontend/
 │   │           ├── components/     # Componentes específicos de la feature
 │   │           ├── pages/          # Páginas enrutadas (solo composición, sin lógica)
 │   │           └── hooks/          # Hooks de UI locales a la feature
+│   ├── components/
+│   │   └── ui/                     # Componentes reutilizables entre features (design system)
+│   │       └── <component>/        # Un directorio por componente compartido
 │   ├── shared/
-│   │   ├── ui/                     # Componentes reutilizables entre features (design system)
 │   │   ├── hooks/                  # Hooks de utilidad transversales
 │   │   └── utils/                  # Funciones puras de utilidad
 │   ├── routes/                     # Configuración de React Router
@@ -102,7 +104,7 @@ frontend/
 ### Diseño de componentes
 
 - Las páginas (`pages/`) solo componen componentes y orquestan rutas; no contienen lógica de negocio.
-- Los componentes de `shared/ui/` son genéricos y sin dependencia de ninguna feature concreta.
+- Los componentes de `components/ui/` son genéricos y sin dependencia de ninguna feature concreta (design system compartido).
 - Evita prop drilling más de dos niveles; usa composición de componentes o contexto de React solo cuando sea necesario.
 - No pongas lógica de transformación de datos dentro del JSX; extráela a funciones o hooks.
 - Aplica la **Ley de Demeter**: un componente solo conoce a sus props directas y a los hooks que usa, no navega por objetos profundamente anidados.
@@ -234,6 +236,7 @@ El frontend sigue principios **OOP** (Object-Oriented Programming) en el dominio
 ## Reglas adicionales
 
 - **Importaciones entre capas**: Los componentes e `ui/hooks/` importan de `application/` (casos de uso, ports si es estrictamente necesario). Nunca importan directamente de `infrastructure/`. La inyección de dependencias de adaptadores concretos ocurre en la raíz de la aplicación o en un fichero de configuración central.
+- **Componentes compartidos**: Los componentes del design system en `components/ui/` se importan desde cualquier feature mediante `@/components/ui/<component-name>`. No tienen dependencias de features específicas.
 - No importes nada de `backend`. Si en el futuro se crea un paquete compartido (ej. `shared/`), será el único importable entre workspaces.
 - Las llamadas a la API van exclusivamente en `infrastructure/api/` (adaptadores que implementan los ports); nunca hagas `fetch` dentro de un componente, página o caso de uso.
 - Gestión de estado global solo cuando sea imprescindible y la feature lo justifique explícitamente; preferir estado local y composición.

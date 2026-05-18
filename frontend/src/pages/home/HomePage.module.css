@@ -63,14 +63,3 @@
   @apply relative;
 }
 
-.playButton {
-  @apply w-full h-14 bg-cta text-current font-bold text-lg rounded-full;
-  @apply transition-all duration-200;
-  @apply hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed;
-  @apply flex items-center justify-center gap-2;
-}
-
-.playButtonIcon {
-  @apply text-lg;
-}
-

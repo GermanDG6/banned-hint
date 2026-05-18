@@ -1,9 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import App from '../App';
-import { HomePage } from '../pages/HomePage';
+import { HomePage } from '../pages/home/HomePage';
 
-const RoundPage = lazy(() => import('../pages/RoundPage').then((m) => ({ default: m.RoundPage })));
+const RoundPage = lazy(() =>
+  import('../pages/round/RoundPage').then((m) => ({ default: m.RoundPage })),
+);
 
 export const router = createBrowserRouter([
   {

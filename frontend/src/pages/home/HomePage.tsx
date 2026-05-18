@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './HomePage.module.css';
+import { CTAButton } from '@/components/ui/cta-button/CTAButton';
 import { Timer } from '@/features/round/domain/value-objects/timer.value-object';
 import { InvalidTimerException } from '@/features/round/domain/exceptions/invalid-timer.exception';
 
@@ -93,9 +94,9 @@ export function HomePage() {
           </div>
         </div>
 
-        <button onClick={handlePlay} disabled={!isValidTimer()} className={styles.playButton}>
-          ¡JUGAR! <span className={styles.playButtonIcon}>▶</span>
-        </button>
+        <CTAButton onClick={handlePlay} disabled={!isValidTimer()} icon="▶">
+          ¡JUGAR!
+        </CTAButton>
       </div>
     </main>
   );
