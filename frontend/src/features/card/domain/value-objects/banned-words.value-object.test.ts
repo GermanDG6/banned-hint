@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { BannedWords } from './banned-words.value-object';
-import { EmptyBannedWordsException } from '../exceptions/empty-banned-words.exception';
+import { InsufficientBannedWordsException } from '../exceptions/insufficient-banned-words.exception';
 
 describe('BannedWords', () => {
   describe('create', () => {
@@ -19,18 +19,20 @@ describe('BannedWords', () => {
       expect(bannedWords.values).toEqual(['red', 'fruit', 'tree', 'sweet']);
     });
 
-    it('should throw EmptyBannedWordsException when list is empty', () => {
-      expect(() => BannedWords.create([])).toThrow(EmptyBannedWordsException);
+    it('should throw InsufficientBannedWordsException when list is empty', () => {
+      expect(() => BannedWords.create([])).toThrow(InsufficientBannedWordsException);
     });
 
-    it('should throw EmptyBannedWordsException when all words are empty after trimming', () => {
-      expect(() => BannedWords.create(['  ', '', '  '])).toThrow(EmptyBannedWordsException);
+    it('should throw InsufficientBannedWordsException when all words are empty after trimming', () => {
+      expect(() => BannedWords.create(['  ', '', '  '])).toThrow(InsufficientBannedWordsException);
     });
 
-    it('should throw EmptyBannedWordsException when less than 4 valid words provided', () => {
-      expect(() => BannedWords.create(['red', 'fruit', 'tree'])).toThrow(EmptyBannedWordsException);
-      expect(() => BannedWords.create(['red', 'fruit'])).toThrow(EmptyBannedWordsException);
-      expect(() => BannedWords.create(['red'])).toThrow(EmptyBannedWordsException);
+    it('should throw InsufficientBannedWordsException when less than 4 valid words provided', () => {
+      expect(() => BannedWords.create(['red', 'fruit', 'tree'])).toThrow(
+        InsufficientBannedWordsException,
+      );
+      expect(() => BannedWords.create(['red', 'fruit'])).toThrow(InsufficientBannedWordsException);
+      expect(() => BannedWords.create(['red'])).toThrow(InsufficientBannedWordsException);
     });
 
     it('should freeze the values array to prevent mutation', () => {
