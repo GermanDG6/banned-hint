@@ -1,6 +1,6 @@
 import { Card } from '../../domain/entities/card.entity';
 import { CardNotFoundException } from '../../domain/exceptions/card-not-found.exception';
-import { CardRepository } from '../ports/card-repository.port';
+import { CardRepository } from '../../domain/repositories/card.repository';
 
 export class GetRandomCard {
   constructor(private readonly cardRepository: CardRepository) {}

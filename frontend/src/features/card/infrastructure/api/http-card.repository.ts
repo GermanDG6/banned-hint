@@ -1,4 +1,4 @@
-import { CardRepository } from '../../application/ports/card-repository.port';
+import { CardRepository } from '../../domain/repositories/card.repository';
 import { Card } from '../../domain/entities/card.entity';
 import { HttpClient } from '@/shared/http/http-client.port.ts';
 import { CardApiResponse } from './card-api-response.type';

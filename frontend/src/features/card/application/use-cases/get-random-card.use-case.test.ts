@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GetRandomCard } from './get-random-card.use-case';
-import { CardRepository } from '../ports/card-repository.port';
+import { CardRepository } from '../../domain/repositories/card.repository';
 import { Card } from '../../domain/entities/card.entity';
 import { CardNotFoundException } from '../../domain/exceptions/card-not-found.exception';
 
