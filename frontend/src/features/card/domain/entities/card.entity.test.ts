@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Card } from './card.entity';
 import { EmptyWordException } from '../exceptions/empty-word.exception';
-import { EmptyBannedWordsException } from '../exceptions/empty-banned-words.exception';
+import { InsufficientBannedWordsException } from '../exceptions/insufficient-banned-words.exception';
 
 describe('Card', () => {
   describe('create', () => {
@@ -31,8 +31,8 @@ describe('Card', () => {
       expect(() => Card.create('', ['red', 'fruit', 'tree', 'sweet'])).toThrow(EmptyWordException);
     });
 
-    it('should throw EmptyBannedWordsException when bannedWords is empty', () => {
-      expect(() => Card.create('apple', [])).toThrow(EmptyBannedWordsException);
+    it('should throw InsufficientBannedWordsException when bannedWords has fewer than 4 words', () => {
+      expect(() => Card.create('apple', [])).toThrow(InsufficientBannedWordsException);
     });
 
     it('should delegate validation to Word and BannedWords value objects', () => {
