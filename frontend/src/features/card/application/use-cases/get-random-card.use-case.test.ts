@@ -1,25 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { GetRandomCard } from './get-random-card.use-case';
-import { CardRepository } from '../../domain/repositories/card.repository';
-import { Card } from '../../domain/entities/card.entity';
+import { FakeCardRepository } from '../../domain/testing/fake-card-repository';
+import { CardMother } from '../../domain/testing/card.mother';
 import { CardNotFoundException } from '../../domain/exceptions/card-not-found.exception';
 
 describe('GetRandomCard', () => {
-  let useCase: GetRandomCard;
-  let findRandomMock: ReturnType<typeof vi.fn>;
-  let cardRepositoryMock: CardRepository;
-
-  beforeEach(() => {
-    findRandomMock = vi.fn();
-    cardRepositoryMock = {
-      findRandom: findRandomMock,
-    } as CardRepository;
-    useCase = new GetRandomCard(cardRepositoryMock);
-  });
-
   it('should return a Card when a card is found', async () => {
-    const card = Card.create('apple', ['red', 'fruit'], 'test-id-1');
-    findRandomMock.mockResolvedValue(card);
+    const card = CardMother.withIdAndWord('test-id-1', 'apple');
+    const cardRepository = new FakeCardRepository(card);
+    const useCase = new GetRandomCard(cardRepository);
 
     const result = await useCase.execute();
 
@@ -29,17 +18,20 @@ describe('GetRandomCard', () => {
   });
 
   it('should throw CardNotFoundException when no card is found', async () => {
-    findRandomMock.mockResolvedValue(null);
+    const cardRepository = new FakeCardRepository(null);
+    const useCase = new GetRandomCard(cardRepository);
 
     await expect(useCase.execute()).rejects.toThrow(CardNotFoundException);
   });
 
   it('should call cardRepository.findRandom exactly once', async () => {
-    const card = Card.create('apple', ['red', 'fruit']);
-    findRandomMock.mockResolvedValue(card);
+    const card = CardMother.valid();
+    const cardRepository = new FakeCardRepository(card);
+    const useCase = new GetRandomCard(cardRepository);
+    const spy = vi.spyOn(cardRepository, 'findRandom');
 
     await useCase.execute();
 
-    expect(findRandomMock).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 });
