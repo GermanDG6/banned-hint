@@ -43,30 +43,39 @@ export function RoundPage() {
     }
   };
 
+  const handleExit = () => {
+    RoundConfigSession.clear();
+    navigate('/', { replace: true });
+  };
+
   if (!config) return null;
 
   return (
     <main className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.brand}>BANNED HINT</h1>
+        <button className={styles.exitButton} onClick={handleExit} aria-label="Finalizar partida">
+          ✕
+        </button>
       </header>
 
-      <section className={styles.timerSection}>
-        <TimerDisplay formatted={formatted} />
-      </section>
+      <div className={styles.centerContent}>
+        <section className={styles.timerSection}>
+          <TimerDisplay formatted={formatted} />
+        </section>
 
-      <section className={styles.cardSection}>
-        <GameCard card={card} loading={loading} />
-      </section>
-
-      <footer className={styles.actions}>
-        <CTAButton onClick={handleNext} icon="⊙">
-          SIGUIENTE
-        </CTAButton>
-        <CTAButton onClick={handlePauseResume} variant="secondary" icon={isRunning ? '⏸' : '▶'}>
-          {isRunning ? 'PAUSA' : 'CONTINUAR'}
-        </CTAButton>
-      </footer>
+        <section className={styles.cardSection}>
+          <GameCard card={card} loading={loading} />
+        </section>
+        <section className={styles.actions}>
+          <CTAButton onClick={handleNext} icon="⊙">
+            SIGUIENTE
+          </CTAButton>
+          <CTAButton onClick={handlePauseResume} variant="secondary" icon={isRunning ? '⏸' : '▶'}>
+            {isRunning ? 'PAUSA' : 'CONTINUAR'}
+          </CTAButton>
+        </section>
+      </div>
     </main>
   );
 }

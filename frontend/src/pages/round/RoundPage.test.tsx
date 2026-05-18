@@ -8,6 +8,7 @@ import { CardMother } from '@/features/card/domain/testing/card.mother';
 vi.mock('@/shared/session/round-config.session', () => ({
   RoundConfigSession: {
     load: vi.fn(),
+    clear: vi.fn(),
   },
 }));
 
@@ -133,5 +134,16 @@ describe('RoundPage', () => {
     expect(screen.getByText('CONTINUAR')).toBeInTheDocument();
     await user.click(screen.getByText('CONTINUAR'));
     expect(resume).toHaveBeenCalledTimes(1);
+  });
+
+  it('should clear session and navigate to home when exit button is clicked', async () => {
+    const user = userEvent.setup();
+    vi.mocked(RoundConfigSession.load).mockReturnValue({ minutes: 1, seconds: 30 });
+
+    renderRoundPage();
+    await user.click(screen.getByLabelText('Finalizar partida'));
+
+    expect(vi.mocked(RoundConfigSession.clear)).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Home')).toBeInTheDocument();
   });
 });
