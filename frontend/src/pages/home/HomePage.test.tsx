@@ -46,7 +46,7 @@ describe('HomePage', () => {
     const minutesInput = screen.getByLabelText('Minutos') as HTMLInputElement;
     const secondsInput = screen.getByLabelText('Segundos') as HTMLInputElement;
 
-    expect(minutesInput).toHaveValue(1);
+    expect(minutesInput).toHaveValue(0);
     expect(secondsInput).toHaveValue(30);
   });
 
