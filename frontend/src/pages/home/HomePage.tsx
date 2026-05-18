@@ -4,6 +4,7 @@ import styles from './HomePage.module.css';
 import { CTAButton } from '@/components/ui/cta-button/CTAButton';
 import { Timer } from '@/features/round/domain/value-objects/timer.value-object';
 import { InvalidTimerException } from '@/features/round/domain/exceptions/invalid-timer.exception';
+import { RoundConfigSession } from '@/shared/session/round-config.session';
 
 export function HomePage() {
   const [minutes, setMinutes] = useState(1);
@@ -32,7 +33,8 @@ export function HomePage() {
   const handlePlay = () => {
     try {
       Timer.create(minutes, seconds);
-      navigate('/round', { state: { minutes, seconds } });
+      RoundConfigSession.save({ minutes, seconds });
+      navigate('/round');
     } catch (error) {
       if (error instanceof InvalidTimerException) {
         console.error('Invalid timer configuration');

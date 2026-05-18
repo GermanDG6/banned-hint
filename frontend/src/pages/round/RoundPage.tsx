@@ -1,8 +1,72 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import styles from './RoundPage.module.css';
+import { RoundConfigSession } from '@/shared/session/round-config.session';
+import { Timer } from '@/features/round/domain/value-objects/timer.value-object';
+import { useCountdown } from '@/features/round/ui/hooks/use-countdown.hook';
+import { useRandomCard } from '@/features/card/ui/hooks/use-get-random-card.hook';
+import { TimerDisplay } from '@/features/round/ui/components/TimerDisplay/TimerDisplay';
+import { GameCard } from '@/features/card/ui/components/GameCard/GameCard';
+import { CTAButton } from '@/components/ui/cta-button/CTAButton';
+
 export function RoundPage() {
+  const navigate = useNavigate();
+  const config = RoundConfigSession.load();
+
+  useEffect(() => {
+    if (!config) {
+      navigate('/', { replace: true });
+    }
+  }, [config, navigate]);
+
+  const initialSeconds = config ? Timer.create(config.minutes, config.seconds).toSeconds() : 0;
+
+  const { card, loading, reload } = useRandomCard();
+  const { formatted, isRunning, pause, resume, reset } = useCountdown({
+    initialSeconds,
+    onExpire: () => {
+      reload();
+      reset();
+    },
+  });
+
+  const handleNext = () => {
+    reload();
+    reset();
+  };
+
+  const handlePauseResume = () => {
+    if (isRunning) {
+      pause();
+    } else {
+      resume();
+    }
+  };
+
+  if (!config) return null;
+
   return (
-    <main className="container flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold tracking-tight">Round Page</h1>
-      <p className="mt-4 text-muted-foreground">Coming soon...</p>
+    <main className={styles.page}>
+      <header className={styles.header}>
+        <h1 className={styles.brand}>BANNED HINT</h1>
+      </header>
+
+      <section className={styles.timerSection}>
+        <TimerDisplay formatted={formatted} />
+      </section>
+
+      <section className={styles.cardSection}>
+        <GameCard card={card} loading={loading} />
+      </section>
+
+      <footer className={styles.actions}>
+        <CTAButton onClick={handleNext} icon="⊙">
+          SIGUIENTE
+        </CTAButton>
+        <CTAButton onClick={handlePauseResume} variant="secondary" icon={isRunning ? '⏸' : '▶'}>
+          {isRunning ? 'PAUSA' : 'CONTINUAR'}
+        </CTAButton>
+      </footer>
     </main>
   );
 }

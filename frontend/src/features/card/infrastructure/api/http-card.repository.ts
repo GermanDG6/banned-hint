@@ -4,7 +4,7 @@ import { HttpClient } from '@/shared/http/http-client.port.ts';
 import { CardApiResponse } from './card-api-response.type';
 
 export class HttpCardRepository implements CardRepository {
-  private readonly apiUrl = '/api/cards/random';
+  private readonly apiUrl = 'http://localhost:3000/api/cards/random';
 
   constructor(private readonly httpClient: HttpClient) {}
 

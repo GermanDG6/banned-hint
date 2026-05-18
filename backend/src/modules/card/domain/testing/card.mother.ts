@@ -19,8 +19,8 @@ export class CardMother {
 
   static validCards(): Card[] {
     return [
-      Card.create('cat', ['animal', 'pet']),
-      Card.create('piano', ['music', 'instrument']),
+      Card.create('cat', ['animal', 'pet', 'dog', 'Garfield']),
+      Card.create('piano', ['music', 'instrument', 'keys', 'play']),
       Card.create('sunset', ['sun', 'evening']),
       Card.create('book', ['paper', 'read']),
       Card.create('mountain', ['peak', 'high']),
