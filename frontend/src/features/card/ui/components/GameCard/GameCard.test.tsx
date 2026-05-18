@@ -21,11 +21,12 @@ describe('GameCard', () => {
   });
 
   it('should render all bannedWords when card is provided', () => {
-    const card = CardMother.withBannedWords(['Planeta', 'Rojo', 'NASA']);
+    const card = CardMother.withBannedWords(['Planeta', 'Rojo', 'NASA', 'Solsticio']);
     render(<GameCard card={card} loading={false} />);
     expect(screen.getByText('Planeta')).toBeInTheDocument();
     expect(screen.getByText('Rojo')).toBeInTheDocument();
     expect(screen.getByText('NASA')).toBeInTheDocument();
+    expect(screen.getByText('Solsticio')).toBeInTheDocument();
   });
 
   it('should not render skeleton when card is loaded', () => {

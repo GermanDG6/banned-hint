@@ -2,11 +2,11 @@ import { Card } from '../entities/card.entity';
 
 export class CardMother {
   static valid(): Card {
-    return Card.create('apple', ['red', 'fruit']);
+    return Card.create('apple', ['red', 'fruit', 'tree', 'sweet']);
   }
 
   static withWord(word: string): Card {
-    return Card.create(word, ['banned1', 'banned2']);
+    return Card.create(word, ['banned1', 'banned2', 'banned3', 'banned4']);
   }
 
   static withBannedWords(bannedWords: string[]): Card {
@@ -14,16 +14,16 @@ export class CardMother {
   }
 
   static withIdAndWord(id: string, word: string): Card {
-    return Card.create(word, ['banned1', 'banned2'], id);
+    return Card.create(word, ['banned1', 'banned2', 'banned3', 'banned4'], id);
   }
 
   static validCards(): Card[] {
     return [
-      Card.create('cat', ['animal', 'pet', 'dog', 'Garfield']),
+      Card.create('cat', ['animal', 'pet', 'dog', 'meow']),
       Card.create('piano', ['music', 'instrument', 'keys', 'play']),
-      Card.create('sunset', ['sun', 'evening']),
-      Card.create('book', ['paper', 'read']),
-      Card.create('mountain', ['peak', 'high']),
+      Card.create('sunset', ['sun', 'evening', 'dusk', 'orange']),
+      Card.create('book', ['paper', 'read', 'story', 'pages']),
+      Card.create('mountain', ['peak', 'high', 'rock', 'climb']),
     ];
   }
 }

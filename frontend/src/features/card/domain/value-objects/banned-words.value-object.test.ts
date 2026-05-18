@@ -4,19 +4,19 @@ import { EmptyBannedWordsException } from '../exceptions/empty-banned-words.exce
 
 describe('BannedWords', () => {
   describe('create', () => {
-    it('should create BannedWords with a non-empty list of words', () => {
-      const bannedWords = BannedWords.create(['red', 'fruit']);
-      expect(bannedWords.values).toEqual(['red', 'fruit']);
+    it('should create BannedWords with a non-empty list of at least 4 words', () => {
+      const bannedWords = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
+      expect(bannedWords.values).toEqual(['red', 'fruit', 'tree', 'sweet']);
     });
 
     it('should trim whitespace from each word', () => {
-      const bannedWords = BannedWords.create(['  red  ', '  fruit  ']);
-      expect(bannedWords.values).toEqual(['red', 'fruit']);
+      const bannedWords = BannedWords.create(['  red  ', '  fruit  ', '  tree  ', '  sweet  ']);
+      expect(bannedWords.values).toEqual(['red', 'fruit', 'tree', 'sweet']);
     });
 
     it('should filter out empty strings after trimming', () => {
-      const bannedWords = BannedWords.create(['red', '  ', 'fruit', '']);
-      expect(bannedWords.values).toEqual(['red', 'fruit']);
+      const bannedWords = BannedWords.create(['red', '  ', 'fruit', 'tree', 'sweet']);
+      expect(bannedWords.values).toEqual(['red', 'fruit', 'tree', 'sweet']);
     });
 
     it('should throw EmptyBannedWordsException when list is empty', () => {
@@ -27,70 +27,76 @@ describe('BannedWords', () => {
       expect(() => BannedWords.create(['  ', '', '  '])).toThrow(EmptyBannedWordsException);
     });
 
+    it('should throw EmptyBannedWordsException when less than 4 valid words provided', () => {
+      expect(() => BannedWords.create(['red', 'fruit', 'tree'])).toThrow(EmptyBannedWordsException);
+      expect(() => BannedWords.create(['red', 'fruit'])).toThrow(EmptyBannedWordsException);
+      expect(() => BannedWords.create(['red'])).toThrow(EmptyBannedWordsException);
+    });
+
     it('should freeze the values array to prevent mutation', () => {
-      const bannedWords = BannedWords.create(['red', 'fruit']);
+      const bannedWords = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
       expect(Object.isFrozen(bannedWords.values)).toBe(true);
     });
   });
 
   describe('contains', () => {
     it('should return true when word is in the list', () => {
-      const bannedWords = BannedWords.create(['red', 'fruit']);
+      const bannedWords = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
       expect(bannedWords.contains('red')).toBe(true);
     });
 
     it('should return false when word is not in the list', () => {
-      const bannedWords = BannedWords.create(['red', 'fruit']);
+      const bannedWords = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
       expect(bannedWords.contains('green')).toBe(false);
     });
 
     it('should be case-insensitive', () => {
-      const bannedWords = BannedWords.create(['red', 'fruit']);
+      const bannedWords = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
       expect(bannedWords.contains('RED')).toBe(true);
       expect(bannedWords.contains('Fruit')).toBe(true);
     });
 
     it('should trim the word before checking', () => {
-      const bannedWords = BannedWords.create(['red', 'fruit']);
+      const bannedWords = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
       expect(bannedWords.contains('  red  ')).toBe(true);
     });
   });
 
   describe('equals', () => {
     it('should return true when lists contain the same words', () => {
-      const bannedWords1 = BannedWords.create(['red', 'fruit']);
-      const bannedWords2 = BannedWords.create(['red', 'fruit']);
+      const bannedWords1 = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
+      const bannedWords2 = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
       expect(bannedWords1.equals(bannedWords2)).toBe(true);
     });
 
     it('should return true when lists contain same words in different order', () => {
-      const bannedWords1 = BannedWords.create(['red', 'fruit']);
-      const bannedWords2 = BannedWords.create(['fruit', 'red']);
+      const bannedWords1 = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
+      const bannedWords2 = BannedWords.create(['sweet', 'tree', 'fruit', 'red']);
       expect(bannedWords1.equals(bannedWords2)).toBe(true);
     });
 
     it('should return false when lists have different lengths', () => {
-      const bannedWords1 = BannedWords.create(['red', 'fruit']);
-      const bannedWords2 = BannedWords.create(['red', 'fruit', 'green']);
+      const bannedWords1 = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
+      const bannedWords2 = BannedWords.create(['red', 'fruit', 'tree', 'sweet', 'juicy']);
       expect(bannedWords1.equals(bannedWords2)).toBe(false);
     });
 
     it('should return false when lists contain different words', () => {
-      const bannedWords1 = BannedWords.create(['red', 'fruit']);
-      const bannedWords2 = BannedWords.create(['red', 'green']);
+      const bannedWords1 = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
+      const bannedWords2 = BannedWords.create(['red', 'fruit', 'tree', 'green']);
       expect(bannedWords1.equals(bannedWords2)).toBe(false);
     });
   });
 
   describe('toArray', () => {
     it('should return array copy of values', () => {
-      const bannedWords = BannedWords.create(['red', 'fruit']);
+      const bannedWords = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
       const array = bannedWords.toArray();
-      expect(array).toEqual(['red', 'fruit']);
+      expect(array).toEqual(['red', 'fruit', 'tree', 'sweet']);
     });
 
     it('should return a new array instance on each call', () => {
-      const bannedWords = BannedWords.create(['red', 'fruit']);
+      const bannedWords = BannedWords.create(['red', 'fruit', 'tree', 'sweet']);
       const array1 = bannedWords.toArray();
       const array2 = bannedWords.toArray();
       expect(array1).not.toBe(array2);

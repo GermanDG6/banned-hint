@@ -16,7 +16,7 @@ describe('MongoCardRepository', () => {
 
   describe('findRandom', () => {
     it('should return a Card when a document is found', async () => {
-      const mockCard = Card.create('apple', ['red', 'fruit']);
+      const mockCard = Card.create('apple', ['red', 'fruit', 'tree', 'sweet']);
       const mockDoc = {
         _id: mockCard.id.value,
         word: mockCard.word.value,

@@ -20,7 +20,7 @@ describe('HttpCardRepository', () => {
     const mockApiResponse: CardApiResponse = {
       id: 'test-id-1',
       word: 'apple',
-      bannedWords: ['red', 'fruit'],
+      bannedWords: ['red', 'fruit', 'tree', 'sweet'],
     };
     getMock.mockResolvedValue(mockApiResponse);
 
@@ -29,22 +29,22 @@ describe('HttpCardRepository', () => {
     expect(card).toBeDefined();
     expect(card?.id.value).toBe('test-id-1');
     expect(card?.word.value).toBe('apple');
-    expect(card?.bannedWords.toArray()).toEqual(['red', 'fruit']);
-    expect(httpClientMock.get).toHaveBeenCalledWith('/api/cards/random');
+    expect(card?.bannedWords.toArray()).toEqual(['red', 'fruit', 'tree', 'sweet']);
+    expect(httpClientMock.get).toHaveBeenCalledWith('http://localhost:3000/api/cards/random');
   });
 
   it('should map API response to Card entity correctly', async () => {
     const mockApiResponse: CardApiResponse = {
       id: 'card-uuid',
       word: 'banana',
-      bannedWords: ['yellow', 'fruit', 'peel'],
+      bannedWords: ['yellow', 'fruit', 'peel', 'tropical'],
     };
     getMock.mockResolvedValue(mockApiResponse);
 
     const card = await repository.findRandom();
 
     expect(card?.word.value).toBe('banana');
-    expect(card?.bannedWords.toArray()).toEqual(['yellow', 'fruit', 'peel']);
+    expect(card?.bannedWords.toArray()).toEqual(['yellow', 'fruit', 'peel', 'tropical']);
   });
 
   it('should throw an error if httpClient throws', async () => {
@@ -58,13 +58,13 @@ describe('HttpCardRepository', () => {
     const mockApiResponse: CardApiResponse = {
       id: 'test-id',
       word: 'test',
-      bannedWords: ['word'],
+      bannedWords: ['word', 'exam', 'trial', 'check'],
     };
     getMock.mockResolvedValue(mockApiResponse);
 
     await repository.findRandom();
 
     expect(getMock).toHaveBeenCalledTimes(1);
-    expect(getMock).toHaveBeenCalledWith('/api/cards/random');
+    expect(getMock).toHaveBeenCalledWith('http://localhost:3000/api/cards/random');
   });
 });

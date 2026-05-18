@@ -10,8 +10,8 @@ export class BannedWords {
   static create(values: string[]): BannedWords {
     const trimmedValues = values.map((word) => word.trim()).filter((word) => word.length > 0);
 
-    if (trimmedValues.length === 0) {
-      throw new EmptyBannedWordsException();
+    if (trimmedValues.length < 4) {
+      throw new EmptyBannedWordsException(); //TODO Reemplazar por InsufficientBannedWordsException
     }
 
     return new BannedWords(trimmedValues);
