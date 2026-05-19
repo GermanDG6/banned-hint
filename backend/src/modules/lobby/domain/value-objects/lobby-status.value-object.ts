@@ -1,27 +1,25 @@
-//TODO rename to LobbyStatusType
-export type LobbyStatus = 'waiting' | 'playing';
+export type LobbyStatusType = 'waiting' | 'playing';
 
-//TODO remove suffix VO
-export class LobbyStatusVO {
-  readonly value: LobbyStatus;
+export class LobbyStatus {
+  readonly value: LobbyStatusType;
 
-  private constructor(value: LobbyStatus) {
+  private constructor(value: LobbyStatusType) {
     this.value = value;
   }
 
-  static create(value: string): LobbyStatusVO {
+  static create(value: string): LobbyStatus {
     if (value !== 'waiting' && value !== 'playing') {
       throw new Error(`Invalid LobbyStatus: "${value}". Expected "waiting" or "playing".`);
     }
-    return new LobbyStatusVO(value as LobbyStatus);
+    return new LobbyStatus(value as LobbyStatusType);
   }
 
-  static waiting(): LobbyStatusVO {
-    return new LobbyStatusVO('waiting');
+  static waiting(): LobbyStatus {
+    return new LobbyStatus('waiting');
   }
 
-  static playing(): LobbyStatusVO {
-    return new LobbyStatusVO('playing');
+  static playing(): LobbyStatus {
+    return new LobbyStatus('playing');
   }
 
   isWaiting(): boolean {
@@ -32,7 +30,7 @@ export class LobbyStatusVO {
     return this.value === 'playing';
   }
 
-  equals(other: LobbyStatusVO): boolean {
+  equals(other: LobbyStatus): boolean {
     return this.value === other.value;
   }
 

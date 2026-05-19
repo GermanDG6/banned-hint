@@ -1,6 +1,6 @@
 import { LobbyId } from '../value-objects/lobby-id.value-object';
 import { LobbyCode } from '../value-objects/lobby-code.value-object';
-import { LobbyStatusVO, LobbyStatus } from '../value-objects/lobby-status.value-object';
+import { LobbyStatus, LobbyStatusType } from '../value-objects/lobby-status.value-object';
 import { Player } from './player.entity';
 import { RoundSession } from '../models/round-session.model';
 import { DescriberAlreadyExistsException } from '../exceptions/describer-already-exists.exception';
@@ -10,14 +10,14 @@ export class Lobby {
   readonly id: LobbyId;
   readonly code: LobbyCode;
   private players: Player[];
-  private status: LobbyStatusVO;
+  private status: LobbyStatus;
   private roundSession: RoundSession | null;
 
   private constructor(
     id: LobbyId,
     code: LobbyCode,
     players: Player[],
-    status: LobbyStatusVO,
+    status: LobbyStatus,
     roundSession: RoundSession | null,
   ) {
     this.id = id;
@@ -28,24 +28,24 @@ export class Lobby {
   }
 
   static create(code: LobbyCode, hostPlayer: Player): Lobby {
-    return new Lobby(LobbyId.generate(), code, [hostPlayer], LobbyStatusVO.waiting(), null);
+    return new Lobby(LobbyId.generate(), code, [hostPlayer], LobbyStatus.waiting(), null);
   }
 
   static restore(
     id: LobbyId,
     code: LobbyCode,
     players: Player[],
-    status: LobbyStatus,
+    status: LobbyStatusType,
     roundSession: RoundSession | null,
   ): Lobby {
-    return new Lobby(id, code, players, LobbyStatusVO.create(status), roundSession);
+    return new Lobby(id, code, players, LobbyStatus.create(status), roundSession);
   }
 
   getPlayers(): readonly Player[] {
     return Object.freeze([...this.players]);
   }
 
-  getStatus(): LobbyStatus {
+  getStatus(): LobbyStatusType {
     return this.status.value;
   }
 
@@ -66,7 +66,7 @@ export class Lobby {
   }
 
   startRound(cardId: string, word: string, durationSeconds: number): RoundSession {
-    this.status = LobbyStatusVO.playing();
+    this.status = LobbyStatus.playing();
     this.roundSession = {
       cardId,
       word,

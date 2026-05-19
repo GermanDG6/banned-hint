@@ -1,31 +1,31 @@
-import { LobbyStatusVO } from './lobby-status.value-object';
+import { LobbyStatus } from './lobby-status.value-object';
 
 describe('LobbyStatusVO', () => {
   describe('create', () => {
     it('should create a waiting status', () => {
-      const status = LobbyStatusVO.create('waiting');
+      const status = LobbyStatus.create('waiting');
       expect(status.value).toBe('waiting');
     });
 
     it('should create a playing status', () => {
-      const status = LobbyStatusVO.create('playing');
+      const status = LobbyStatus.create('playing');
       expect(status.value).toBe('playing');
     });
 
     it('should throw error for invalid status', () => {
-      expect(() => LobbyStatusVO.create('invalid')).toThrow();
+      expect(() => LobbyStatus.create('invalid')).toThrow();
     });
   });
 
   describe('helper methods', () => {
     it('should identify waiting status', () => {
-      const status = LobbyStatusVO.waiting();
+      const status = LobbyStatus.waiting();
       expect(status.isWaiting()).toBe(true);
       expect(status.isPlaying()).toBe(false);
     });
 
     it('should identify playing status', () => {
-      const status = LobbyStatusVO.playing();
+      const status = LobbyStatus.playing();
       expect(status.isPlaying()).toBe(true);
       expect(status.isWaiting()).toBe(false);
     });
