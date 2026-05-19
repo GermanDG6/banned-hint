@@ -5,6 +5,7 @@ vi.mock('socket.io-client', () => {
   const mockSocket = {
     emit: vi.fn(),
     on: vi.fn(),
+    off: vi.fn(),
     disconnect: vi.fn(),
   };
 
@@ -164,6 +165,35 @@ describe('SocketIOLobbySocket', () => {
     });
   });
 
+  describe('onConnect', () => {
+    it('should register handler for connect event', () => {
+      socketAdapter.connect();
+      const mockSocket = vi.mocked(io).mock.results[0].value;
+      const handler = vi.fn();
+
+      socketAdapter.onConnect(handler);
+
+      expect(mockSocket.on).toHaveBeenCalledWith('connect', handler);
+    });
+
+    it('should return cleanup function that calls socket.off', () => {
+      socketAdapter.connect();
+      const mockSocket = vi.mocked(io).mock.results[0].value;
+      const handler = vi.fn();
+
+      const cleanup = socketAdapter.onConnect(handler);
+      cleanup();
+
+      expect(mockSocket.off).toHaveBeenCalledWith('connect', handler);
+    });
+
+    it('should throw error if not connected', () => {
+      const handler = vi.fn();
+
+      expect(() => socketAdapter.onConnect(handler)).toThrow('Socket not connected');
+    });
+  });
+
   describe('onLobbyUpdated', () => {
     it('should register handler for lobby-updated event', () => {
       socketAdapter.connect();
@@ -189,6 +219,18 @@ describe('SocketIOLobbySocket', () => {
       expect(handler).toHaveBeenCalledWith(players);
     });
 
+    it('should return cleanup function that calls socket.off', () => {
+      socketAdapter.connect();
+      const mockSocket = vi.mocked(io).mock.results[0].value;
+      const handler = vi.fn();
+
+      const cleanup = socketAdapter.onLobbyUpdated(handler);
+      const wrappedHandler = mockSocket.on.mock.calls[0][1];
+      cleanup();
+
+      expect(mockSocket.off).toHaveBeenCalledWith('lobby-updated', wrappedHandler);
+    });
+
     it('should throw error if not connected', () => {
       const handler = vi.fn();
 
@@ -204,7 +246,7 @@ describe('SocketIOLobbySocket', () => {
 
       socketAdapter.onRoundStarted(handler);
 
-      expect(mockSocket.on).toHaveBeenCalledWith('round-started', expect.any(Function));
+      expect(mockSocket.on).toHaveBeenCalledWith('round-started', handler);
     });
 
     it('should call handler with session when event fires', () => {
@@ -219,6 +261,17 @@ describe('SocketIOLobbySocket', () => {
       eventHandler(session);
 
       expect(handler).toHaveBeenCalledWith(session);
+    });
+
+    it('should return cleanup function that calls socket.off', () => {
+      socketAdapter.connect();
+      const mockSocket = vi.mocked(io).mock.results[0].value;
+      const handler = vi.fn();
+
+      const cleanup = socketAdapter.onRoundStarted(handler);
+      cleanup();
+
+      expect(mockSocket.off).toHaveBeenCalledWith('round-started', handler);
     });
 
     it('should throw error if not connected', () => {
@@ -236,7 +289,7 @@ describe('SocketIOLobbySocket', () => {
 
       socketAdapter.onCardChanged(handler);
 
-      expect(mockSocket.on).toHaveBeenCalledWith('card-changed', expect.any(Function));
+      expect(mockSocket.on).toHaveBeenCalledWith('card-changed', handler);
     });
 
     it('should call handler with session when event fires', () => {
@@ -251,6 +304,17 @@ describe('SocketIOLobbySocket', () => {
       eventHandler(session);
 
       expect(handler).toHaveBeenCalledWith(session);
+    });
+
+    it('should return cleanup function that calls socket.off', () => {
+      socketAdapter.connect();
+      const mockSocket = vi.mocked(io).mock.results[0].value;
+      const handler = vi.fn();
+
+      const cleanup = socketAdapter.onCardChanged(handler);
+      cleanup();
+
+      expect(mockSocket.off).toHaveBeenCalledWith('card-changed', handler);
     });
 
     it('should throw error if not connected', () => {
@@ -268,7 +332,7 @@ describe('SocketIOLobbySocket', () => {
 
       socketAdapter.onGuessResult(handler);
 
-      expect(mockSocket.on).toHaveBeenCalledWith('guess-result', expect.any(Function));
+      expect(mockSocket.on).toHaveBeenCalledWith('guess-result', handler);
     });
 
     it('should call handler with result when event fires', () => {
@@ -282,6 +346,17 @@ describe('SocketIOLobbySocket', () => {
       eventHandler({ correct: true });
 
       expect(handler).toHaveBeenCalledWith({ correct: true });
+    });
+
+    it('should return cleanup function that calls socket.off', () => {
+      socketAdapter.connect();
+      const mockSocket = vi.mocked(io).mock.results[0].value;
+      const handler = vi.fn();
+
+      const cleanup = socketAdapter.onGuessResult(handler);
+      cleanup();
+
+      expect(mockSocket.off).toHaveBeenCalledWith('guess-result', handler);
     });
 
     it('should throw error if not connected', () => {
@@ -299,7 +374,7 @@ describe('SocketIOLobbySocket', () => {
 
       socketAdapter.onError(handler);
 
-      expect(mockSocket.on).toHaveBeenCalledWith('error', expect.any(Function));
+      expect(mockSocket.on).toHaveBeenCalledWith('error', handler);
     });
 
     it('should call handler with error when event fires', () => {
@@ -313,6 +388,17 @@ describe('SocketIOLobbySocket', () => {
       eventHandler({ message: 'Something went wrong' });
 
       expect(handler).toHaveBeenCalledWith({ message: 'Something went wrong' });
+    });
+
+    it('should return cleanup function that calls socket.off', () => {
+      socketAdapter.connect();
+      const mockSocket = vi.mocked(io).mock.results[0].value;
+      const handler = vi.fn();
+
+      const cleanup = socketAdapter.onError(handler);
+      cleanup();
+
+      expect(mockSocket.off).toHaveBeenCalledWith('error', handler);
     });
 
     it('should throw error if not connected', () => {

@@ -67,48 +67,54 @@ export class SocketIOLobbySocket implements LobbySocket {
     });
   }
 
-  onLobbyUpdated(handler: (players: Player[]) => void): void {
+  onConnect(handler: () => void): () => void {
     if (!this.socket) {
       throw new Error('Socket not connected. Call connect() first.');
     }
-    this.socket.on('lobby-updated', (data: { players: Player[] }) => {
+    this.socket.on('connect', handler);
+    return () => this.socket?.off('connect', handler);
+  }
+
+  onLobbyUpdated(handler: (players: Player[]) => void): () => void {
+    if (!this.socket) {
+      throw new Error('Socket not connected. Call connect() first.');
+    }
+    const wrappedHandler = (data: { players: Player[] }) => {
       handler(data.players);
-    });
+    };
+    this.socket.on('lobby-updated', wrappedHandler);
+    return () => this.socket?.off('lobby-updated', wrappedHandler);
   }
 
-  onRoundStarted(handler: (session: RoundSession) => void): void {
+  onRoundStarted(handler: (session: RoundSession) => void): () => void {
     if (!this.socket) {
       throw new Error('Socket not connected. Call connect() first.');
     }
-    this.socket.on('round-started', (session: RoundSession) => {
-      handler(session);
-    });
+    this.socket.on('round-started', handler);
+    return () => this.socket?.off('round-started', handler);
   }
 
-  onCardChanged(handler: (session: RoundSession) => void): void {
+  onCardChanged(handler: (session: RoundSession) => void): () => void {
     if (!this.socket) {
       throw new Error('Socket not connected. Call connect() first.');
     }
-    this.socket.on('card-changed', (session: RoundSession) => {
-      handler(session);
-    });
+    this.socket.on('card-changed', handler);
+    return () => this.socket?.off('card-changed', handler);
   }
 
-  onGuessResult(handler: (result: { correct: boolean }) => void): void {
+  onGuessResult(handler: (result: { correct: boolean }) => void): () => void {
     if (!this.socket) {
       throw new Error('Socket not connected. Call connect() first.');
     }
-    this.socket.on('guess-result', (result: { correct: boolean }) => {
-      handler(result);
-    });
+    this.socket.on('guess-result', handler);
+    return () => this.socket?.off('guess-result', handler);
   }
 
-  onError(handler: (error: { message: string }) => void): void {
+  onError(handler: (error: { message: string }) => void): () => void {
     if (!this.socket) {
       throw new Error('Socket not connected. Call connect() first.');
     }
-    this.socket.on('error', (error: { message: string }) => {
-      handler(error);
-    });
+    this.socket.on('error', handler);
+    return () => this.socket?.off('error', handler);
   }
 }

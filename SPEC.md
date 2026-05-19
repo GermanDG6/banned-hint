@@ -400,26 +400,41 @@ npm install @nestjs/websockets @nestjs/platform-socket.io socket.io -w backend
 
 ### Tarea 10 — `frontend`: Hook `useLobby`
 
-**Alcance**: `frontend/src/features/lobby/ui/hooks/use-lobby.hook.ts`.  
-**Descripción**: hook adaptador que suscribe al `LobbySocket` del contexto y expone el estado de UI:
-```typescript
-{
-  players: Player[]
-  roundSession: RoundSession | null
-  myRole: PlayerRole | null
-  isConnected: boolean
-  startRound: (durationSeconds: number) => void
-  nextCard: () => void
-  submitGuess: (word: string) => void
-}
-```
-Escucha `lobby-updated`, `round-started`, `card-changed`. Al recibir `round-started` o `card-changed`, actualiza `roundSession`. **No navega** — la navegación la hace el componente.
+**Alcance**: 
+- `frontend/src/features/lobby/application/ports/lobby-socket.port.ts` (actualizar)
+- `frontend/src/features/lobby/infrastructure/ws/socket-io-lobby-socket.ts` (implementar cleanups)
+- `frontend/src/features/lobby/infrastructure/ws/socket-io-lobby-socket.test.ts` (actualizar tests)
+- `frontend/src/features/lobby/ui/hooks/use-lobby.hook.ts` (nuevo)
+- `frontend/src/features/lobby/ui/hooks/use-lobby.hook.test.ts` (nuevo)
 
-**Tests**: con `renderHook` + socket fake.
+**Descripción**: 
+1. **Extender `LobbySocket` port** con método `onConnect(handler: () => void): () => void` y cambiar retorno de todos los `on*` de `void` → `() => void`. Cada método devuelve una función cleanup que desuscribe el listener.
+2. **Implementar cleanups en `SocketIOLobbySocket`**: guardar referencias de handlers y devolver `() => socket.off(event, handler)` en cada método, garantizando que el cleanup elimina exactamente el listener registrado.
+3. **Crear hook `useLobby`** que recibe `{ myRole: PlayerRole | null }` como parámetro. Integra:
+   - Obtención de `LobbySocket` mediante `useLobbySocket()`.
+   - Registro de handlers en `useEffect` con estrategia explícita de cleanup: `useEffect(() => { const cleanup1 = socket.onConnect(...); const cleanup2 = ...; return () => { cleanup1(); cleanup2(); ... } }, [socket])`.
+   - Expone estado de UI: `{ players, roundSession, myRole, isConnected, startRound, nextCard, submitGuess }`.
+   - **Importante**: `myRole` se recibe como parámetro (host = `'describer'`, invitado = `'guesser'`). En futuras iteraciones, cuando los roles roten por ronda, se derivará del array `players` (ver comentario TODO en el código).
 
-**Verificación**: `npm run test -w frontend`.
+**Tests**: 
+- `use-lobby.hook.test.ts`: renderHook con socket fake. Verificar:
+  - `isConnected` cambia cuando `onConnect` se dispara.
+  - `players` se actualiza con `onLobbyUpdated`.
+  - `roundSession` se actualiza con `onRoundStarted` y `onCardChanged`.
+  - Las funciones de cleanup se llaman correctamente al desmontar.
+  - No hay re-registro de handlers duplicados en remonturas.
+- `socket-io-lobby-socket.test.ts`: añadir mock para `socket.off`, tests para `onConnect`, y verificar que todos los métodos `on*` devuelven cleanups que llaman a `socket.off`.
 
----
+**Ventajas del patrón de cleanups explícitos**:
+- Previene memory leaks en remonturas en modo desarrollo.
+- El singleton `SocketIOLobbySocket` nunca acumula listeners duplicados.
+- Testeable: los cleanups se pueden verificar explícitamente.
+
+**Verificación**: 
+- `npm run test -w frontend` — 206 tests passed (incluyendo 11 tests de `use-lobby.hook`).
+- `npm run lint -w frontend` — sin errores.
+
+------
 
 ### Tarea 11 — `frontend`: Páginas `CreateLobbyPage` y `WaitingRoomPage`
 
@@ -555,7 +570,7 @@ Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma
 | 7 | `frontend`: Infraestructura de la feature `lobby` | ✅ Completada |
 | 8 | `frontend`: `LobbyProvider` y contexto de dependencias | ✅ Completada |
 | 9 | `frontend`: Hook `useServerSyncedCountdown` | ✅ Completada |
-| 10 | `frontend`: Hook `useLobby` | ⬜ Pendiente |
+| 10 | `frontend`: Hook `useLobby` | ✅ Completada |
 | 11 | `frontend`: Páginas `CreateLobbyPage` y `WaitingRoomPage` | ⬜ Pendiente |
 | 12 | `frontend`: Nueva `GuesserPage` | ⬜ Pendiente |
 | 13 | `frontend`: Adaptar `RoundPage` al modo multijugador | ⬜ Pendiente |

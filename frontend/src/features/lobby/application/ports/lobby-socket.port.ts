@@ -14,13 +14,39 @@ export interface LobbySocket {
 
   submitGuess(word: string): void;
 
-  onLobbyUpdated(handler: (players: Player[]) => void): void;
+  /**
+   * Registra un handler que se dispara cuando el socket se conecta.
+   * Devuelve una función de cleanup que desuscribe el handler.
+   */
+  onConnect(handler: () => void): () => void;
 
-  onRoundStarted(handler: (session: RoundSession) => void): void;
+  /**
+   * Registra un handler para el evento 'lobby-updated'.
+   * Devuelve una función de cleanup que desuscribe el handler.
+   */
+  onLobbyUpdated(handler: (players: Player[]) => void): () => void;
 
-  onCardChanged(handler: (session: RoundSession) => void): void;
+  /**
+   * Registra un handler para el evento 'round-started'.
+   * Devuelve una función de cleanup que desuscribe el handler.
+   */
+  onRoundStarted(handler: (session: RoundSession) => void): () => void;
 
-  onGuessResult(handler: (result: { correct: boolean }) => void): void;
+  /**
+   * Registra un handler para el evento 'card-changed'.
+   * Devuelve una función de cleanup que desuscribe el handler.
+   */
+  onCardChanged(handler: (session: RoundSession) => void): () => void;
 
-  onError(handler: (error: { message: string }) => void): void;
+  /**
+   * Registra un handler para el evento 'guess-result'.
+   * Devuelve una función de cleanup que desuscribe el handler.
+   */
+  onGuessResult(handler: (result: { correct: boolean }) => void): () => void;
+
+  /**
+   * Registra un handler para el evento 'error'.
+   * Devuelve una función de cleanup que desuscribe el handler.
+   */
+  onError(handler: (error: { message: string }) => void): () => void;
 }
