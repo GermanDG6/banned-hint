@@ -347,16 +347,41 @@ npm install @nestjs/websockets @nestjs/platform-socket.io socket.io -w backend
 
 ---
 
-### Tarea 8 — `frontend`: `LobbyProvider` y contexto de dependencias
+### Tarea 8 — `frontend`: `LobbyProvider` y contexto de dependencias (+ refactor de `card`)
 
-**Alcance**: `frontend/src/features/lobby/infrastructure/lobby-dependencies.context.tsx`.  
-**Descripción**: Context de React que instancia `SocketIOLobbySocket`, `HttpLobbyRepository`, `CreateLobby` y `JoinLobby`, y los expone mediante hooks (`useLobbySocket`, `useCreateLobby`, `useJoinLobby`). Sigue exactamente el patrón de `card-dependencies.context.tsx`.
+**Alcance**: 
+- `frontend/src/features/lobby/infrastructure/` (nuevos archivos)
+- `frontend/src/features/card/infrastructure/` (refactorización)
 
-El `LobbyProvider` se añade en `App.tsx` envolviendo los `Outlet` (o solo las rutas `/lobby/*` y `/round/*` mediante un layout route).
+**Descripción**: Implementar el patrón **singleton container** para aislar la creación de dependencias a nivel de módulo. Refactorizar `card` para mantener coherencia entre ambas features.
 
-**Tests**: test que verifica que los hooks lanzan error fuera del provider.
+**Nuevos ficheros (lobby)**:
+- `lobby-dependencies.container.ts` — contenedor singleton que instancia `FetchHttpClient` → `HttpLobbyRepository`, `SocketIOLobbySocket`, `CreateLobby(repository)`, `JoinLobby(repository, socket)`. Exporta `lobbyContainer` como `const`.
+- `lobby-dependencies.context.tsx` — React Context que expone `lobbyContainer` mediante cinco hooks:
+  - `useLobbyDependencies()` — acceso al contexto completo; lanza error fuera del provider
+  - `useLobbySocket()` — acceso a `LobbySocket`
+  - `useCreateLobby()` — acceso a `CreateLobby`
+  - `useJoinLobby()` — acceso a `JoinLobby`
+- `lobby-dependencies.context.test.tsx` — 3 tests que verifican acceso correcto dentro del provider usando wrapper.
 
-**Verificación**: `npm run test -w frontend`.
+**Cambios en card (refactorización)**:
+- Extraer `card-dependencies.container.ts` — contenedor singleton de `GetRandomCard`.
+- Simplificar `card-dependencies.context.tsx` — eliminar `useMemo`, usar `cardContainer` directamente como `value`.
+- Añadir `card-dependencies.context.test.tsx` — test que verifica acceso correcto dentro del provider.
+
+**Ventajas del patrón singleton**:
+- Instancias perduran durante todo el ciclo de vida de la app (reconexiones WebSocket controladas explícitamente con `connect()`/`disconnect()`).
+- Fácil testabilidad: mock a nivel de módulo con `vi.mock('./lobby-dependencies.container')`.
+- Referencia estable entre renders sin necesidad de `useMemo`.
+
+**Nota**: `LobbyProvider` **no se registra** en `App.tsx` en esta tarea — se añade en la Tarea 14 como layout route padre de `/lobby/*` y `/round/*`.
+
+**Tests**: 
+- `card-dependencies.context.test.tsx`: 1 test
+- `lobby-dependencies.context.test.tsx`: 3 tests
+- Total: ✅ 177 tests passed
+
+**Verificación**: ✅ `npm run test -w frontend` — 23 test files, 177 tests passed; `npm run lint -w frontend` — sin errores.
 
 ---
 
@@ -528,7 +553,7 @@ Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma
 | 5 | `backend`: Interfaces HTTP + WebSocket del módulo `lobby` | ✅ Completada |
 | 6 | `frontend`: Dominio + puerto de la feature `lobby` | ✅ Completada |
 | 7 | `frontend`: Infraestructura de la feature `lobby` | ✅ Completada |
-| 8 | `frontend`: `LobbyProvider` y contexto de dependencias | ⬜ Pendiente |
+| 8 | `frontend`: `LobbyProvider` y contexto de dependencias | ✅ Completada |
 | 9 | `frontend`: Hook `useServerSyncedCountdown` | ⬜ Pendiente |
 | 10 | `frontend`: Hook `useLobby` | ⬜ Pendiente |
 | 11 | `frontend`: Páginas `CreateLobbyPage` y `WaitingRoomPage` | ⬜ Pendiente |

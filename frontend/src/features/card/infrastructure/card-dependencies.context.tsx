@@ -1,7 +1,6 @@
-import React, { createContext, useMemo } from 'react';
+import React, { createContext } from 'react';
 import { GetRandomCard } from '../application/use-cases/get-random-card.use-case';
-import { HttpCardRepository } from './api/http-card.repository';
-import { FetchHttpClient } from '@/shared/http/fetch-http-client.ts';
+import { cardContainer } from './card-dependencies.container';
 
 interface CardDependencies {
   getRandomCard: GetRandomCard;
@@ -14,18 +13,8 @@ interface CardDependenciesProviderProps {
 }
 
 export function CardDependenciesProvider({ children }: CardDependenciesProviderProps) {
-  const dependencies = useMemo(() => {
-    const httpClient = new FetchHttpClient();
-    const cardRepository = new HttpCardRepository(httpClient);
-    const getRandomCard = new GetRandomCard(cardRepository);
-
-    return {
-      getRandomCard,
-    };
-  }, []);
-
   return (
-    <CardDependenciesContext.Provider value={dependencies}>
+    <CardDependenciesContext.Provider value={cardContainer}>
       {children}
     </CardDependenciesContext.Provider>
   );
