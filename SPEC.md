@@ -512,8 +512,8 @@ Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma
 | # | Tarea | Estado |
 |---|---|---|
 | 1 | `docs/`: Actualizar lenguaje ubicuo y overview | ✅ Completada |
-| 2 | `backend`: Dominio del módulo `lobby` | ⬜ Pendiente |
-| 3 | `backend`: Casos de uso del módulo `lobby` | ⬜ Pendiente |
+| 2 | `backend`: Dominio del módulo `lobby` | ✅ Completada |
+| 3 | `backend`: Casos de uso del módulo `lobby` | ✅ Completada |
 | 4 | `backend`: Infraestructura del módulo `lobby` | ⬜ Pendiente |
 | 5 | `backend`: Interfaces HTTP + WebSocket del módulo `lobby` | ⬜ Pendiente |
 | 6 | `frontend`: Dominio + puerto de la feature `lobby` | ⬜ Pendiente |

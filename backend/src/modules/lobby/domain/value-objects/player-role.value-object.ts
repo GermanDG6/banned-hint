@@ -1,4 +1,4 @@
-export type PlayerRoleType = 'describer' | 'guesser';
+export type PlayerRoleType = 'describer' | 'guesser'; //TODO - consider using an enum instead of a string literal type for better type safety and maintainability
 
 export class PlayerRole {
   readonly value: PlayerRoleType;
