@@ -1,6 +1,11 @@
 import { Player } from '@/features/lobby/domain/models/player.model.ts';
 
-export type LobbyStatus = 'waiting' | 'playing'; // TODO: refactor string literal types by as const object
+export const LobbyStatusType = {
+  Waiting: 'waiting',
+  Playing: 'playing',
+} as const;
+
+export type LobbyStatus = (typeof LobbyStatusType)[keyof typeof LobbyStatusType];
 
 export interface Lobby {
   code: string;

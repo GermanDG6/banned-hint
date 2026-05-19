@@ -3,12 +3,12 @@ import { JoinLobby } from './join-lobby.use-case';
 import { LobbyHttpPort } from '../ports/lobby-http.port';
 import { LobbySocket } from '../ports/lobby-socket.port';
 import { LobbyNotFoundException } from '../../domain/exceptions/lobby-not-found.exception';
-import { Lobby } from '../../domain/models/lobby.model.ts';
+import { Lobby, LobbyStatusType } from '../../domain/models/lobby.model.ts';
 
 describe('JoinLobby', () => {
   const fakeLobby: Lobby = {
     code: 'ABC123',
-    status: 'waiting',
+    status: LobbyStatusType.Waiting,
     players: [
       {
         id: 'player-1',
