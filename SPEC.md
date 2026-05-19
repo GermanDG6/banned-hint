@@ -554,7 +554,7 @@ Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma
 | 6 | `frontend`: Dominio + puerto de la feature `lobby` | ✅ Completada |
 | 7 | `frontend`: Infraestructura de la feature `lobby` | ✅ Completada |
 | 8 | `frontend`: `LobbyProvider` y contexto de dependencias | ✅ Completada |
-| 9 | `frontend`: Hook `useServerSyncedCountdown` | ⬜ Pendiente |
+| 9 | `frontend`: Hook `useServerSyncedCountdown` | ✅ Completada |
 | 10 | `frontend`: Hook `useLobby` | ⬜ Pendiente |
 | 11 | `frontend`: Páginas `CreateLobbyPage` y `WaitingRoomPage` | ⬜ Pendiente |
 | 12 | `frontend`: Nueva `GuesserPage` | ⬜ Pendiente |
