@@ -306,16 +306,18 @@ npm install @nestjs/websockets @nestjs/platform-socket.io socket.io -w backend
 
 **Alcance**: `frontend/src/features/lobby/domain/` y `frontend/src/features/lobby/application/`.  
 **Nuevos ficheros**:
-- `domain/models/lobby.model.ts` — interfaces `Lobby`, `Player`, `PlayerRole`, `RoundSession`.
-- `domain/value-objects/lobby-code.value-object.ts` — valida formato 6 chars `[A-Z0-9]`.
+- `domain/models/card-data.model.ts` — tipo plano `CardData` (sin acoplamiento a `features/card/`).
+- `domain/models/lobby.model.ts` — interfaces `Lobby`, `Player`, `RoundSession`; tipo `PlayerRole` con patrón `as const`.
+- `domain/value-objects/lobby-code.value-object.ts` — valida formato 6 chars `[A-Z0-9]`; incluye tests.
+- `domain/exceptions/lobby-not-found.exception.ts` — excepción tipada de dominio.
+- `application/ports/lobby-http.port.ts` — interfaz `LobbyHttpPort` (métodos `createLobby`, `getLobby`).
 - `application/ports/lobby-socket.port.ts` — interfaz `LobbySocket` (ver §4.5).
-- `application/use-cases/create-lobby.use-case.ts` — llama al port HTTP (no WS) `POST /api/lobby`, devuelve `{ code, role }`.
-- `application/use-cases/join-lobby.use-case.ts` — llama al port HTTP `GET /api/lobby/:code` para verificar que existe, luego conecta el socket con `joinLobby(code, name, role)`.
-- `application/ports/lobby-http.port.ts` — interfaz HTTP para `createLobby` y `getLobby`.
+- `application/use-cases/create-lobby.use-case.ts` — llama a `LobbyHttpPort.createLobby()`, devuelve `{ code, playerId, role }`; incluye tests.
+- `application/use-cases/join-lobby.use-case.ts` — verifica existencia del Lobby con `LobbyHttpPort.getLobby()`, lanza `LobbyNotFoundException` si no existe, luego conecta socket; incluye tests.
 
-**Tests**: casos de uso con fakes de los ports.
+**Tests**: todos los casos de uso + value objects pasan con fakes de los ports.
 
-**Verificación**: `npm run test -w frontend`.
+**Verificación**: ✅ `npm run test -w frontend` — 19 test files, 133 tests passed.
 
 ---
 
@@ -516,7 +518,7 @@ Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma
 | 3 | `backend`: Casos de uso del módulo `lobby` | ✅ Completada |
 | 4 | `backend`: Infraestructura del módulo `lobby` | ✅ Completada |
 | 5 | `backend`: Interfaces HTTP + WebSocket del módulo `lobby` | ✅ Completada |
-| 6 | `frontend`: Dominio + puerto de la feature `lobby` | ⬜ Pendiente |
+| 6 | `frontend`: Dominio + puerto de la feature `lobby` | ✅ Completada |
 | 7 | `frontend`: Infraestructura de la feature `lobby` | ⬜ Pendiente |
 | 8 | `frontend`: `LobbyProvider` y contexto de dependencias | ⬜ Pendiente |
 | 9 | `frontend`: Hook `useServerSyncedCountdown` | ⬜ Pendiente |
