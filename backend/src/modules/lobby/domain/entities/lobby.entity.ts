@@ -2,6 +2,7 @@ import { LobbyId } from '../value-objects/lobby-id.value-object';
 import { LobbyCode } from '../value-objects/lobby-code.value-object';
 import { LobbyStatus, LobbyStatusType } from '../value-objects/lobby-status.value-object';
 import { Player } from './player.entity';
+import { PlayerRoleType } from '../value-objects/player-role.value-object';
 import { RoundSession } from '../models/round-session.model';
 import { DescriberAlreadyExistsException } from '../exceptions/describer-already-exists.exception';
 import { OnlyDescriberCanException } from '../exceptions/only-describer-can.exception';
@@ -113,7 +114,11 @@ export class Lobby {
     // Replace the describer with a new instance with the socket ID
     const describerIndex = this.players.findIndex((p) => p.isDescriber());
     if (describerIndex !== -1) {
-      this.players[describerIndex] = Player.create(socketId, describer.name, 'describer');
+      this.players[describerIndex] = Player.create(
+        socketId,
+        describer.name,
+        PlayerRoleType.Describer,
+      );
     }
   }
 }

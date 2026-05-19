@@ -21,5 +21,3 @@ export class MongoCardRepository implements CardRepository {
     return Card.create(doc.word, doc.bannedWords, doc._id);
   }
 }
-
-// TODO revisar lógica para random : realmente se está haciendo un random? o se está devolviendo la primera ocurrencia? revisar si el método aggregate con $sample es la mejor opción para obtener un documento aleatorio de la colección.

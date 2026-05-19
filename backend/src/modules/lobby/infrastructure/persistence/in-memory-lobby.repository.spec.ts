@@ -2,6 +2,7 @@ import { InMemoryLobbyRepository } from './in-memory-lobby.repository';
 import { Lobby } from '../../domain/entities/lobby.entity';
 import { LobbyCode } from '../../domain/value-objects/lobby-code.value-object';
 import { Player } from '../../domain/entities/player.entity';
+import { PlayerRoleType } from '../../domain/value-objects/player-role.value-object';
 
 describe('InMemoryLobbyRepository', () => {
   let repository: InMemoryLobbyRepository;
@@ -13,7 +14,7 @@ describe('InMemoryLobbyRepository', () => {
   describe('save', () => {
     it('should persist a Lobby in memory', async () => {
       const code = LobbyCode.generate();
-      const player = Player.create('player-1', 'Alice', 'describer');
+      const player = Player.create('player-1', 'Alice', PlayerRoleType.Describer);
       const lobby = Lobby.create(code, player);
 
       await repository.save(lobby);
@@ -25,12 +26,12 @@ describe('InMemoryLobbyRepository', () => {
 
     it('should overwrite an existing Lobby with the same code', async () => {
       const code = LobbyCode.generate();
-      const player1 = Player.create('player-1', 'Alice', 'describer');
+      const player1 = Player.create('player-1', 'Alice', PlayerRoleType.Describer);
       const lobby1 = Lobby.create(code, player1);
 
       await repository.save(lobby1);
 
-      const player2 = Player.create('player-2', 'Bob', 'guesser');
+      const player2 = Player.create('player-2', 'Bob', PlayerRoleType.Guesser);
       lobby1.join(player2);
       await repository.save(lobby1);
 
@@ -42,7 +43,7 @@ describe('InMemoryLobbyRepository', () => {
   describe('findByCode', () => {
     it('should return a Lobby when it exists', async () => {
       const code = LobbyCode.generate();
-      const player = Player.create('player-1', 'Alice', 'describer');
+      const player = Player.create('player-1', 'Alice', PlayerRoleType.Describer);
       const lobby = Lobby.create(code, player);
 
       await repository.save(lobby);
@@ -61,10 +62,10 @@ describe('InMemoryLobbyRepository', () => {
 
     it('should preserve Lobby state after retrieval', async () => {
       const code = LobbyCode.generate();
-      const player1 = Player.create('player-1', 'Alice', 'describer');
+      const player1 = Player.create('player-1', 'Alice', PlayerRoleType.Describer);
       const lobby = Lobby.create(code, player1);
 
-      const player2 = Player.create('player-2', 'Bob', 'guesser');
+      const player2 = Player.create('player-2', 'Bob', PlayerRoleType.Guesser);
       lobby.join(player2);
 
       await repository.save(lobby);
@@ -76,7 +77,7 @@ describe('InMemoryLobbyRepository', () => {
 
     it('should return the exact same instance after save and retrieve', async () => {
       const code = LobbyCode.generate();
-      const player = Player.create('player-1', 'Alice', 'describer');
+      const player = Player.create('player-1', 'Alice', PlayerRoleType.Describer);
       const lobby = Lobby.create(code, player);
 
       await repository.save(lobby);
@@ -91,10 +92,10 @@ describe('InMemoryLobbyRepository', () => {
       const code1 = LobbyCode.generate();
       const code2 = LobbyCode.generate();
 
-      const player1 = Player.create('player-1', 'Alice', 'describer');
+      const player1 = Player.create('player-1', 'Alice', PlayerRoleType.Describer);
       const lobby1 = Lobby.create(code1, player1);
 
-      const player2 = Player.create('player-2', 'Bob', 'describer');
+      const player2 = Player.create('player-2', 'Bob', PlayerRoleType.Describer);
       const lobby2 = Lobby.create(code2, player2);
 
       await repository.save(lobby1);

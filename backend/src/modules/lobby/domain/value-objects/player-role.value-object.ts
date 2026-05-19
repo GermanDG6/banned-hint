@@ -1,4 +1,9 @@
-export type PlayerRoleType = 'describer' | 'guesser'; //TODO - consider using an enum instead of a string literal type for better type safety and maintainability
+export const PlayerRoleType = {
+  Describer: 'describer',
+  Guesser: 'guesser',
+} as const;
+
+export type PlayerRoleType = (typeof PlayerRoleType)[keyof typeof PlayerRoleType];
 
 export class PlayerRole {
   readonly value: PlayerRoleType;
@@ -8,26 +13,28 @@ export class PlayerRole {
   }
 
   static create(value: string): PlayerRole {
-    if (value !== 'describer' && value !== 'guesser') {
-      throw new Error(`Invalid PlayerRole: "${value}". Expected "describer" or "guesser".`);
+    if (value !== PlayerRoleType.Describer && value !== PlayerRoleType.Guesser) {
+      throw new Error(
+        `Invalid PlayerRole: "${value}". Expected "${PlayerRoleType.Describer}" or "${PlayerRoleType.Guesser}".`,
+      );
     }
     return new PlayerRole(value as PlayerRoleType);
   }
 
   static describer(): PlayerRole {
-    return new PlayerRole('describer');
+    return new PlayerRole(PlayerRoleType.Describer);
   }
 
   static guesser(): PlayerRole {
-    return new PlayerRole('guesser');
+    return new PlayerRole(PlayerRoleType.Guesser);
   }
 
   isDescriber(): boolean {
-    return this.value === 'describer';
+    return this.value === PlayerRoleType.Describer;
   }
 
   isGuesser(): boolean {
-    return this.value === 'guesser';
+    return this.value === PlayerRoleType.Guesser;
   }
 
   equals(other: PlayerRole): boolean {

@@ -11,8 +11,6 @@ export class CardSchema {
 
   @Prop({ type: [String], required: true })
   bannedWords: string[];
-
-  //TODO revisar si CardId debe ser necesario aquí
 }
 
 export type CardDocument = HydratedDocument<CardSchema>;

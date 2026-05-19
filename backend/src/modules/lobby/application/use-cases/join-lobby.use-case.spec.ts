@@ -3,6 +3,7 @@ import { LobbyRepository } from '../../domain/repositories/lobby.repository';
 import { Lobby } from '../../domain/entities/lobby.entity';
 import { Player } from '../../domain/entities/player.entity';
 import { LobbyCode } from '../../domain/value-objects/lobby-code.value-object';
+import { PlayerRoleType } from '../../domain/value-objects/player-role.value-object';
 import { JoinLobbyDto } from '../dtos/join-lobby.dto';
 import { LobbyNotFoundException } from '../../domain/exceptions/lobby-not-found.exception';
 
@@ -20,7 +21,7 @@ describe('JoinLobbyUseCase', () => {
 
   it('should add a guesser player to an existing lobby', async () => {
     const code = LobbyCode.from('TEST01');
-    const describer = Player.create('socket-1', 'Alice', 'describer');
+    const describer = Player.create('socket-1', 'Alice', PlayerRoleType.Describer);
     const lobby = Lobby.create(code, describer);
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
@@ -45,7 +46,7 @@ describe('JoinLobbyUseCase', () => {
 
   it('should accept code in different case and normalize it', async () => {
     const code = LobbyCode.from('TEST01');
-    const describer = Player.create('socket-1', 'Alice', 'describer');
+    const describer = Player.create('socket-1', 'Alice', PlayerRoleType.Describer);
     const lobby = Lobby.create(code, describer);
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
@@ -59,7 +60,7 @@ describe('JoinLobbyUseCase', () => {
 
   it('should persist the updated lobby', async () => {
     const code = LobbyCode.from('TEST01');
-    const describer = Player.create('socket-1', 'Alice', 'describer');
+    const describer = Player.create('socket-1', 'Alice', PlayerRoleType.Describer);
     const lobby = Lobby.create(code, describer);
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);

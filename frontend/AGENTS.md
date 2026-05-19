@@ -179,6 +179,48 @@ El frontend sigue principios **OOP** (Object-Oriented Programming) en el dominio
 - Usa tipos del dominio (`features/<feature>/domain/models/`, `domain/entities/`, `domain/value-objects/`) en lugar de tipos derivados de la respuesta de la API; mapea siempre en la capa de infraestructura.
 - Los formularios usan `react-hook-form` con validación tipada mediante `zod`; no gestiones estado de formulario manualmente.
 
+### Value Objects con conjunto acotado de valores
+
+Cuando un Value Object contiene un **conjunto fijo y bien definido de valores** (ej. `PlayerRole` con `describer` | `guesser`), define el tipo usando **`as const` + type alias** en lugar de union de string literals. Esto elimina magic strings en todo el codebase:
+
+```typescript
+// ✅ Recomendado: patrón as const
+export const PlayerRoleType = {
+  Describer: 'describer',
+  Guesser: 'guesser',
+} as const;
+
+export type PlayerRoleType = typeof PlayerRoleType[keyof typeof PlayerRoleType];
+
+export class PlayerRole {
+  readonly value: PlayerRoleType;
+
+  private constructor(value: PlayerRoleType) {
+    this.value = value;
+  }
+
+  static create(value: string): PlayerRole {
+    if (value !== PlayerRoleType.Describer && value !== PlayerRoleType.Guesser) {
+      throw new Error(`Invalid PlayerRole: "${value}". Expected "${PlayerRoleType.Describer}" or "${PlayerRoleType.Guesser}".`);
+    }
+    return new PlayerRole(value as PlayerRoleType);
+  }
+
+  // Métodos estáticos y validación usan PlayerRoleType.Describer, etc.
+}
+```
+
+**Ventajas del patrón `as const`**:
+- Cero overhead en runtime (borrado durante compilación).
+- Los callers usan `PlayerRoleType.Describer` en lugar de magic string `'describer'` — seguridad de tipos refactorizable.
+- Deserialización desde infraestructura (API responses, JSON) permanece typesafe: `PlayerRole.create(value: string)` recibe un `string` sin garantías, valida en tiempo de ejecución.
+- Compatible con `isolatedModules: true` (obligatorio en frontend) — `const enum` quedaría descartado.
+
+**No uses**:
+- `string enum Foo { Describer = 'describer' }` — emite código innecesario en runtime.
+- `const enum` — **incompatible con `isolatedModules: true`**.
+- Union de string literals sin referenciación nombrada (`'describer' | 'guesser'`) — permite magic strings, dificulta refactoring.
+
 ---
 
 ## Testing con Vitest

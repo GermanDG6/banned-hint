@@ -1,6 +1,8 @@
 import { Lobby } from './lobby.entity';
 import { Player } from './player.entity';
 import { LobbyCode } from '../value-objects/lobby-code.value-object';
+import { PlayerRoleType } from '../value-objects/player-role.value-object';
+import { LobbyStatusType } from '../value-objects/lobby-status.value-object';
 import { DescriberAlreadyExistsException } from '../exceptions/describer-already-exists.exception';
 import { LobbyId } from '../value-objects/lobby-id.value-object';
 
@@ -12,9 +14,9 @@ describe('Lobby', () => {
 
   beforeEach(() => {
     lobbyCode = LobbyCode.from('TEST01');
-    describer = Player.create('socket-1', 'Alice', 'describer');
-    guesser1 = Player.create('socket-2', 'Bob', 'guesser');
-    guesser2 = Player.create('socket-3', 'Charlie', 'guesser');
+    describer = Player.create('socket-1', 'Alice', PlayerRoleType.Describer);
+    guesser1 = Player.create('socket-2', 'Bob', PlayerRoleType.Guesser);
+    guesser2 = Player.create('socket-3', 'Charlie', PlayerRoleType.Guesser);
   });
 
   describe('create', () => {
@@ -53,7 +55,7 @@ describe('Lobby', () => {
     });
 
     it('should throw DescriberAlreadyExistsException when joining a second describer', () => {
-      const secondDescriber = Player.create('socket-99', 'Diana', 'describer');
+      const secondDescriber = Player.create('socket-99', 'Diana', PlayerRoleType.Describer);
       const lobby = Lobby.create(lobbyCode, describer);
 
       expect(() => lobby.join(secondDescriber)).toThrow(DescriberAlreadyExistsException);
@@ -185,7 +187,7 @@ describe('Lobby', () => {
         lobbyId,
         lobbyCode,
         [describer, guesser1],
-        'playing',
+        LobbyStatusType.Playing,
         roundSession,
       );
 

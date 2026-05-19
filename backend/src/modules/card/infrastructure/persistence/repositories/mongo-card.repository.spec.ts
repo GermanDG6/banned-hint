@@ -4,7 +4,7 @@ import { Card } from '../../../domain/entities/card.entity';
 describe('MongoCardRepository', () => {
   let repository: MongoCardRepository;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let mockCardModel: any; //TODO remove any is possible?
+  let mockCardModel: any;
 
   beforeEach(() => {
     mockCardModel = {

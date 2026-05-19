@@ -106,6 +106,48 @@ backend/
 - Usa `readonly` en propiedades de entidades y value objects que no deban mutar.
 - **Convención de nombres**: no uses prefijos (`I`, `Abstract`) ni sufijos (`Impl`, `Service`, `Repository`) artificiales. El nombre debe reflejar el concepto de dominio; el contexto (ubicación en capas) distingue la interfaz de la implementación.
 
+### Value Objects con conjunto acotado de valores
+
+Cuando un Value Object contiene un **conjunto fijo y bien definido de valores** (ej. `PlayerRole` con `describer` | `guesser`), define el tipo usando **`as const` + type alias** en lugar de union de string literals. Esto elimina magic strings en todo el codebase:
+
+```typescript
+// ✅ Recomendado: patrón as const
+export const PlayerRoleType = {
+  Describer: 'describer',
+  Guesser: 'guesser',
+} as const;
+
+export type PlayerRoleType = typeof PlayerRoleType[keyof typeof PlayerRoleType];
+
+export class PlayerRole {
+  readonly value: PlayerRoleType;
+
+  private constructor(value: PlayerRoleType) {
+    this.value = value;
+  }
+
+  static create(value: string): PlayerRole {
+    if (value !== PlayerRoleType.Describer && value !== PlayerRoleType.Guesser) {
+      throw new Error(`Invalid PlayerRole: "${value}". Expected "${PlayerRoleType.Describer}" or "${PlayerRoleType.Guesser}".`);
+    }
+    return new PlayerRole(value as PlayerRoleType);
+  }
+
+  // Métodos estáticos y validación usan PlayerRoleType.Describer, etc.
+}
+```
+
+**Ventajas del patrón `as const`**:
+- Cero overhead en runtime (borrado durante compilación).
+- Los callers usan `PlayerRoleType.Describer` en lugar de magic string `'describer'` — seguridad de tipos refactorizable.
+- Deserialización desde infraestructura (Mongoose, WebSocket) permanece typesafe: `PlayerRole.create(value: string)` recibe un `string` sin garantías, valida en tiempo de ejecución.
+- Compatible con `isolatedModules: true` del compilador (el frontend lo usa).
+
+**No uses**:
+- `string enum Foo { Describer = 'describer' }` — emite código innecesario en runtime.
+- `const enum` — incompatible con `isolatedModules: true`.
+- Union de string literals sin referenciación nombrada (`'describer' | 'guesser'`) — permite magic strings, dificulta refactoring.
+
 ---
 
 ## Testing con Jest y Supertest

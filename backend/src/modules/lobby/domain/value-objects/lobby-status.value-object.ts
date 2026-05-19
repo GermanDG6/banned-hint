@@ -1,4 +1,9 @@
-export type LobbyStatusType = 'waiting' | 'playing';
+export const LobbyStatusType = {
+  Waiting: 'waiting',
+  Playing: 'playing',
+} as const;
+
+export type LobbyStatusType = (typeof LobbyStatusType)[keyof typeof LobbyStatusType];
 
 export class LobbyStatus {
   readonly value: LobbyStatusType;
@@ -8,26 +13,28 @@ export class LobbyStatus {
   }
 
   static create(value: string): LobbyStatus {
-    if (value !== 'waiting' && value !== 'playing') {
-      throw new Error(`Invalid LobbyStatus: "${value}". Expected "waiting" or "playing".`);
+    if (value !== LobbyStatusType.Waiting && value !== LobbyStatusType.Playing) {
+      throw new Error(
+        `Invalid LobbyStatus: "${value}". Expected "${LobbyStatusType.Waiting}" or "${LobbyStatusType.Playing}".`,
+      );
     }
     return new LobbyStatus(value as LobbyStatusType);
   }
 
   static waiting(): LobbyStatus {
-    return new LobbyStatus('waiting');
+    return new LobbyStatus(LobbyStatusType.Waiting);
   }
 
   static playing(): LobbyStatus {
-    return new LobbyStatus('playing');
+    return new LobbyStatus(LobbyStatusType.Playing);
   }
 
   isWaiting(): boolean {
-    return this.value === 'waiting';
+    return this.value === LobbyStatusType.Waiting;
   }
 
   isPlaying(): boolean {
-    return this.value === 'playing';
+    return this.value === LobbyStatusType.Playing;
   }
 
   equals(other: LobbyStatus): boolean {
