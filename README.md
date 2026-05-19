@@ -56,8 +56,10 @@ banned-hint/
 │   └── ubiquitous-language.md # Definición de términos de dominio
 ├── frontend/                 # SPA — React + Vite + Tailwind + shadcn/ui
 │   ├── src/
-│   │   ├── components/ui/    # Componentes generados por shadcn/ui
-│   │   ├── pages/
+│   │   ├── features/         # Bounded contexts (card, round) con capas DDD
+│   │   ├── components/ui/    # Componentes del design system (CTAButton, …)
+│   │   ├── pages/            # Páginas enrutadas (HomePage, RoundPage)
+│   │   ├── shared/           # Utilidades transversales (http, session)
 │   │   ├── routes/
 │   │   ├── lib/utils.ts      # Helper cn() para Tailwind
 │   │   ├── App.tsx
