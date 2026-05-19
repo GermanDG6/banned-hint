@@ -1,26 +1,25 @@
-//TODO rename to PlayerRoleType
-export type PlayerRole = 'describer' | 'guesser';
-//TODO remove suffix VO
-export class PlayerRoleVO {
-  readonly value: PlayerRole;
+export type PlayerRoleType = 'describer' | 'guesser';
 
-  private constructor(value: PlayerRole) {
+export class PlayerRole {
+  readonly value: PlayerRoleType;
+
+  private constructor(value: PlayerRoleType) {
     this.value = value;
   }
 
-  static create(value: string): PlayerRoleVO {
+  static create(value: string): PlayerRole {
     if (value !== 'describer' && value !== 'guesser') {
       throw new Error(`Invalid PlayerRole: "${value}". Expected "describer" or "guesser".`);
     }
-    return new PlayerRoleVO(value as PlayerRole);
+    return new PlayerRole(value as PlayerRoleType);
   }
 
-  static describer(): PlayerRoleVO {
-    return new PlayerRoleVO('describer');
+  static describer(): PlayerRole {
+    return new PlayerRole('describer');
   }
 
-  static guesser(): PlayerRoleVO {
-    return new PlayerRoleVO('guesser');
+  static guesser(): PlayerRole {
+    return new PlayerRole('guesser');
   }
 
   isDescriber(): boolean {
@@ -31,7 +30,7 @@ export class PlayerRoleVO {
     return this.value === 'guesser';
   }
 
-  equals(other: PlayerRoleVO): boolean {
+  equals(other: PlayerRole): boolean {
     return this.value === other.value;
   }
 

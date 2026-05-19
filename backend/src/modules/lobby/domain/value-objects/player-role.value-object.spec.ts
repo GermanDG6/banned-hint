@@ -1,31 +1,31 @@
-import { PlayerRoleVO } from './player-role.value-object';
+import { PlayerRole } from './player-role.value-object';
 
 describe('PlayerRoleVO', () => {
   describe('create', () => {
     it('should create a describer role', () => {
-      const role = PlayerRoleVO.create('describer');
+      const role = PlayerRole.create('describer');
       expect(role.value).toBe('describer');
     });
 
     it('should create a guesser role', () => {
-      const role = PlayerRoleVO.create('guesser');
+      const role = PlayerRole.create('guesser');
       expect(role.value).toBe('guesser');
     });
 
     it('should throw error for invalid role', () => {
-      expect(() => PlayerRoleVO.create('invalid')).toThrow();
+      expect(() => PlayerRole.create('invalid')).toThrow();
     });
   });
 
   describe('helper methods', () => {
     it('should identify describer role', () => {
-      const role = PlayerRoleVO.describer();
+      const role = PlayerRole.describer();
       expect(role.isDescriber()).toBe(true);
       expect(role.isGuesser()).toBe(false);
     });
 
     it('should identify guesser role', () => {
-      const role = PlayerRoleVO.guesser();
+      const role = PlayerRole.guesser();
       expect(role.isGuesser()).toBe(true);
       expect(role.isDescriber()).toBe(false);
     });
