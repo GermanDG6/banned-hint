@@ -324,18 +324,26 @@ npm install @nestjs/websockets @nestjs/platform-socket.io socket.io -w backend
 ### Tarea 7 — `frontend`: Infraestructura de la feature `lobby`
 
 **Alcance**: `frontend/src/features/lobby/infrastructure/`.  
+**Cambios glogales previos**:
+- Extendido `shared/http/http-client.port.ts` añadiendo método `post<T>(url, body): Promise<T>`.
+- Implementado `post` en `shared/http/fetch-http-client.ts` siguiendo el mismo patrón que `get`.
+- Actualizado `shared/http/fetch-http-client.test.ts` con 6 nuevos tests para `post` (incluyendo serialización de objetos, errores 4xx/5xx, etc.).
+
 **Nuevos ficheros**:
-- `ws/socket-io-lobby-socket.ts` — implementa `LobbySocket` usando `socket.io-client`. Gestiona la conexión, el `connect()` / `disconnect()` y tutti los eventos.
-- `http/http-lobby.repository.ts` — implementa `LobbyHttpPort` usando `FetchHttpClient` existente.
+- `http/lobby-api-response.type.ts` — tipo que mapea la respuesta de `GET /api/lobby/:code`.
+- `http/http-lobby.repository.ts` — implementa `LobbyHttpPort` usando `FetchHttpClient`. Captura status 404 y devuelve `null` (resultado válido, no excepción).
+- `http/http-lobby.repository.test.ts` — 8 tests unitarios con mocks de `HttpClient`.
+- `ws/socket-io-lobby-socket.ts` — implementa `LobbySocket` usando `socket.io-client`. Gestiona `connect()` / `disconnect()`, 5 métodos de emisión y 5 handlers de eventos con validación de conexión.
+- `ws/socket-io-lobby-socket.test.ts` — 27 tests unitarios mockeando `socket.io-client` al nivel de módulo con `vi.mock`.
 
-**Instalación de dependencias**:
-```bash
-npm install socket.io-client -w frontend
-```
+**Instalación de dependencias**: ✅ `npm install socket.io-client -w frontend`.
 
-**Tests**: `socket-io-lobby-socket.test.ts` con un servidor Socket.IO real levantado en el test (o mock de la librería). `http-lobby.repository.test.ts` con `msw`.
+**Tests**: todos los tests pasan.
+- FetchHttpClient: 9 tests (incluyendo métodos `get` y `post`)
+- HttpLobbyRepository: 8 tests (cases de `createLobby` y `getLobby` con 404 handling)
+- SocketIOLobbySocket: 27 tests (conexión, emisión de eventos, registro de handlers)
 
-**Verificación**: `npm run test -w frontend`.
+**Verificación**: ✅ `npm run test -w frontend` — 21 test files, 173 tests passed; `npm run lint -w frontend` — sin errores.
 
 ---
 
@@ -519,7 +527,7 @@ Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma
 | 4 | `backend`: Infraestructura del módulo `lobby` | ✅ Completada |
 | 5 | `backend`: Interfaces HTTP + WebSocket del módulo `lobby` | ✅ Completada |
 | 6 | `frontend`: Dominio + puerto de la feature `lobby` | ✅ Completada |
-| 7 | `frontend`: Infraestructura de la feature `lobby` | ⬜ Pendiente |
+| 7 | `frontend`: Infraestructura de la feature `lobby` | ✅ Completada |
 | 8 | `frontend`: `LobbyProvider` y contexto de dependencias | ⬜ Pendiente |
 | 9 | `frontend`: Hook `useServerSyncedCountdown` | ⬜ Pendiente |
 | 10 | `frontend`: Hook `useLobby` | ⬜ Pendiente |
