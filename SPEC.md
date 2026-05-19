@@ -514,8 +514,8 @@ Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma
 | 1 | `docs/`: Actualizar lenguaje ubicuo y overview | ✅ Completada |
 | 2 | `backend`: Dominio del módulo `lobby` | ✅ Completada |
 | 3 | `backend`: Casos de uso del módulo `lobby` | ✅ Completada |
-| 4 | `backend`: Infraestructura del módulo `lobby` | ⬜ Pendiente |
-| 5 | `backend`: Interfaces HTTP + WebSocket del módulo `lobby` | ⬜ Pendiente |
+| 4 | `backend`: Infraestructura del módulo `lobby` | ✅ Completada |
+| 5 | `backend`: Interfaces HTTP + WebSocket del módulo `lobby` | ✅ Completada |
 | 6 | `frontend`: Dominio + puerto de la feature `lobby` | ⬜ Pendiente |
 | 7 | `frontend`: Infraestructura de la feature `lobby` | ⬜ Pendiente |
 | 8 | `frontend`: `LobbyProvider` y contexto de dependencias | ⬜ Pendiente |

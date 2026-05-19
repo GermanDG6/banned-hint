@@ -3,11 +3,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CardModule } from './modules/card/card.module';
+import { LobbyModule } from './modules/lobby/lobby.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot(process.env.MONGODB_URI ?? 'mongodb://localhost:27017/banned-hint'),
     CardModule,
+    LobbyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

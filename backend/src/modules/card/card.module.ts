@@ -16,5 +16,6 @@ import { CARD_REPOSITORY } from './domain/repositories/card.repository';
       useClass: MongoCardRepository,
     },
   ],
+  exports: [CARD_REPOSITORY],
 })
 export class CardModule {}

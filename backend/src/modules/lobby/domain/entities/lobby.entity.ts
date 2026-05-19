@@ -104,4 +104,16 @@ export class Lobby {
       throw new OnlyDescriberCanException();
     }
   }
+
+  assignDescriberId(socketId: string): void {
+    const describer = this.findDescriber();
+    if (!describer) {
+      throw new OnlyDescriberCanException('No describer found to assign socket');
+    }
+    // Replace the describer with a new instance with the socket ID
+    const describerIndex = this.players.findIndex((p) => p.isDescriber());
+    if (describerIndex !== -1) {
+      this.players[describerIndex] = Player.create(socketId, describer.name, 'describer');
+    }
+  }
 }
