@@ -26,7 +26,7 @@ describe('JoinLobbyUseCase', () => {
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
 
-    const input = new JoinLobbyDto('TEST01', 'Bob');
+    const input = new JoinLobbyDto('TEST01', 'Bob', 'bob-player-id');
     const result = await useCase.execute(input);
 
     expect(result.role).toBe('guesser');
@@ -39,7 +39,7 @@ describe('JoinLobbyUseCase', () => {
   it('should throw LobbyNotFoundException if lobby does not exist', async () => {
     lobbyRepositoryMock.findByCode.mockResolvedValue(null);
 
-    const input = new JoinLobbyDto('TEST02', 'Charlie');
+    const input = new JoinLobbyDto('TEST02', 'Charlie', 'charlie-player-id');
 
     await expect(useCase.execute(input)).rejects.toThrow(LobbyNotFoundException);
   });
@@ -51,7 +51,7 @@ describe('JoinLobbyUseCase', () => {
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
 
-    const input = new JoinLobbyDto('test01', 'Diana');
+    const input = new JoinLobbyDto('test01', 'Diana', 'diana-player-id');
     const result = await useCase.execute(input);
 
     expect(result.role).toBe('guesser');
@@ -65,7 +65,7 @@ describe('JoinLobbyUseCase', () => {
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
 
-    const input = new JoinLobbyDto('TEST01', 'Eve');
+    const input = new JoinLobbyDto('TEST01', 'Eve', 'eve-player-id');
     await useCase.execute(input);
 
     expect(lobbyRepositoryMock.save).toHaveBeenCalledTimes(1);

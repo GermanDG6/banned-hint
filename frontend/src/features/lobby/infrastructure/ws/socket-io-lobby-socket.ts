@@ -31,7 +31,7 @@ export class SocketIOLobbySocket implements LobbySocket {
     }
   }
 
-  joinLobby(code: string, playerName: string, role: PlayerRole): void {
+  joinLobby(code: string, playerName: string, role: PlayerRole, playerId?: string): void {
     if (!this.socket) {
       throw new Error('Socket not connected. Call connect() first.');
     }
@@ -39,6 +39,7 @@ export class SocketIOLobbySocket implements LobbySocket {
       code,
       playerName,
       role,
+      ...(playerId && { playerId }),
     });
   }
 

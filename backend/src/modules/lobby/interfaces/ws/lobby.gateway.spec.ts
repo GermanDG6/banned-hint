@@ -117,8 +117,9 @@ describe('LobbyGateway', () => {
       expect(mockSocket.join).toHaveBeenCalledWith('ABC123');
     });
 
-    it('should join guesser using use-case when role is guesser', async () => {
+    it('should join guesser using use-case when role is guesser and player is new', async () => {
       const mockLobby = {
+        findGuesserById: jest.fn().mockReturnValue(undefined), // Player does not exist yet
         getPlayers: jest.fn().mockReturnValue([
           { id: 'socket-1', name: 'John', isDescriber: jest.fn().mockReturnValue(true) },
           { id: 'player-2', name: 'Jane', isDescriber: jest.fn().mockReturnValue(false) },
@@ -132,12 +133,40 @@ describe('LobbyGateway', () => {
         code: 'ABC123',
         playerName: 'Jane',
         role: 'guesser',
+        playerId: 'player-2',
       });
 
+      expect(mockLobby.findGuesserById).toHaveBeenCalledWith('player-2');
       expect(mockJoinLobby.execute).toHaveBeenCalledWith({
         code: 'ABC123',
         playerName: 'Jane',
+        playerId: 'player-2',
       });
+      expect(mockSocket.join).toHaveBeenCalledWith('ABC123');
+    });
+
+    it('should not call use-case when guesser already exists (reconnect)', async () => {
+      const mockLobby = {
+        findGuesserById: jest
+          .fn()
+          .mockReturnValue({ id: 'player-2', name: 'Jane', isDescriber: () => false }),
+        getPlayers: jest.fn().mockReturnValue([
+          { id: 'socket-1', name: 'John', isDescriber: jest.fn().mockReturnValue(true) },
+          { id: 'player-2', name: 'Jane', isDescriber: jest.fn().mockReturnValue(false) },
+        ]),
+      };
+
+      mockLobbyRepository.findByCode.mockResolvedValue(mockLobby);
+
+      await gateway.handleJoinLobby(mockSocket, {
+        code: 'ABC123',
+        playerName: 'Jane',
+        role: 'guesser',
+        playerId: 'player-2',
+      });
+
+      expect(mockLobby.findGuesserById).toHaveBeenCalledWith('player-2');
+      expect(mockJoinLobby.execute).not.toHaveBeenCalled();
       expect(mockSocket.join).toHaveBeenCalledWith('ABC123');
     });
 

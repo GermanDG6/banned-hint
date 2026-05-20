@@ -15,26 +15,19 @@ export class JoinLobbyUseCase {
   ) {}
 
   async execute(input: JoinLobbyDto): Promise<JoinLobbyResponseDto> {
-    // Validate the code format
     const lobbyCode = LobbyCode.from(input.code);
 
-    // Find the lobby
     const lobby = await this.lobbyRepository.findByCode(lobbyCode.value);
     if (!lobby) {
       throw new LobbyNotFoundException(`Lobby with code ${input.code} not found`);
     }
 
-    // Create a new guesser player
-    // Note: socket.id will be assigned when the socket connects; here we use empty for now
-    const guesserPlayer = Player.create('', input.playerName, PlayerRoleType.Guesser);
+    const guesserPlayer = Player.create(input.playerId, input.playerName, PlayerRoleType.Guesser);
 
-    // Add the player to the lobby
     lobby.join(guesserPlayer);
 
-    // Persist the updated lobby
     await this.lobbyRepository.save(lobby);
 
-    // Return the response
     return new JoinLobbyResponseDto(guesserPlayer.id, 'guesser');
   }
 }

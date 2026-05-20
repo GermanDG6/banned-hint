@@ -42,41 +42,48 @@ export class LobbyGateway implements OnGatewayDisconnect {
   @SubscribeMessage('join-lobby')
   async handleJoinLobby(
     client: Socket,
-    payload: { code: string; playerName: string; role: 'describer' | 'guesser' },
+    payload: { code: string; playerName: string; role: 'describer' | 'guesser'; playerId?: string },
   ) {
     try {
-      const { code, playerName, role } = payload;
+      const { code, playerName, role, playerId } = payload;
 
-      let playerId: string;
+      let connectedPlayerId: string;
 
       if (role === 'describer') {
-        // For describer: fetch the existing lobby and assign the socket ID
         const lobby = await this.lobbyRepository.findByCode(code);
         if (!lobby) {
           client.emit('error', { message: 'Lobby not found' });
           return;
         }
 
-        // Update the describer's socket ID
         // NOTE: MVP limitation - no authentication; any client can claim the describer role
         lobby.assignDescriberId(client.id);
         await this.lobbyRepository.save(lobby);
 
-        playerId = client.id;
+        connectedPlayerId = client.id;
       } else {
-        // For guesser: use the join-lobby use-case
-        const result = await this.joinLobbyUseCase.execute({
-          code,
-          playerName,
-        });
-        playerId = result.playerId;
+        const lobby = await this.lobbyRepository.findByCode(code);
+        if (!lobby) {
+          client.emit('error', { message: 'Lobby not found' });
+          return;
+        }
+
+        const existingGuesser = playerId ? lobby.findGuesserById(playerId) : undefined;
+        if (existingGuesser) {
+          connectedPlayerId = existingGuesser.id;
+        } else {
+          const result = await this.joinLobbyUseCase.execute({
+            code,
+            playerName,
+            playerId: playerId || '',
+          });
+          connectedPlayerId = result.playerId;
+        }
       }
 
-      // Join the socket to the room
       client.join(code);
 
-      // Store the socket context
-      this.socketMap.set(client.id, { lobbyCode: code, playerId });
+      this.socketMap.set(client.id, { lobbyCode: code, playerId: connectedPlayerId });
 
       // Emit lobby-updated event to the entire room
       const lobby = await this.lobbyRepository.findByCode(code);
@@ -107,14 +114,12 @@ export class LobbyGateway implements OnGatewayDisconnect {
         durationSeconds: payload.durationSeconds,
       });
 
-      // Emit to describer with card data
       client.emit('round-started', {
         startAt: result.startAt,
         durationSeconds: result.durationSeconds,
         card: result.card,
       });
 
-      // Emit to guessers without card data
       client.to(context.lobbyCode).emit('round-started', {
         startAt: result.startAt,
         durationSeconds: result.durationSeconds,
@@ -138,13 +143,11 @@ export class LobbyGateway implements OnGatewayDisconnect {
         playerId: context.playerId,
       });
 
-      // Emit to describer with card data
       client.emit('card-changed', {
         startAt: result.startAt,
         card: result.card,
       });
 
-      // Emit to guessers without card data
       client.to(context.lobbyCode).emit('card-changed', {
         startAt: result.startAt,
       });
@@ -167,7 +170,6 @@ export class LobbyGateway implements OnGatewayDisconnect {
         word: payload.word,
       });
 
-      // Emit result only to the guesser who submitted
       client.emit('guess-result', {
         correct: result.correct,
       });
@@ -177,9 +179,6 @@ export class LobbyGateway implements OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
-    // Clean up: remove the socket from the map
-    // Note: the Player remains in the Lobby aggregate (MVP limitation)
-    // In a future version with persistence, we might want to remove players after a timeout
     this.socketMap.delete(client.id);
   }
 }

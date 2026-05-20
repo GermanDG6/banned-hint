@@ -1,8 +1,9 @@
 import { useParams, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import styles from './WaitingRoomPage.module.css';
 import { useJoinLobby } from '@/features/lobby/infrastructure/lobby-dependencies.context';
 import { PlayerRole } from '@/features/lobby/domain/models/player.model';
+import { LobbyPlayerSession } from '@/features/lobby/infrastructure/lobby-player.session';
 import { JoinLobbyForm } from '../../components';
 import { ConnectedWaitingRoom } from './ConnectedWaitingRoom';
 
@@ -27,27 +28,49 @@ export function WaitingRoomPage() {
   const [connectionError, setConnectionError] = useState<string | null>(null);
 
   const state = location.state as LocationState | null;
+  const sessionData = useMemo(() => LobbyPlayerSession.load(), []);
 
-  // Efecto: Host conecta automáticamente al montar
   useEffect(() => {
-    if (!code || !state) return;
+    if (!code) return;
+
+    const sourceData = state || sessionData;
+    if (!sourceData) return;
 
     joinLobby
-      .execute(code, state.playerName, 'describer')
+      .execute(code, sourceData.playerName, sourceData.role, sourceData.playerId)
       .then(() => {
-        setJoinedState({ role: 'describer', durationSeconds: state.durationSeconds });
+        setJoinedState({
+          role: sourceData.role,
+          durationSeconds: sourceData.durationSeconds,
+        });
+        // Guardar sesión tras conexión exitosa
+        LobbyPlayerSession.save({
+          playerId: sourceData.playerId,
+          playerName: sourceData.playerName,
+          role: sourceData.role,
+          durationSeconds: sourceData.durationSeconds,
+        });
       })
       .catch((err: unknown) => {
         const message = err instanceof Error ? err.message : 'Error al conectar a la sala';
         setConnectionError(message);
       });
-  }, [code, state, joinLobby]);
+  }, [code, state, sessionData, joinLobby]);
 
   const handleGuestJoin = async (playerName: string) => {
     if (!code) return;
     try {
-      await joinLobby.execute(code, playerName, 'guesser');
+      const playerId = crypto.randomUUID();
+
+      await joinLobby.execute(code, playerName, 'guesser', playerId);
       setJoinedState({ role: 'guesser', durationSeconds: 0 });
+      // Guardar sesión tras unirse exitosamente
+      LobbyPlayerSession.save({
+        playerId,
+        playerName,
+        role: 'guesser',
+        durationSeconds: 0,
+      });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al unirse a la sala';
       setConnectionError(message);
@@ -56,7 +79,7 @@ export function WaitingRoomPage() {
   };
 
   if (!joinedState) {
-    if (!state) {
+    if (!state && !sessionData) {
       return (
         <main className={styles.page}>
           <div className={styles.container}>

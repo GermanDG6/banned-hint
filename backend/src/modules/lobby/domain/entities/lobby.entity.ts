@@ -121,4 +121,8 @@ export class Lobby {
       );
     }
   }
+
+  findGuesserById(playerId: string): Player | undefined {
+    return this.players.find((p) => p.isGuesser() && p.id === playerId);
+  }
 }

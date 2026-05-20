@@ -9,13 +9,18 @@ export class JoinLobby {
     private readonly lobbySocket: LobbySocket,
   ) {}
 
-  async execute(code: string, playerName: string, role: PlayerRole): Promise<void> {
+  async execute(
+    code: string,
+    playerName: string,
+    role: PlayerRole,
+    playerId?: string,
+  ): Promise<void> {
     const lobby = await this.lobbyHttpPort.getLobby(code);
     if (!lobby) {
       throw new LobbyNotFoundException(code);
     }
 
     this.lobbySocket.connect();
-    this.lobbySocket.joinLobby(code, playerName, role);
+    this.lobbySocket.joinLobby(code, playerName, role, playerId);
   }
 }

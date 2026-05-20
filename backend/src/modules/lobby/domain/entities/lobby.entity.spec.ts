@@ -173,6 +173,36 @@ describe('Lobby', () => {
     });
   });
 
+  describe('findGuesserById', () => {
+    it('should return the guesser with the given playerId', () => {
+      const lobby = Lobby.create(lobbyCode, describer);
+      lobby.join(guesser1);
+
+      const found = lobby.findGuesserById(guesser1.id);
+
+      expect(found).toBeDefined();
+      expect(found!.name).toBe('Bob');
+      expect(found!.isGuesser()).toBe(true);
+    });
+
+    it('should return undefined when no guesser with that playerId exists', () => {
+      const lobby = Lobby.create(lobbyCode, describer);
+      lobby.join(guesser1);
+
+      const found = lobby.findGuesserById('unknown-player-id');
+
+      expect(found).toBeUndefined();
+    });
+
+    it('should not match a describer even if ID matches', () => {
+      const lobby = Lobby.create(lobbyCode, describer);
+
+      const found = lobby.findGuesserById(describer.id);
+
+      expect(found).toBeUndefined();
+    });
+  });
+
   describe('restore', () => {
     it('should restore a Lobby from persisted data', () => {
       const lobbyId = LobbyId.generate();
