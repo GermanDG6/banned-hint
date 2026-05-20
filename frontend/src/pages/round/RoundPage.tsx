@@ -5,7 +5,7 @@ import { RoundConfigSession } from '@/shared/session/round-config.session';
 import { Timer } from '@/features/round/domain/value-objects/timer.value-object';
 import { useCountdown } from '@/features/round/ui/hooks/use-countdown.hook';
 import { useRandomCard } from '@/features/card/ui/hooks/use-get-random-card.hook';
-import { TimerDisplay } from '@/features/round/ui/components/TimerDisplay/TimerDisplay';
+import { TimerDisplay } from '@/components/ui/timer-display/TimerDisplay';
 import { GameCard } from '@/features/card/ui/components/GameCard/GameCard';
 import { CTAButton } from '@/components/ui/cta-button/CTAButton';
 

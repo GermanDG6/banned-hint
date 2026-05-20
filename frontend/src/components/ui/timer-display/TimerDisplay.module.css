@@ -1,4 +1,4 @@
-/* frontend/src/features/round/ui/components/TimerDisplay/TimerDisplay.module.css */
+/* frontend/src/components/ui/timer-display/TimerDisplay.module.css */
 
 .container {
   @apply flex items-center justify-center gap-2;

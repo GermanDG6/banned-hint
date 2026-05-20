@@ -14,3 +14,4 @@ export function TimerDisplay({ formatted }: TimerDisplayProps) {
     </div>
   );
 }
+

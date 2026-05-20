@@ -19,3 +19,4 @@ describe('TimerDisplay', () => {
     expect(screen.getByText('01:29')).toBeInTheDocument();
   });
 });
+
