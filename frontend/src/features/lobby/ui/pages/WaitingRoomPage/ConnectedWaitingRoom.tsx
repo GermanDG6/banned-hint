@@ -26,7 +26,7 @@ export function ConnectedWaitingRoom({ code, myRole, durationSeconds }: Connecte
     if (!lobby.roundSession) return;
 
     if (myRole === PlayerRoleType.Describer) {
-      navigate('/round', { state: { roundSession: lobby.roundSession } });
+      navigate('/round/describe', { state: { roundSession: lobby.roundSession } });
     } else {
       navigate('/round/guess', { state: { roundSession: lobby.roundSession } });
     }

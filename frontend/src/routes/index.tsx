@@ -16,6 +16,10 @@ const GuesserPage = lazy(() =>
   import('../features/lobby/ui/pages').then((m) => ({ default: m.GuesserPage })),
 );
 
+const DescriberPage = lazy(() =>
+  import('../features/lobby/ui/pages').then((m) => ({ default: m.DescriberPage })),
+);
+
 const RoundPage = lazy(() =>
   import('../pages/round/RoundPage').then((m) => ({ default: m.RoundPage })),
 );
@@ -53,8 +57,16 @@ export const router = createBrowserRouter([
         path: 'round',
         element: (
           <Suspense fallback={<div>Loading...</div>}>
+            <RoundPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'round/describe',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
             <LobbyDependenciesProvider>
-              <RoundPage />
+              <DescriberPage />
             </LobbyDependenciesProvider>
           </Suspense>
         ),
