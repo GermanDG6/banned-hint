@@ -12,6 +12,10 @@ const WaitingRoomPage = lazy(() =>
   import('../features/lobby/ui/pages').then((m) => ({ default: m.WaitingRoomPage })),
 );
 
+const GuesserPage = lazy(() =>
+  import('../features/lobby/ui/pages').then((m) => ({ default: m.GuesserPage })),
+);
+
 const RoundPage = lazy(() =>
   import('../pages/round/RoundPage').then((m) => ({ default: m.RoundPage })),
 );
@@ -60,7 +64,7 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<div>Loading...</div>}>
             <LobbyDependenciesProvider>
-              <div>GuesserPage - Coming soon</div>
+              <GuesserPage />
             </LobbyDependenciesProvider>
           </Suspense>
         ),

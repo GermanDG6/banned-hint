@@ -104,11 +104,12 @@ describe('useLobby', () => {
     vi.mocked(useLobbySocket).mockReturnValue(fakeLobbySocket as unknown as LobbySocket);
   });
 
-  it('should initialize with empty players, null roundSession, and isConnected as false', () => {
+  it('should initialize with empty players, null roundSession, null guessResult, and isConnected as false', () => {
     const { result } = renderHook(() => useLobby({ myRole: null }));
 
     expect(result.current.players).toEqual([]);
     expect(result.current.roundSession).toBeNull();
+    expect(result.current.guessResult).toBeNull();
     expect(result.current.isConnected).toBe(false);
   });
 
@@ -170,6 +171,64 @@ describe('useLobby', () => {
     expect(result.current.roundSession).toEqual(session);
   });
 
+  it('should update guessResult when onGuessResult event fires', () => {
+    const { result } = renderHook(() => useLobby({ myRole: null }));
+
+    act(() => {
+      fakeLobbySocket._emit('guess-result', { correct: true });
+    });
+
+    expect(result.current.guessResult).toEqual({ correct: true });
+  });
+
+  it('should reset guessResult to null when onRoundStarted event fires', () => {
+    const { result } = renderHook(() => useLobby({ myRole: null }));
+
+    // Primero establecer un guessResult
+    act(() => {
+      fakeLobbySocket._emit('guess-result', { correct: false });
+    });
+
+    expect(result.current.guessResult).toEqual({ correct: false });
+
+    // Luego disparar round-started que debe resetear guessResult
+    const session: RoundSession = {
+      startAt: 1000,
+      durationSeconds: 60,
+    };
+
+    act(() => {
+      fakeLobbySocket._emit('round-started', session);
+    });
+
+    expect(result.current.guessResult).toBeNull();
+    expect(result.current.roundSession).toEqual(session);
+  });
+
+  it('should reset guessResult to null when onCardChanged event fires', () => {
+    const { result } = renderHook(() => useLobby({ myRole: null }));
+
+    // Primero establecer un guessResult
+    act(() => {
+      fakeLobbySocket._emit('guess-result', { correct: true });
+    });
+
+    expect(result.current.guessResult).toEqual({ correct: true });
+
+    // Luego disparar card-changed que debe resetear guessResult
+    const session: RoundSession = {
+      startAt: 2000,
+      durationSeconds: 60,
+    };
+
+    act(() => {
+      fakeLobbySocket._emit('card-changed', session);
+    });
+
+    expect(result.current.guessResult).toBeNull();
+    expect(result.current.roundSession).toEqual(session);
+  });
+
   it('should preserve myRole from options', () => {
     const { result } = renderHook(() => useLobby({ myRole: PlayerRoleType.Describer }));
 
@@ -215,12 +274,14 @@ describe('useLobby', () => {
       const lobbyUpdatedCleanups = fakeLobbySocket._getCleanups('lobby-updated');
       const roundStartedCleanups = fakeLobbySocket._getCleanups('round-started');
       const cardChangedCleanups = fakeLobbySocket._getCleanups('card-changed');
+      const guessResultCleanups = fakeLobbySocket._getCleanups('guess-result');
 
       // Verificar que los handlers fueron registrados
       expect(connectCleanups.length).toBeGreaterThan(0);
       expect(lobbyUpdatedCleanups.length).toBeGreaterThan(0);
       expect(roundStartedCleanups.length).toBeGreaterThan(0);
       expect(cardChangedCleanups.length).toBeGreaterThan(0);
+      expect(guessResultCleanups.length).toBeGreaterThan(0);
 
       // Desmontar el hook
       unmount();
@@ -236,6 +297,9 @@ describe('useLobby', () => {
         expect(cleanup).toHaveBeenCalled();
       });
       cardChangedCleanups.forEach((cleanup) => {
+        expect(cleanup).toHaveBeenCalled();
+      });
+      guessResultCleanups.forEach((cleanup) => {
         expect(cleanup).toHaveBeenCalled();
       });
     });

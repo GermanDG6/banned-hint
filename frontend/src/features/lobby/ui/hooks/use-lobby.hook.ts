@@ -21,6 +21,7 @@ interface UseLobbyResult {
   roundSession: RoundSession | null;
   myRole: PlayerRole | null;
   isConnected: boolean;
+  guessResult: { correct: boolean } | null;
   startRound: (durationSeconds: number) => void;
   nextCard: () => void;
   submitGuess: (word: string) => void;
@@ -41,6 +42,7 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
   const [players, setPlayers] = useState<Player[]>([]);
   const [roundSession, setRoundSession] = useState<RoundSession | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [guessResult, setGuessResult] = useState<{ correct: boolean } | null>(null);
 
   useEffect(() => {
     // Registrar handlers y guardar sus funciones de cleanup
@@ -54,10 +56,16 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
 
     const cleanupRoundStarted = socket.onRoundStarted((session) => {
       setRoundSession(session);
+      setGuessResult(null); // Limpiar resultado anterior al iniciar nueva ronda
     });
 
     const cleanupCardChanged = socket.onCardChanged((session) => {
       setRoundSession(session);
+      setGuessResult(null); // Limpiar resultado anterior al cambiar carta
+    });
+
+    const cleanupGuessResult = socket.onGuessResult((result) => {
+      setGuessResult(result);
     });
 
     // Cleanup: desuscribir todos los handlers al desmontar
@@ -66,6 +74,7 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
       cleanupLobbyUpdated();
       cleanupRoundStarted();
       cleanupCardChanged();
+      cleanupGuessResult();
     };
   }, [socket]);
 
@@ -86,6 +95,7 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
     roundSession,
     myRole,
     isConnected,
+    guessResult,
     startRound,
     nextCard,
     submitGuess,
