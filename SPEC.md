@@ -476,19 +476,31 @@ npm install @nestjs/websockets @nestjs/platform-socket.io socket.io -w backend
 
 ---
 
-### Tarea 13 — `frontend`: Adaptar `RoundPage` al modo multijugador
+### Tarea 13 — `frontend`: Crear `DescriberPage` para modo multijugador
 
-**Alcance**: `frontend/src/pages/round/RoundPage.tsx` (y su test).  
-**Cambios**:
-- Sustituir `useRandomCard` por la `card` que llega de `useLobby().roundSession.card`.
-- Sustituir `useCountdown` por `useServerSyncedCountdown` con `startAt` y `durationSeconds` de `roundSession`.
-- El botón "Siguiente" llama a `useLobby().nextCard()` en lugar de `reload()`.
-- Eliminar botón "Pausa/Continuar" (timer sincronizado, no local).
-- `RoundConfigSession` deja de usarse en esta página (la config viene del servidor).
+**Alcance**: `frontend/src/features/lobby/ui/pages/DescriberPage/` y actualizar rutas.  
+**Nuevos ficheros**:
+- `DescriberPage.tsx` — página para el rol `Describer` en modo multijugador. Estructura idéntica a `GuesserPage` pero sin formulario; renderiza `ActiveCardView` y botón "Siguiente".
+- `DescriberPage.test.tsx` — tests RTL: timer visible, card renderizada, botón "Siguiente" llama a `nextCard()`, redirección sin state, actualización reactiva de card.
+- `DescriberPage.module.css` — estilos con Tailwind + `@apply`.
 
-**Tests**: actualizar `RoundPage.test.tsx` para mockear `useLobby`.
+**Cambios en `features/lobby/ui/components/ActiveCardView/`** (nuevo componente):
+- `ActiveCardView.tsx` — renderiza `CardData` (tipo plano). Acepta `card: CardData | undefined` y `loading?: boolean`. Muestra palabra en mayúsculas y lista de palabras prohibidas.
+- `ActiveCardView.test.tsx` — tests RTL básicos.
+- `ActiveCardView.module.css` — estilos.
 
-**Nota**: `useRandomCard` y `useCountdown` siguen existiendo sin modificar (respetan OCP).
+**Cambios en `features/lobby/ui/pages/WaitingRoomPage/ConnectedWaitingRoom.tsx`**:
+- Redirigir `Describer` a `/round/describe` en lugar de `/round`.
+
+**Cambios en `routes/index.tsx`**:
+- Añadir ruta `/round/describe` → `<DescriberPage>` con lazy + `LobbyDependenciesProvider`.
+- Restaurar ruta `/round` → `<RoundPage>` sin `LobbyDependenciesProvider` (modo solo).
+
+**Tests**:
+- `ActiveCardView.test.tsx`: 5 tests (renderizado de palabra, palabras prohibidas, loading, null).
+- `DescriberPage.test.tsx`: 7 tests (redirección, timer visible, card renderizada, botón, nextCard, countdown params, actualización reactiva).
+
+**Nota**: `RoundPage` se mantiene intacta para modo en solitario; no es adaptada al multijugador.
 
 **Verificación**: `npm run test -w frontend`.
 
@@ -573,7 +585,7 @@ Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma
 | 10 | `frontend`: Hook `useLobby` | ✅ Completada |
 | 11 | `frontend`: Páginas `CreateLobbyPage` y `WaitingRoomPage` | ✅ Completada |
 | 12 | `frontend`: Nueva `GuesserPage` | ✅ Completada |
-| 13 | `frontend`: Adaptar `RoundPage` al modo multijugador | ⬜ Pendiente |
+| 13 | `frontend`: Crear `DescriberPage` para modo multijugador | ✅ Completada |
 | 14 | `frontend`: Actualizar rutas | ✅ Completada |
 | 15 | `e2e`: Test de flujo completo | ⬜ Pendiente |
 
