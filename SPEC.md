@@ -571,9 +571,9 @@ Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma
 | 8 | `frontend`: `LobbyProvider` y contexto de dependencias | ✅ Completada |
 | 9 | `frontend`: Hook `useServerSyncedCountdown` | ✅ Completada |
 | 10 | `frontend`: Hook `useLobby` | ✅ Completada |
-| 11 | `frontend`: Páginas `CreateLobbyPage` y `WaitingRoomPage` | ⬜ Pendiente |
+| 11 | `frontend`: Páginas `CreateLobbyPage` y `WaitingRoomPage` | ✅ Completada |
 | 12 | `frontend`: Nueva `GuesserPage` | ⬜ Pendiente |
 | 13 | `frontend`: Adaptar `RoundPage` al modo multijugador | ⬜ Pendiente |
-| 14 | `frontend`: Actualizar rutas | ⬜ Pendiente |
+| 14 | `frontend`: Actualizar rutas | ✅ Completada |
 | 15 | `e2e`: Test de flujo completo | ⬜ Pendiente |
 

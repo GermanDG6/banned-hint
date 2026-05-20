@@ -12,6 +12,7 @@ describe('HttpCardRepository', () => {
     getMock = vi.fn();
     httpClientMock = {
       get: getMock,
+      post: vi.fn(),
     } as HttpClient;
     repository = new HttpCardRepository(httpClientMock);
   });
