@@ -1,0 +1,35 @@
+/* LobbyCodeDisplay.module.css */
+
+.container {
+  @apply bg-muted rounded-lg p-4 text-center;
+}
+
+.label {
+  @apply text-sm font-semibold text-foreground/70 mb-2;
+}
+
+.codeWrapper {
+  @apply flex items-center justify-center gap-2 mb-3;
+}
+
+.code {
+  @apply text-3xl font-bold text-foreground tracking-widest;
+  font-family: 'Courier New', monospace;
+}
+
+.copyButton {
+  @apply h-10 w-10 bg-white border border-border rounded-lg flex items-center justify-center;
+  @apply text-lg font-bold text-foreground transition-all duration-200;
+  @apply hover:bg-cta hover:text-white hover:border-cta;
+  @apply active:scale-95;
+  @apply cursor-pointer;
+}
+
+.copyButton:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.hint {
+  @apply text-xs text-foreground/60 italic;
+}
+
