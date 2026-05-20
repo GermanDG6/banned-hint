@@ -1,0 +1,34 @@
+.card {
+  @apply rounded-lg border border-gray-200 shadow-md p-6 bg-white flex flex-col gap-4;
+}
+
+.word {
+  @apply text-3xl font-bold text-center text-gray-900;
+  word-break: break-word;
+}
+
+.divider {
+  @apply border-t-2 border-gray-300;
+}
+
+.bannedWordsList {
+  @apply list-none p-0 m-0 flex flex-col gap-3;
+}
+
+.bannedWord {
+  @apply px-4 py-2 bg-red-100 text-red-800 rounded-md font-medium text-center;
+}
+
+/* Skeleton loading states */
+.skeletonWord {
+  @apply h-12 bg-gray-200 rounded-md animate-pulse;
+}
+
+.skeletonList {
+  @apply flex flex-col gap-3;
+}
+
+.skeletonBannedWord {
+  @apply h-10 bg-gray-200 rounded-md animate-pulse;
+}
+
