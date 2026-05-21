@@ -39,15 +39,22 @@ WaitingRoomPage ─────WS──────►  LobbyGateway (socket.io)
   start-round                      → StartRound use-case  (solo Describer)
   next-card                        → NextCard use-case    (solo Describer)
   submit-guess                     → SubmitGuess use-case (solo Guessers)
+  end-round                        → EndRound use-case    (solo Describer, al expirar timer)
 
 ◄─────────WS──────────────────  Eventos emitidos a la sala:
   lobby-updated                    (players conectados)
-  round-started  { card, startAt, durationSeconds }
-  card-changed   { card, startAt }
-  guess-result   { correct: bool } → solo al emisor
+  round-started  { card?, startAt, durationSeconds }   → card solo al Describer
+                                                        → también al reconectar si hay ronda activa
+  card-changed   { card?, startAt }                    → card solo al Describer
+  guess-result   { correct: bool }                     → solo al emisor
+  round-ended    {}                                    → a toda la sala al terminar la ronda
 
 RoundPage (Describer) ◄── card + startAt desde WS (no llama a GET /api/cards/random)
 GuesserPage (Guesser) ◄── startAt desde WS (no ve la card)
+
+Reconexión (recarga de página):
+  join-lobby (con playerId) ───►  handleJoinLobby detecta ronda activa
+  ◄── round-started              → emitido solo al cliente reconectado
 ```
 
 **Nota sobre seguridad**: el servidor nunca envía la `Card` (ni `word` ni `bannedWords`) al cliente con rol `guesser`. La validación de `Guess` ocurre en el backend.
@@ -102,7 +109,7 @@ interface RoundSession {
 
 ```typescript
 // join-lobby
-{ code: string; playerName: string; role: 'describer' | 'guesser' }
+{ code: string; playerName: string; role: 'describer' | 'guesser'; playerId?: string }
 
 // start-round  (solo Describer, valida en backend)
 { durationSeconds: number }
@@ -112,6 +119,9 @@ interface RoundSession {
 
 // submit-guess (solo Guessers)
 { word: string }
+
+// end-round    (solo Describer, cuando el timer expira en el cliente)
+{}
 ```
 
 **Eventos que emite el servidor:**
@@ -119,8 +129,12 @@ interface RoundSession {
 ```typescript
 // → a toda la sala
 'lobby-updated':  { players: { id: string; name: string; role: string }[] }
-'round-started':  { startAt: number; durationSeconds: number; card: CardDto }
-'card-changed':   { startAt: number; card: CardDto }
+'round-ended':    {}
+
+// → a toda la sala (card solo al Describer; al Guesser sin card)
+// También emitido individualmente al cliente que se reconecta si hay ronda activa
+'round-started':  { startAt: number; durationSeconds: number; card?: CardDto }
+'card-changed':   { startAt: number; card?: CardDto }
 
 // → solo al Guesser emisor
 'guess-result':   { correct: boolean }
@@ -527,7 +541,10 @@ El `LobbyProvider` se añade como layout route padre de `/lobby/*` y `/round/*`.
 
 ### Tarea 15 — `e2e`: Test de flujo completo
 
-**Alcance**: `e2e/tests/lobby.spec.ts`.  
+**Alcance**: `e2e/tests/lobby.spec.ts`.
+
+> ⚠️ Esta tarea debe ejecutarse **después de las Tareas 16–23** (reconexión implementada) para cubrir el flujo completo incluyendo el ciclo `round-ended` → sala de espera → siguiente ronda.
+
 **Flujo cubierto**:
 1. Host abre `/lobby/new`, introduce nombre, crea sala.
 2. Guesser abre `/lobby/:code` en otra pestaña, introduce nombre.
@@ -549,7 +566,8 @@ Tarea 1 (docs)
         └─► Tarea 3 (backend use-cases)
               └─► Tarea 4 (backend infra)
                     └─► Tarea 5 (backend interfaces + WS)  ◄─── instala @nestjs/websockets
-                          └─► Tarea 15 (e2e)
+                          ├─► Tarea 18 (backend: emit on reconnect)
+                          └─► Tarea 19 (backend: round-ended + EndRound)
 
 Tarea 6 (frontend dominio + ports)  ◄─── requiere Tarea 1
   └─► Tarea 7 (frontend infra)  ◄─── instala socket.io-client
@@ -559,17 +577,321 @@ Tarea 6 (frontend dominio + ports)  ◄─── requiere Tarea 1
                     ├─► Tarea 12 (GuesserPage)  ◄─── requiere Tarea 9
                     └─► Tarea 13 (adaptar RoundPage)
                           └─► Tarea 14 (rutas)
-                                └─► Tarea 15 (e2e)
 
 Tarea 9 (useServerSyncedCountdown) — independiente de Tareas 6-8
+
+── Reconexión ──────────────────────────────────────────────────────────
+
+Tarea 16 (frontend: socket resiliente)  — independiente; elimina el crash visible
+  └─► Tarea 17 (frontend: RoundSessionStorage + lobbyCode)
+        ├─► Tarea 20 (frontend: RejoinRound use case)    ◄── tb. necesita T16
+        ├─► Tarea 21 (frontend: ConnectedWaitingRoom save)
+        └─► Tarea 22 (frontend: onRoundEnded hook)        ◄── tb. necesita T16 + T19
+
+Tarea 18 (backend: emit on reconnect)   — requiere T5; independiente del frontend
+Tarea 19 (backend: round-ended)         — requiere T5; independiente del frontend
+  └─► Tarea 22 (frontend: onRoundEnded hook)
+
+Tarea 20 + T21 + T22 → Tarea 23 (frontend: páginas integración final)
+
+── E2E ─────────────────────────────────────────────────────────────────
+
+Tarea 14 + Tarea 23 → Tarea 15 (e2e: flujo completo con reconexión)
 ```
 
-Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma. Las dependencias son **en vertical** (una tarea necesita la anterior del mismo workspace) pero ninguna tarea cruza los dos workspaces simultáneamente.
+Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma. Las tareas 16-17 (frontend infra) y 18-19 (backend) son independientes entre sí y pueden desarrollarse en paralelo.
 
 
 ---
 
-## 8. Estado de implementación
+## 8. Reconexión al recargar páginas de ronda
+
+### 9.1 Problema
+
+Al recargar `/round/describe` o `/round/guess`:
+
+1. El singleton de `SocketIOLobbySocket` se reinicializa con `socket = null` (el runtime JS se resetea completamente).
+2. `location.state` se pierde (React Router solo mantiene el state en navegaciones en memoria).
+3. `useLobby` intenta registrar handlers (`onConnect`, `onLobbyUpdated`, etc.) en un socket nulo y lanza `"Socket not connected. Call connect() first."`.
+
+### 9.2 Ciclo de vida de las sesiones en `sessionStorage`
+
+| Sesión | Contenido | Se crea | Se destruye |
+|---|---|---|---|
+| `LobbyPlayerSession` | `playerId`, `playerName`, `role`, `durationSeconds`, `lobbyCode` | Al unirse al lobby (`WaitingRoomPage`) | Al terminar la **partida** (fuera del alcance actual) |
+| `RoundSessionStorage` | `startAt`, `durationSeconds`, `card?` | Al navegar desde `ConnectedWaitingRoom` a la página de ronda | Al recibir `round-ended` del servidor |
+
+**Regla clave**: `LobbyPlayerSession` persiste durante **toda la partida** (múltiples rondas). Solo `RoundSessionStorage` se limpia al terminar una ronda, dado que al inicio de la siguiente ronda se sobreescribirá con los nuevos datos.
+
+### 9.3 Flujo de reconexión
+
+```
+Recarga de /round/describe o /round/guess
+ │
+ ├─ location.state === null
+ │   └─ Cargar RoundSessionStorage.load()   → mostrar datos mientras se sincroniza
+ │   └─ Cargar LobbyPlayerSession.load()    → obtener lobbyCode, playerId, playerName, role
+ │
+ ├─ RejoinRound.execute(code, playerName, role, playerId)
+ │   └─ lobbySocket.connect()
+ │   └─ lobbySocket.joinLobby(code, playerName, role, playerId)
+ │
+ ├─ Backend: handleJoinLobby detecta ronda activa
+ │   └─ Emite round-started solo al cliente reconectado (con card si es Describer)
+ │
+ └─ useLobby recibe round-started → actualiza roundSession en UI
+```
+
+### 9.4 Evento `round-ended`
+
+- **Quién lo emite**: solo el **Describer** desde el frontend mediante el evento `end-round` cuando el timer llega a cero. El Guesser nunca emite `end-round` (evita race conditions).
+- **Qué hace el backend**: el handler `end-round` en el gateway llama a `EndRound` use case (llama a `lobby.endRound()`) y emite `round-ended` a toda la sala.
+- **Qué hace el frontend**: `useLobby` escucha `round-ended`, llama a `RoundSessionStorage.clear()` (**no** limpia `LobbyPlayerSession`) y expone `roundEnded: boolean`. Las páginas navegan a `/lobby/:code` (sala de espera para la siguiente ronda).
+
+### 9.5 Contrato WebSocket ampliado
+
+**Nuevo evento de entrada:**
+
+```typescript
+// end-round (solo Describer)
+{}
+```
+
+**Nuevos eventos de salida:**
+
+```typescript
+// → a toda la sala (al reconectar, solo al cliente)
+'round-started': { startAt: number; durationSeconds: number; card?: CardDto }
+
+// → a toda la sala
+'round-ended': {}
+```
+
+### 9.6 Consideraciones adicionales
+
+- **`assignDescriberId`**: al reconectar, el backend reemplaza el id del Describer por el nuevo `socket.id`. Esto es una limitación MVP documentada: el `playerId` guardado en sesión solo es relevante para el Guesser al reconectar.
+- **Resiliencia del socket**: los métodos `on*` de `SocketIOLobbySocket` deben soportar ser llamados antes de `connect()`. Los handlers se almacenan en un buffer interno y se registran en el socket real cuando se llama a `connect()`. Esto elimina el crash inmediato sin cambiar la API del port.
+- **`onExpire` en `useServerSyncedCountdown`**: el Describer pasa un callback `onExpire` que emite `end-round`. El Guesser no pasa `onExpire`.
+
+---
+
+## 9. Tareas de reconexión (detalle)
+
+### Tarea 16 — `frontend`: Hacer resiliente `SocketIOLobbySocket`
+
+**Alcance**: `frontend/src/features/lobby/infrastructure/ws/socket-io-lobby-socket.ts` y su test.
+
+**Descripción**: actualmente todos los métodos `on*` lanzan si `this.socket` es null. Cambiar la implementación para que almacenen handlers en un buffer interno (`pendingListeners`) cuando el socket no está conectado, y los registren al llamar a `connect()`. Los métodos `on*` devuelven una función cleanup que elimina el handler del buffer o del socket real, según el estado de conexión en el momento del cleanup. **Esta tarea elimina el crash visible de inmediato.**
+
+**Estructura interna propuesta:**
+
+```typescript
+type PendingListener = { event: string; handler: (...args: unknown[]) => void };
+private pendingListeners: PendingListener[] = [];
+
+connect(): void {
+  if (this.socket) return;
+  this.socket = io(this.serverUrl, { ... });
+  for (const { event, handler } of this.pendingListeners) {
+    this.socket.on(event, handler);
+  }
+  this.pendingListeners = [];
+}
+
+private registerListener(event: string, handler: (...args: unknown[]) => void): () => void {
+  if (this.socket) {
+    this.socket.on(event, handler);
+    return () => this.socket?.off(event, handler);
+  }
+  this.pendingListeners.push({ event, handler });
+  return () => {
+    this.pendingListeners = this.pendingListeners.filter(l => l.handler !== handler);
+    this.socket?.off(event, handler);
+  };
+}
+```
+
+**Tests a añadir** (`socket-io-lobby-socket.test.ts`):
+- `should not throw when calling on* before connect`.
+- `should register pending listeners when connect is called after on*`.
+- `should cleanup pending listener before connect is called`.
+- `should cleanup registered listener after connect is called`.
+
+**Verificación**: `npm run test -w frontend` — todos los tests existentes siguen pasando.
+
+---
+
+### Tarea 17 — `frontend`: `RoundSessionStorage` y `lobbyCode` en `LobbyPlayerSession`
+
+**Alcance**:
+- Nuevo: `frontend/src/features/lobby/infrastructure/round-session.storage.ts`
+- Nuevo: `frontend/src/features/lobby/infrastructure/round-session.storage.test.ts`
+- Modificar: `frontend/src/features/lobby/infrastructure/lobby-player.session.ts`
+- Modificar: `frontend/src/features/lobby/infrastructure/lobby-player.session.test.ts`
+- Modificar: `frontend/src/features/lobby/ui/pages/WaitingRoomPage/WaitingRoomPage.tsx`
+
+**`RoundSessionStorage`**: clase con `save(session: RoundSession)`, `load(): RoundSession | null`, `clear()`. Serializa a `sessionStorage` bajo la clave `'round-session'`. Valida estructura al cargar (`isValid`).
+
+**`LobbyPlayerSession`**: añadir campo `lobbyCode: string` a la interfaz `LobbyPlayerData` y al validador `isValid`. **No cambiar** ningún otro comportamiento.
+
+**`WaitingRoomPage`**: actualizar las dos llamadas a `LobbyPlayerSession.save()` para incluir el `code` del lobby (disponible en `useParams`).
+
+**Tests**:
+- `RoundSessionStorage`: `should save and load a valid RoundSession`, `should return null when storage is empty`, `should return null when stored data is invalid`, `should clear the stored session`.
+- `LobbyPlayerSession`: añadir tests que verifiquen `lobbyCode` en save/load/isValid.
+
+**Verificación**: `npm run test -w frontend`.
+
+---
+
+### Tarea 18 — `backend`: Emitir estado actual al reconectar
+
+**Alcance**: `backend/src/modules/lobby/interfaces/ws/lobby.gateway.ts` y su spec.
+
+**Descripción**: en `handleJoinLobby`, tras unirse a la sala y actualizar `socketMap`, verificar si `lobby.getRoundSession() !== null`. Si hay ronda activa, emitir `round-started` **solo al cliente que se reconecta** (`client.emit`, no `server.to(code).emit`) con los datos actuales. El payload incluye `card` únicamente si el rol del jugador reconectado es `describer`.
+
+**Cambios en `handleJoinLobby`** (al final, antes del `catch`):
+
+```typescript
+const activeSession = lobby.getRoundSession();
+if (activeSession) {
+  const isDescriber = payload.role === 'describer';
+  const roundStartedPayload = {
+    startAt: activeSession.startAt,
+    durationSeconds: activeSession.durationSeconds,
+    ...(isDescriber && { card: { /* mapear card desde activeSession */ } }),
+  };
+  client.emit('round-started', roundStartedPayload);
+}
+```
+
+**Tests a añadir** (`lobby.gateway.spec.ts`):
+- `should emit round-started to reconnecting describer when round is active`.
+- `should emit round-started without card to reconnecting guesser when round is active`.
+- `should not emit round-started when no active round`.
+
+**Verificación**: `npm run test -w backend`.
+
+---
+
+### Tarea 19 — `backend`: Evento `round-ended` y caso de uso `EndRound`
+
+**Alcance**:
+- Modificar: `backend/src/modules/lobby/domain/entities/lobby.entity.ts`
+- Nuevo: `backend/src/modules/lobby/application/use-cases/end-round.use-case.ts`
+- Nuevo: `backend/src/modules/lobby/application/use-cases/end-round.use-case.spec.ts`
+- Modificar: `backend/src/modules/lobby/interfaces/ws/lobby.gateway.ts`
+- Modificar: `backend/src/modules/lobby/interfaces/lobby.module.ts`
+
+**`Lobby.endRound()`**: nuevo método que cambia `status` a `waiting` y pone `roundSession` a `null`. Lanza si no hay ronda activa.
+
+**`EndRound` use case**: busca lobby por código (obtenido de `socketMap`), valida que el solicitante es Describer, llama `lobby.endRound()`, persiste.
+
+**Gateway**: nuevo handler `@SubscribeMessage('end-round')` que llama `EndRound.execute()` y emite `round-ended` a toda la sala (`server.to(code).emit('round-ended', {})`). Solo el Describer puede emitir `end-round`; si no lo es, emitir `error`.
+
+**Tests**:
+- `Lobby.endRound()`: cambia status a `waiting`, limpia `roundSession`; lanza si no hay ronda activa.
+- `EndRound` use case: llama `endRound()` y persiste; lanza si no es Describer.
+- Gateway: `should emit round-ended to the room when describer emits end-round`; `should emit error when guesser emits end-round`.
+
+**Verificación**: `npm run test -w backend`.
+
+---
+
+### Tarea 20 — `frontend`: Caso de uso `RejoinRound`
+
+**Alcance**:
+- Nuevo: `frontend/src/features/lobby/application/use-cases/rejoin-round.use-case.ts`
+- Nuevo: `frontend/src/features/lobby/application/use-cases/rejoin-round.use-case.test.ts`
+- Modificar: `frontend/src/features/lobby/infrastructure/lobby-dependencies.container.ts` (exponer instancia)
+- Modificar: `frontend/src/features/lobby/infrastructure/lobby-dependencies.context.tsx` (añadir hook `useRejoinRound`)
+
+**`RejoinRound`**: caso de uso que recibe `lobbySocket: LobbySocket` en el constructor y expone `execute(code: string, playerName: string, role: PlayerRole, playerId: string): void`. Llama a `lobbySocket.connect()` y luego `lobbySocket.joinLobby(code, playerName, role, playerId)`. No hace verificación HTTP (el lobby ya existe, se viene de una ronda activa).
+
+**Diferencia con `JoinLobby`**: `JoinLobby` verifica la existencia del lobby vía HTTP y no requiere `playerId`; `RejoinRound` asume que el lobby existe y usa `playerId` para identificar al jugador en el servidor.
+
+**Tests**:
+- `should call connect and joinLobby with correct args`.
+- `should pass playerId to joinLobby`.
+
+**Verificación**: `npm run test -w frontend`.
+
+---
+
+### Tarea 21 — `frontend`: Persistir `RoundSession` en `ConnectedWaitingRoom`
+
+**Alcance**: `frontend/src/features/lobby/ui/pages/WaitingRoomPage/ConnectedWaitingRoom.tsx` y su test.
+
+**Descripción**: en el `useEffect` que escucha `lobby.roundSession` y navega, llamar a `RoundSessionStorage.save(lobby.roundSession)` **antes** de `navigate(...)`. Así el dato persiste si el usuario recarga nada más llegar a la página de ronda.
+
+**Tests a añadir** (crear `ConnectedWaitingRoom.test.tsx` si no existe):
+- `should save RoundSession to storage before navigating to describer page`.
+- `should save RoundSession to storage before navigating to guesser page`.
+
+**Verificación**: `npm run test -w frontend`.
+
+---
+
+### Tarea 22 — `frontend`: `onRoundEnded` en puerto, socket y `useLobby`
+
+**Alcance**:
+- Modificar: `frontend/src/features/lobby/application/ports/lobby-socket.port.ts`
+- Modificar: `frontend/src/features/lobby/infrastructure/ws/socket-io-lobby-socket.ts`
+- Modificar: `frontend/src/features/lobby/infrastructure/ws/socket-io-lobby-socket.test.ts`
+- Modificar: `frontend/src/features/lobby/ui/hooks/use-lobby.hook.ts`
+- Modificar: `frontend/src/features/lobby/ui/hooks/use-lobby.hook.test.ts`
+
+**Puerto**: añadir `onRoundEnded(handler: () => void): () => void` y `endRound(): void` a `LobbySocket`.
+
+**`SocketIOLobbySocket`**:
+- `onRoundEnded`: implementar usando el método privado `registerListener('round-ended', handler)` introducido en la Tarea 16.
+- `endRound()`: emitir `end-round` al servidor.
+
+**`useLobby`**:
+- Añadir handler `onRoundEnded` en el `useEffect` que llama a `RoundSessionStorage.clear()` y actualiza estado `roundEnded: boolean` a `true`.
+- Exponer `roundEnded` y `endRound` en el resultado del hook.
+- **No** limpiar `LobbyPlayerSession` (los datos del jugador persisten para la siguiente ronda).
+
+**Tests a añadir** (`use-lobby.hook.test.ts`):
+- `should set roundEnded to true when round-ended event is received`.
+- `should clear RoundSessionStorage when round-ended is received`.
+- `should not clear LobbyPlayerSession when round-ended is received`.
+
+**Verificación**: `npm run test -w frontend`.
+
+---
+
+### Tarea 23 — `frontend`: Reconexión en `DescriberPage` y `GuesserPage`
+
+**Alcance**:
+- Modificar: `frontend/src/features/lobby/ui/pages/DescriberPage/DescriberPage.tsx`
+- Modificar: `frontend/src/features/lobby/ui/pages/DescriberPage/DescriberPage.test.tsx`
+- Modificar: `frontend/src/features/lobby/ui/pages/GuesserPage/GuesserPage.tsx`
+- Modificar: `frontend/src/features/lobby/ui/pages/GuesserPage/GuesserPage.test.tsx`
+- Modificar: `frontend/src/shared/hooks/use-server-synced-countdown.hook.ts` (añadir `onExpire`)
+
+**`useServerSyncedCountdown`**: añadir parámetro opcional `onExpire?: () => void` que se llama una sola vez cuando `remaining` llega a 0 (usar ref para evitar retriggering en cada tick).
+
+**`DescriberPage`**:
+1. Si `location.state` es null: cargar `RoundSessionStorage.load()` como `roundSession` inicial y llamar `RejoinRound.execute(...)` con datos de `LobbyPlayerSession`.
+2. Si no hay ni state ni storage: navegar a `/` (sesión completamente perdida).
+3. Pasar `onExpire` a `useServerSyncedCountdown` que llama a `lobby.endRound()`.
+4. Cuando `lobby.roundEnded` sea `true`: navegar a `/lobby/:code` (sala de espera para la siguiente ronda).
+
+**`GuesserPage`**:
+1. Mismo patrón de restauración que `DescriberPage`.
+2. No pasa `onExpire` (el Guesser no emite `end-round`).
+3. Cuando `lobby.roundEnded` sea `true`: navegar a `/lobby/:code`.
+
+**Tests**:
+- `DescriberPage`: `should reconnect using session data when location.state is null`, `should call endRound when countdown expires`, `should navigate to lobby when roundEnded`.
+- `GuesserPage`: `should reconnect using session data when location.state is null`, `should navigate to lobby when roundEnded`.
+
+**Verificación**: `npm run test -w frontend` + `npm run lint -w frontend`.
+
+---
+
+## 10. Estado de implementación
 
 | # | Tarea | Estado |
 |---|---|---|
@@ -587,5 +909,12 @@ Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma
 | 12 | `frontend`: Nueva `GuesserPage` | ✅ Completada |
 | 13 | `frontend`: Crear `DescriberPage` para modo multijugador | ✅ Completada |
 | 14 | `frontend`: Actualizar rutas | ✅ Completada |
+| 16 | `frontend`: Hacer resiliente `SocketIOLobbySocket` (buffer de listeners) | ⬜ Pendiente |
+| 17 | `frontend`: `RoundSessionStorage` y `lobbyCode` en `LobbyPlayerSession` | ⬜ Pendiente |
+| 18 | `backend`: Emitir estado actual al reconectar (`join-lobby`) | ⬜ Pendiente |
+| 19 | `backend`: Evento `round-ended` y caso de uso `EndRound` | ⬜ Pendiente |
+| 20 | `frontend`: Caso de uso `RejoinRound` | ⬜ Pendiente |
+| 21 | `frontend`: Persistir `RoundSession` en `ConnectedWaitingRoom` | ⬜ Pendiente |
+| 22 | `frontend`: `onRoundEnded` en puerto, socket y `useLobby` | ⬜ Pendiente |
+| 23 | `frontend`: Reconexión en `DescriberPage` y `GuesserPage` | ⬜ Pendiente |
 | 15 | `e2e`: Test de flujo completo | ⬜ Pendiente |
-
