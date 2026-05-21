@@ -4,6 +4,7 @@ import styles from './ConnectedWaitingRoom.module.css';
 import { useLobby } from '@/features/lobby/ui/hooks/use-lobby.hook';
 import { PlayerRoleType, PlayerRole } from '@/features/lobby/domain/models/player.model';
 import { LobbyCodeDisplay, PlayerList } from '../../components';
+import { RoundSessionStorage } from '@/features/lobby/infrastructure/round-session.storage';
 
 interface ConnectedWaitingRoomProps {
   code: string;
@@ -11,12 +12,6 @@ interface ConnectedWaitingRoomProps {
   durationSeconds: number;
 }
 
-/**
- * ConnectedWaitingRoom: Renderiza la sala de espera cuando el socket ya está conectado.
- *
- * Este componente usa useLobby(), que requiere que el socket esté activo.
- * Por eso se renderiza como componente separado solo cuando joinedState != null.
- */
 export function ConnectedWaitingRoom({ code, myRole, durationSeconds }: ConnectedWaitingRoomProps) {
   const navigate = useNavigate();
   const lobby = useLobby({ myRole });
@@ -24,6 +19,8 @@ export function ConnectedWaitingRoom({ code, myRole, durationSeconds }: Connecte
   // Efecto: navegar cuando comienza una ronda
   useEffect(() => {
     if (!lobby.roundSession) return;
+
+    RoundSessionStorage.save(lobby.roundSession);
 
     if (myRole === PlayerRoleType.Describer) {
       navigate('/round/describe', { state: { roundSession: lobby.roundSession } });

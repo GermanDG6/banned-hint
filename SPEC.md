@@ -941,7 +941,7 @@ if (activeSession) {
 | 18 | `backend`: Emitir estado actual al reconectar (`join-lobby`) | ✅ Completada |
 | 19 | `backend`: Evento `round-ended` y caso de uso `EndRound` | ✅ Completada |
 | 20 | `frontend`: Caso de uso `RejoinRound` | ✅ Completada |
-| 21 | `frontend`: Persistir `RoundSession` en `ConnectedWaitingRoom` | ⬜ Pendiente |
+| 21 | `frontend`: Persistir `RoundSession` en `ConnectedWaitingRoom` | ✅ Completada |
 | 22 | `frontend`: `onRoundEnded` en puerto, socket y `useLobby` | ⬜ Pendiente |
 | 23 | `frontend`: Reconexión en `DescriberPage` y `GuesserPage` | ⬜ Pendiente |
 | 24 | `frontend`: Tests de `WaitingRoomPage` y `ConnectedWaitingRoom` | ⬜ Pendiente |
