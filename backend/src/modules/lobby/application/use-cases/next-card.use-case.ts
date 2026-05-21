@@ -21,28 +21,22 @@ export class NextCardUseCase {
   ) {}
 
   async execute(input: NextCardInput): Promise<RoundSessionDto> {
-    // Find the lobby
     const lobby = await this.lobbyRepository.findByCode(input.lobbyCode);
     if (!lobby) {
       throw new LobbyNotFoundException(`Lobby with code ${input.lobbyCode} not found`);
     }
 
-    // Validate that the player is the describer
     lobby.validateDescriberOnly(input.playerId);
 
-    // Get a random card
     const card = await this.cardRepository.findRandom();
     if (!card) {
       throw new CardNotFoundException('No cards available');
     }
 
-    // Move to the next card in the ongoing round
-    lobby.nextCard(card.id.value, card.word.value);
+    lobby.nextCard(card.id.value, card.word.value, card.bannedWords.toArray());
 
-    // Persist the updated lobby
     await this.lobbyRepository.save(lobby);
 
-    // Create and return the DTO with card data
     const cardDto = new CardDto(card.id.value, card.word.value, card.bannedWords.toArray());
     return new RoundSessionDto(lobby.getRoundSession()!, cardDto);
   }

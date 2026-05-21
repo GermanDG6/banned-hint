@@ -24,7 +24,7 @@ describe('SubmitGuessUseCase', () => {
     const lobby = Lobby.create(code, describer);
     const card = CardMother.withWord('apple');
 
-    lobby.startRound(card.id.value, card.word.value, 60);
+    lobby.startRound(card.id.value, card.word.value, card.bannedWords.toArray(), 60);
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
 
@@ -42,7 +42,7 @@ describe('SubmitGuessUseCase', () => {
     const lobby = Lobby.create(code, describer);
     const card = CardMother.withWord('apple');
 
-    lobby.startRound(card.id.value, card.word.value, 60);
+    lobby.startRound(card.id.value, card.word.value, card.bannedWords.toArray(), 60);
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
 
@@ -60,7 +60,7 @@ describe('SubmitGuessUseCase', () => {
     const lobby = Lobby.create(code, describer);
     const card = CardMother.withWord('Apple');
 
-    lobby.startRound(card.id.value, card.word.value, 60);
+    lobby.startRound(card.id.value, card.word.value, card.bannedWords.toArray(), 60);
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
 
@@ -84,7 +84,7 @@ describe('SubmitGuessUseCase', () => {
     const lobby = Lobby.create(code, describer);
     const card = CardMother.withWord('apple');
 
-    lobby.startRound(card.id.value, card.word.value, 60);
+    lobby.startRound(card.id.value, card.word.value, card.bannedWords.toArray(), 60);
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
 

@@ -186,6 +186,112 @@ describe('LobbyGateway', () => {
         }),
       );
     });
+
+    it('should emit round-started with card to reconnecting describer when round is active', async () => {
+      const mockLobby = {
+        assignDescriberId: jest.fn(),
+        findGuesserById: jest.fn().mockReturnValue(undefined),
+        getPlayers: jest
+          .fn()
+          .mockReturnValue([
+            { id: 'socket-1', name: 'John', isDescriber: jest.fn().mockReturnValue(true) },
+          ]),
+        getRoundSession: jest.fn().mockReturnValue({
+          cardId: 'card-1',
+          word: 'test-word',
+          bannedWords: ['bad1', 'bad2', 'bad3', 'bad4'],
+          startAt: Date.now(),
+          durationSeconds: 60,
+        }),
+      };
+
+      mockLobbyRepository.findByCode.mockResolvedValue(mockLobby);
+
+      await gateway.handleJoinLobby(mockSocket, {
+        code: 'ABC123',
+        playerName: 'John',
+        role: 'describer',
+      });
+
+      const roundStartedCall = mockSocket.emit.mock.calls.find(
+        (call) => call[0] === 'round-started',
+      );
+      expect(roundStartedCall).toBeDefined();
+      expect(roundStartedCall?.[1]).toMatchObject({
+        startAt: expect.any(Number),
+        durationSeconds: 60,
+        card: {
+          id: 'card-1',
+          word: 'test-word',
+          bannedWords: ['bad1', 'bad2', 'bad3', 'bad4'],
+        },
+      });
+    });
+
+    it('should emit round-started without card to reconnecting guesser when round is active', async () => {
+      const mockLobby = {
+        findGuesserById: jest
+          .fn()
+          .mockReturnValue({ id: 'player-2', name: 'Jane', isDescriber: () => false }),
+        getPlayers: jest.fn().mockReturnValue([
+          { id: 'socket-1', name: 'John', isDescriber: jest.fn().mockReturnValue(true) },
+          { id: 'player-2', name: 'Jane', isDescriber: jest.fn().mockReturnValue(false) },
+        ]),
+        getRoundSession: jest.fn().mockReturnValue({
+          cardId: 'card-1',
+          word: 'test-word',
+          bannedWords: ['bad1', 'bad2', 'bad3', 'bad4'],
+          startAt: Date.now(),
+          durationSeconds: 60,
+        }),
+      };
+
+      mockLobbyRepository.findByCode.mockResolvedValue(mockLobby);
+
+      await gateway.handleJoinLobby(mockSocket, {
+        code: 'ABC123',
+        playerName: 'Jane',
+        role: 'guesser',
+        playerId: 'player-2',
+      });
+
+      const roundStartedCall = mockSocket.emit.mock.calls.find(
+        (call) => call[0] === 'round-started',
+      );
+      expect(roundStartedCall).toBeDefined();
+      expect(roundStartedCall?.[1]).toMatchObject({
+        startAt: expect.any(Number),
+        durationSeconds: 60,
+      });
+      expect(roundStartedCall?.[1]).not.toHaveProperty('card');
+    });
+
+    it('should not emit round-started when no active round on reconnect', async () => {
+      const mockLobby = {
+        findGuesserById: jest
+          .fn()
+          .mockReturnValue({ id: 'player-2', name: 'Jane', isDescriber: () => false }),
+        getPlayers: jest.fn().mockReturnValue([
+          { id: 'socket-1', name: 'John', isDescriber: jest.fn().mockReturnValue(true) },
+          { id: 'player-2', name: 'Jane', isDescriber: jest.fn().mockReturnValue(false) },
+        ]),
+        getRoundSession: jest.fn().mockReturnValue(null),
+      };
+
+      mockLobbyRepository.findByCode.mockResolvedValue(mockLobby);
+
+      await gateway.handleJoinLobby(mockSocket, {
+        code: 'ABC123',
+        playerName: 'Jane',
+        role: 'guesser',
+        playerId: 'player-2',
+      });
+
+      // Verify round-started was NOT emitted
+      const emissionCalls = mockSocket.emit.mock.calls;
+      const roundStartedCall = emissionCalls.find((call) => call[0] === 'round-started');
+      expect(roundStartedCall).toBeUndefined();
+    });
   });
 
   describe('handleStartRound', () => {

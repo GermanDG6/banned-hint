@@ -38,7 +38,12 @@ export class StartRoundUseCase {
     }
 
     // Start the round in the lobby
-    lobby.startRound(card.id.value, card.word.value, input.durationSeconds);
+    lobby.startRound(
+      card.id.value,
+      card.word.value,
+      card.bannedWords.toArray(),
+      input.durationSeconds,
+    );
 
     // Persist the updated lobby
     await this.lobbyRepository.save(lobby);

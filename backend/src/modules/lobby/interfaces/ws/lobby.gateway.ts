@@ -48,26 +48,19 @@ export class LobbyGateway implements OnGatewayDisconnect {
       const { code, playerName, role, playerId } = payload;
 
       let connectedPlayerId: string;
+      let lobby = await this.lobbyRepository.findByCode(code);
+
+      if (!lobby) {
+        client.emit('error', { message: 'Lobby not found' });
+        return;
+      }
 
       if (role === 'describer') {
-        const lobby = await this.lobbyRepository.findByCode(code);
-        if (!lobby) {
-          client.emit('error', { message: 'Lobby not found' });
-          return;
-        }
-
         // NOTE: MVP limitation - no authentication; any client can claim the describer role
         lobby.assignDescriberId(client.id);
         await this.lobbyRepository.save(lobby);
-
         connectedPlayerId = client.id;
       } else {
-        const lobby = await this.lobbyRepository.findByCode(code);
-        if (!lobby) {
-          client.emit('error', { message: 'Lobby not found' });
-          return;
-        }
-
         const existingGuesser = playerId ? lobby.findGuesserById(playerId) : undefined;
         if (existingGuesser) {
           connectedPlayerId = existingGuesser.id;
@@ -86,7 +79,7 @@ export class LobbyGateway implements OnGatewayDisconnect {
       this.socketMap.set(client.id, { lobbyCode: code, playerId: connectedPlayerId });
 
       // Emit lobby-updated event to the entire room
-      const lobby = await this.lobbyRepository.findByCode(code);
+      lobby = await this.lobbyRepository.findByCode(code);
       this.server.to(code).emit('lobby-updated', {
         players: lobby!.getPlayers().map((p) => ({
           id: p.id,
@@ -94,6 +87,28 @@ export class LobbyGateway implements OnGatewayDisconnect {
           role: p.isDescriber() ? 'describer' : 'guesser',
         })),
       });
+
+      // Emit round-started to reconnecting client if round is active
+      const activeSession = lobby!.getRoundSession();
+      if (activeSession) {
+        const isDescriber = role === 'describer';
+        const roundStartedPayload: {
+          startAt: number;
+          durationSeconds: number;
+          card?: { id: string; word: string; bannedWords: string[] };
+        } = {
+          startAt: activeSession.startAt,
+          durationSeconds: activeSession.durationSeconds,
+        };
+        if (isDescriber) {
+          roundStartedPayload.card = {
+            id: activeSession.cardId,
+            word: activeSession.word,
+            bannedWords: activeSession.bannedWords,
+          };
+        }
+        client.emit('round-started', roundStartedPayload);
+      }
     } catch (error) {
       client.emit('error', { message: error.message });
     }

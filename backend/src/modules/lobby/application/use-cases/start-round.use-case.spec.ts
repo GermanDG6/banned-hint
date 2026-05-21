@@ -112,5 +112,6 @@ describe('StartRoundUseCase', () => {
     const savedLobby = lobbyRepositoryMock.save.mock.calls[0][0];
     expect(savedLobby.getStatus()).toBe('playing');
     expect(savedLobby.getRoundSession()).toBeDefined();
+    expect(savedLobby.getRoundSession()!.bannedWords).toBeDefined();
   });
 });

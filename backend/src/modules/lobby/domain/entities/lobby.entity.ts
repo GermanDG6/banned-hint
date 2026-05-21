@@ -66,18 +66,24 @@ export class Lobby {
     this.players.push(player);
   }
 
-  startRound(cardId: string, word: string, durationSeconds: number): RoundSession {
+  startRound(
+    cardId: string,
+    word: string,
+    bannedWords: string[],
+    durationSeconds: number,
+  ): RoundSession {
     this.status = LobbyStatus.playing();
     this.roundSession = {
       cardId,
       word,
       startAt: Date.now(),
       durationSeconds,
+      bannedWords,
     };
     return this.roundSession;
   }
 
-  nextCard(cardId: string, word: string): RoundSession {
+  nextCard(cardId: string, word: string, bannedWords: string[]): RoundSession {
     if (!this.roundSession) {
       throw new Error('No round session active');
     }
@@ -87,6 +93,7 @@ export class Lobby {
       word,
       startAt: Date.now(),
       durationSeconds: this.roundSession.durationSeconds,
+      bannedWords,
     };
     return this.roundSession;
   }

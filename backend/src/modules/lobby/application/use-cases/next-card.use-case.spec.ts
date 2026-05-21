@@ -11,7 +11,7 @@ import { LobbyNotFoundException } from '../../domain/exceptions/lobby-not-found.
 import { CardNotFoundException } from '../../../card/domain/exceptions/card-not-found.exception';
 
 describe('NextCardUseCase', () => {
-  let useCase: NextCardUseCase;
+  let nextCardUseCase: NextCardUseCase;
   let lobbyRepositoryMock: jest.Mocked<LobbyRepository>;
   let cardRepositoryMock: jest.Mocked<CardRepository>;
 
@@ -23,7 +23,7 @@ describe('NextCardUseCase', () => {
     cardRepositoryMock = {
       findRandom: jest.fn(),
     };
-    useCase = new NextCardUseCase(lobbyRepositoryMock, cardRepositoryMock);
+    nextCardUseCase = new NextCardUseCase(lobbyRepositoryMock, cardRepositoryMock);
   });
 
   it('should move to next card in ongoing round', async () => {
@@ -33,13 +33,12 @@ describe('NextCardUseCase', () => {
     const firstCard = CardMother.withWord('apple');
     const secondCard = CardMother.withWord('banana');
 
-    // Start the round with the first card
-    lobby.startRound(firstCard.id.value, firstCard.word.value, 60);
+    lobby.startRound(firstCard.id.value, firstCard.word.value, firstCard.bannedWords.toArray(), 60);
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
     cardRepositoryMock.findRandom.mockResolvedValue(secondCard);
 
-    const result = await useCase.execute({
+    const result = await nextCardUseCase.execute({
       lobbyCode: 'TEST01',
       playerId: 'socket-1',
     });
@@ -54,19 +53,24 @@ describe('NextCardUseCase', () => {
     const lobby = Lobby.create(code, describer);
     const firstCard = CardMother.withWord('apple');
     const secondCard = CardMother.withWord('banana');
+    const durationSeconds = 120;
 
-    // Start the round with 120 seconds duration
-    lobby.startRound(firstCard.id.value, firstCard.word.value, 120);
+    lobby.startRound(
+      firstCard.id.value,
+      firstCard.word.value,
+      firstCard.bannedWords.toArray(),
+      durationSeconds,
+    );
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
     cardRepositoryMock.findRandom.mockResolvedValue(secondCard);
 
-    const result = await useCase.execute({
+    const result = await nextCardUseCase.execute({
       lobbyCode: 'TEST01',
       playerId: 'socket-1',
     });
 
-    expect(result.durationSeconds).toBe(120);
+    expect(result.durationSeconds).toBe(durationSeconds);
   });
 
   it('should throw OnlyDescriberCanException if player is not describer', async () => {
@@ -77,12 +81,12 @@ describe('NextCardUseCase', () => {
     lobby.join(guesser);
 
     const firstCard = CardMother.withWord('apple');
-    lobby.startRound(firstCard.id.value, firstCard.word.value, 60);
+    lobby.startRound(firstCard.id.value, firstCard.word.value, firstCard.bannedWords.toArray(), 60);
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
 
     await expect(
-      useCase.execute({
+      nextCardUseCase.execute({
         lobbyCode: 'TEST01',
         playerId: 'socket-2',
       }),
@@ -93,7 +97,7 @@ describe('NextCardUseCase', () => {
     lobbyRepositoryMock.findByCode.mockResolvedValue(null);
 
     await expect(
-      useCase.execute({
+      nextCardUseCase.execute({
         lobbyCode: 'INVALID',
         playerId: 'socket-1',
       }),
@@ -106,13 +110,13 @@ describe('NextCardUseCase', () => {
     const lobby = Lobby.create(code, describer);
 
     const firstCard = CardMother.withWord('apple');
-    lobby.startRound(firstCard.id.value, firstCard.word.value, 60);
+    lobby.startRound(firstCard.id.value, firstCard.word.value, firstCard.bannedWords.toArray(), 60);
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
     cardRepositoryMock.findRandom.mockResolvedValue(null);
 
     await expect(
-      useCase.execute({
+      nextCardUseCase.execute({
         lobbyCode: 'TEST01',
         playerId: 'socket-1',
       }),
@@ -126,12 +130,12 @@ describe('NextCardUseCase', () => {
     const firstCard = CardMother.withWord('apple');
     const secondCard = CardMother.withWord('banana');
 
-    lobby.startRound(firstCard.id.value, firstCard.word.value, 60);
+    lobby.startRound(firstCard.id.value, firstCard.word.value, firstCard.bannedWords.toArray(), 60);
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
     cardRepositoryMock.findRandom.mockResolvedValue(secondCard);
 
-    await useCase.execute({
+    await nextCardUseCase.execute({
       lobbyCode: 'TEST01',
       playerId: 'socket-1',
     });

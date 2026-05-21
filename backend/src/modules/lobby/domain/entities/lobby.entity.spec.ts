@@ -72,19 +72,30 @@ describe('Lobby', () => {
   describe('startRound', () => {
     it('should start a round and change status to playing', () => {
       const lobby = Lobby.create(lobbyCode, describer);
-      const roundSession = lobby.startRound('card-123', 'apple', 60);
+      const roundSession = lobby.startRound(
+        'card-123',
+        'apple',
+        ['fruit', 'red', 'sweet', 'crunchy'],
+        60,
+      );
 
       expect(lobby.getStatus()).toBe('playing');
       expect(roundSession.cardId).toBe('card-123');
       expect(roundSession.word).toBe('apple');
       expect(roundSession.durationSeconds).toBe(60);
+      expect(roundSession.bannedWords).toEqual(['fruit', 'red', 'sweet', 'crunchy']);
       expect(typeof roundSession.startAt).toBe('number');
     });
 
     it('should set startAt to approximately now', () => {
       const before = Date.now();
       const lobby = Lobby.create(lobbyCode, describer);
-      const roundSession = lobby.startRound('card-123', 'apple', 60);
+      const roundSession = lobby.startRound(
+        'card-123',
+        'apple',
+        ['fruit', 'red', 'sweet', 'crunchy'],
+        60,
+      );
       const after = Date.now();
 
       expect(roundSession.startAt).toBeGreaterThanOrEqual(before);
@@ -95,21 +106,27 @@ describe('Lobby', () => {
   describe('nextCard', () => {
     it('should update the round session with new card', () => {
       const lobby = Lobby.create(lobbyCode, describer);
-      lobby.startRound('card-123', 'apple', 60);
+      lobby.startRound('card-123', 'apple', ['fruit', 'red', 'sweet', 'crunchy'], 60);
       const originalRoundSession = lobby.getRoundSession()!;
 
-      const newRoundSession = lobby.nextCard('card-456', 'banana');
+      const newRoundSession = lobby.nextCard('card-456', 'banana', [
+        'yellow',
+        'peel',
+        'monkey',
+        'soft',
+      ]);
 
       expect(newRoundSession.cardId).toBe('card-456');
       expect(newRoundSession.word).toBe('banana');
+      expect(newRoundSession.bannedWords).toEqual(['yellow', 'peel', 'monkey', 'soft']);
       expect(newRoundSession.durationSeconds).toBe(60); // Duration stays the same
       expect(newRoundSession.startAt).toBeGreaterThanOrEqual(originalRoundSession.startAt);
     });
 
     it('should keep status as playing after nextCard', () => {
       const lobby = Lobby.create(lobbyCode, describer);
-      lobby.startRound('card-123', 'apple', 60);
-      lobby.nextCard('card-456', 'banana');
+      lobby.startRound('card-123', 'apple', ['fruit', 'red', 'sweet', 'crunchy'], 60);
+      lobby.nextCard('card-456', 'banana', ['yellow', 'peel', 'monkey', 'soft']);
 
       expect(lobby.getStatus()).toBe('playing');
     });
@@ -117,7 +134,9 @@ describe('Lobby', () => {
     it('should throw error if no round session active', () => {
       const lobby = Lobby.create(lobbyCode, describer);
 
-      expect(() => lobby.nextCard('card-456', 'banana')).toThrow('No round session active');
+      expect(() =>
+        lobby.nextCard('card-456', 'banana', ['yellow', 'peel', 'monkey', 'soft']),
+      ).toThrow('No round session active');
     });
   });
 
@@ -211,6 +230,7 @@ describe('Lobby', () => {
         word: 'apple',
         startAt: Date.now(),
         durationSeconds: 60,
+        bannedWords: ['fruit', 'red', 'sweet', 'crunchy'],
       };
 
       const restoredLobby = Lobby.restore(
