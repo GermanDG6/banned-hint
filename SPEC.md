@@ -939,7 +939,7 @@ if (activeSession) {
 | 16 | `frontend`: Hacer resiliente `SocketIOLobbySocket` (buffer de listeners) | ✅ Completada |
 | 17 | `frontend`: `RoundSessionStorage` y `lobbyCode` en `LobbyPlayerSession` | ✅ Completada |
 | 18 | `backend`: Emitir estado actual al reconectar (`join-lobby`) | ✅ Completada |
-| 19 | `backend`: Evento `round-ended` y caso de uso `EndRound` | ⬜ Pendiente |
+| 19 | `backend`: Evento `round-ended` y caso de uso `EndRound` | ✅ Completada |
 | 20 | `frontend`: Caso de uso `RejoinRound` | ⬜ Pendiente |
 | 21 | `frontend`: Persistir `RoundSession` en `ConnectedWaitingRoom` | ⬜ Pendiente |
 | 22 | `frontend`: `onRoundEnded` en puerto, socket y `useLobby` | ⬜ Pendiente |

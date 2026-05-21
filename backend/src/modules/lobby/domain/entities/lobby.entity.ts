@@ -6,6 +6,7 @@ import { PlayerRoleType } from '../value-objects/player-role.value-object';
 import { RoundSession } from '../models/round-session.model';
 import { DescriberAlreadyExistsException } from '../exceptions/describer-already-exists.exception';
 import { OnlyDescriberCanException } from '../exceptions/only-describer-can.exception';
+import { NoActiveRoundException } from '../exceptions/no-active-round.exception';
 
 export class Lobby {
   readonly id: LobbyId;
@@ -96,6 +97,15 @@ export class Lobby {
       bannedWords,
     };
     return this.roundSession;
+  }
+
+  endRound(): void {
+    if (!this.roundSession) {
+      throw new NoActiveRoundException();
+    }
+
+    this.status = LobbyStatus.waiting();
+    this.roundSession = null;
   }
 
   isDescriber(playerId: string): boolean {

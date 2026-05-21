@@ -11,6 +11,7 @@ import { JoinLobbyUseCase } from '../../application/use-cases/join-lobby.use-cas
 import { StartRoundUseCase } from '../../application/use-cases/start-round.use-case';
 import { NextCardUseCase } from '../../application/use-cases/next-card.use-case';
 import { SubmitGuessUseCase } from '../../application/use-cases/submit-guess.use-case';
+import { EndRoundUseCase } from '../../application/use-cases/end-round.use-case';
 import { LobbyRepository, LOBBY_REPOSITORY } from '../../domain/repositories/lobby.repository';
 
 interface SocketContext {
@@ -35,6 +36,7 @@ export class LobbyGateway implements OnGatewayDisconnect {
     private readonly startRoundUseCase: StartRoundUseCase,
     private readonly nextCardUseCase: NextCardUseCase,
     private readonly submitGuessUseCase: SubmitGuessUseCase,
+    private readonly endRoundUseCase: EndRoundUseCase,
     @Inject(LOBBY_REPOSITORY)
     private readonly lobbyRepository: LobbyRepository,
   ) {}
@@ -188,6 +190,26 @@ export class LobbyGateway implements OnGatewayDisconnect {
       client.emit('guess-result', {
         correct: result.correct,
       });
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
+
+  @SubscribeMessage('end-round')
+  async handleEndRound(client: Socket) {
+    try {
+      const context = this.socketMap.get(client.id);
+      if (!context) {
+        client.emit('error', { message: 'Socket not registered' });
+        return;
+      }
+
+      await this.endRoundUseCase.execute({
+        lobbyCode: context.lobbyCode,
+        playerId: context.playerId,
+      });
+
+      this.server.to(context.lobbyCode).emit('round-ended', {});
     } catch (error) {
       client.emit('error', { message: error.message });
     }

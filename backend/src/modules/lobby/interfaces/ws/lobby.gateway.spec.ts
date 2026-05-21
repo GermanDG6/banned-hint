@@ -5,6 +5,7 @@ import { JoinLobbyUseCase } from '../../application/use-cases/join-lobby.use-cas
 import { StartRoundUseCase } from '../../application/use-cases/start-round.use-case';
 import { NextCardUseCase } from '../../application/use-cases/next-card.use-case';
 import { SubmitGuessUseCase } from '../../application/use-cases/submit-guess.use-case';
+import { EndRoundUseCase } from '../../application/use-cases/end-round.use-case';
 import { LOBBY_REPOSITORY } from '../../domain/repositories/lobby.repository';
 
 describe('LobbyGateway', () => {
@@ -14,6 +15,7 @@ describe('LobbyGateway', () => {
   let mockStartRound;
   let mockNextCard;
   let mockSubmitGuess;
+  let mockEndRound;
   let mockLobbyRepository;
   let mockSocket;
   let mockServer;
@@ -36,6 +38,10 @@ describe('LobbyGateway', () => {
     };
 
     mockSubmitGuess = {
+      execute: jest.fn(),
+    };
+
+    mockEndRound = {
       execute: jest.fn(),
     };
 
@@ -81,6 +87,10 @@ describe('LobbyGateway', () => {
         {
           provide: SubmitGuessUseCase,
           useValue: mockSubmitGuess,
+        },
+        {
+          provide: EndRoundUseCase,
+          useValue: mockEndRound,
         },
         {
           provide: LOBBY_REPOSITORY,
@@ -353,6 +363,49 @@ describe('LobbyGateway', () => {
       expect(mockSubmitGuess.execute).toHaveBeenCalledWith({
         lobbyCode: 'ABC123',
         word: 'test',
+      });
+    });
+  });
+
+  describe('handleEndRound', () => {
+    it('should emit round-ended to the room when describer ends round', async () => {
+      mockEndRound.execute.mockResolvedValue(void 0);
+
+      (gateway as any).socketMap.set('socket-1', {
+        lobbyCode: 'ABC123',
+        playerId: 'player-1',
+      });
+
+      await gateway.handleEndRound(mockSocket);
+
+      expect(mockEndRound.execute).toHaveBeenCalledWith({
+        lobbyCode: 'ABC123',
+        playerId: 'player-1',
+      });
+
+      expect(mockServer.to).toHaveBeenCalledWith('ABC123');
+      expect(mockServer.to('ABC123').emit).toHaveBeenCalledWith('round-ended', {});
+    });
+
+    it('should emit error when socket not registered', async () => {
+      await gateway.handleEndRound(mockSocket);
+
+      expect(mockSocket.emit).toHaveBeenCalledWith('error', { message: 'Socket not registered' });
+    });
+
+    it('should emit error when use-case throws exception', async () => {
+      const error = new Error('Only the describer can perform this action');
+      mockEndRound.execute.mockRejectedValue(error);
+
+      (gateway as any).socketMap.set('socket-1', {
+        lobbyCode: 'ABC123',
+        playerId: 'player-2',
+      });
+
+      await gateway.handleEndRound(mockSocket);
+
+      expect(mockSocket.emit).toHaveBeenCalledWith('error', {
+        message: 'Only the describer can perform this action',
       });
     });
   });

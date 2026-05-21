@@ -140,6 +140,24 @@ describe('Lobby', () => {
     });
   });
 
+  describe('endRound', () => {
+    it('should end the round and change status to waiting', () => {
+      const lobby = Lobby.create(lobbyCode, describer);
+      lobby.startRound('card-123', 'apple', ['fruit', 'red', 'sweet', 'crunchy'], 60);
+
+      lobby.endRound();
+
+      expect(lobby.getStatus()).toBe('waiting');
+      expect(lobby.getRoundSession()).toBeNull();
+    });
+
+    it('should throw NoActiveRoundException when no round is active', () => {
+      const lobby = Lobby.create(lobbyCode, describer);
+
+      expect(() => lobby.endRound()).toThrow('No active round in this lobby');
+    });
+  });
+
   describe('isDescriber', () => {
     it('should return true for the describer', () => {
       const lobby = Lobby.create(lobbyCode, describer);
