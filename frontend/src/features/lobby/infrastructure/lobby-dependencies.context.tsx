@@ -1,6 +1,7 @@
 import React, { createContext } from 'react';
 import { CreateLobby } from '../application/use-cases/create-lobby.use-case';
 import { JoinLobby } from '../application/use-cases/join-lobby.use-case';
+import { RejoinRound } from '../application/use-cases/rejoin-round.use-case';
 import { LobbySocket } from '../application/ports/lobby-socket.port';
 import { lobbyContainer } from './lobby-dependencies.container';
 
@@ -8,6 +9,7 @@ interface LobbyDependencies {
   lobbySocket: LobbySocket;
   createLobby: CreateLobby;
   joinLobby: JoinLobby;
+  rejoinRound: RejoinRound;
 }
 
 const LobbyDependenciesContext = createContext<LobbyDependencies | undefined>(undefined);
@@ -60,4 +62,11 @@ export function useCreateLobby(): CreateLobby {
  */
 export function useJoinLobby(): JoinLobby {
   return useLobbyDependencies().joinLobby;
+}
+
+/**
+ * Hook que expone solo `RejoinRound`.
+ */
+export function useRejoinRound(): RejoinRound {
+  return useLobbyDependencies().rejoinRound;
 }
