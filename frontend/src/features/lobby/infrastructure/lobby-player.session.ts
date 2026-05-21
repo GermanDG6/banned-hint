@@ -7,6 +7,7 @@ export interface LobbyPlayerData {
   playerName: string;
   role: PlayerRole;
   durationSeconds: number;
+  lobbyCode: string;
 }
 
 export class LobbyPlayerSession {
@@ -36,7 +37,8 @@ export class LobbyPlayerSession {
       typeof (value as Record<string, unknown>).playerId === 'string' &&
       typeof (value as Record<string, unknown>).playerName === 'string' &&
       typeof (value as Record<string, unknown>).role === 'string' &&
-      typeof (value as Record<string, unknown>).durationSeconds === 'number'
+      typeof (value as Record<string, unknown>).durationSeconds === 'number' &&
+      typeof (value as Record<string, unknown>).lobbyCode === 'string'
     );
   }
 }

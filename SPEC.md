@@ -558,6 +558,31 @@ El `LobbyProvider` se añade como layout route padre de `/lobby/*` y `/round/*`.
 
 ---
 
+### Tarea 24 — `frontend`: Tests de `WaitingRoomPage` y `ConnectedWaitingRoom`
+
+**Alcance**: `frontend/src/features/lobby/ui/pages/WaitingRoomPage/`.
+
+**Nuevos ficheros**:
+- `WaitingRoomPage.test.tsx` — tests RTL que verifican:
+  - `should render JoinLobbyForm when no state and no session data`.
+  - `should call LobbyPlayerSession.save with lobbyCode when host joins successfully`.
+  - `should call LobbyPlayerSession.save with lobbyCode when guest joins successfully`.
+  - `should show loading state when connecting with valid session data`.
+  - `should show error message when connection fails`.
+- `ConnectedWaitingRoom.test.tsx` — tests RTL que verifican:
+  - `should render lobby code display and player list`.
+  - `should render start round button only for describer`.
+  - `should navigate to /round/describe when roundSession is set and role is describer`.
+  - `should navigate to /round/guess when roundSession is set and role is guesser`.
+  - `should disable start round button when not connected`.
+  - `should call startRound with correct duration when button is clicked`.
+
+**Tests**: todos los tests pasan usando `@testing-library/react` con mocks de `useLobby` y `useNavigate`.
+
+**Verificación**: `npm run test -w frontend`.
+
+---
+
 ## 7. Resumen de dependencias entre tareas
 
 ```
@@ -594,12 +619,14 @@ Tarea 19 (backend: round-ended)         — requiere T5; independiente del front
 
 Tarea 20 + T21 + T22 → Tarea 23 (frontend: páginas integración final)
 
+Tarea 11 + T14 + T17 → Tarea 24 (frontend: tests de WaitingRoomPage y ConnectedWaitingRoom)
+
 ── E2E ─────────────────────────────────────────────────────────────────
 
 Tarea 14 + Tarea 23 → Tarea 15 (e2e: flujo completo con reconexión)
 ```
 
-Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma. Las tareas 16-17 (frontend infra) y 18-19 (backend) son independientes entre sí y pueden desarrollarse en paralelo.
+Cada tarea se puede implementar, pasar lint + tests y mergear de forma autónoma. Las tareas 16-17 (frontend infra) y 18-19 (backend) son independientes entre sí y pueden desarrollarse en paralelo. La Tarea 24 (tests) puede ejecutarse en paralelo con 18-23 ya que solo cubre comportamiento ya implementado.
 
 
 ---
@@ -910,11 +937,12 @@ if (activeSession) {
 | 13 | `frontend`: Crear `DescriberPage` para modo multijugador | ✅ Completada |
 | 14 | `frontend`: Actualizar rutas | ✅ Completada |
 | 16 | `frontend`: Hacer resiliente `SocketIOLobbySocket` (buffer de listeners) | ✅ Completada |
-| 17 | `frontend`: `RoundSessionStorage` y `lobbyCode` en `LobbyPlayerSession` | ⬜ Pendiente |
+| 17 | `frontend`: `RoundSessionStorage` y `lobbyCode` en `LobbyPlayerSession` | ✅ Completada |
 | 18 | `backend`: Emitir estado actual al reconectar (`join-lobby`) | ⬜ Pendiente |
 | 19 | `backend`: Evento `round-ended` y caso de uso `EndRound` | ⬜ Pendiente |
 | 20 | `frontend`: Caso de uso `RejoinRound` | ⬜ Pendiente |
 | 21 | `frontend`: Persistir `RoundSession` en `ConnectedWaitingRoom` | ⬜ Pendiente |
 | 22 | `frontend`: `onRoundEnded` en puerto, socket y `useLobby` | ⬜ Pendiente |
 | 23 | `frontend`: Reconexión en `DescriberPage` y `GuesserPage` | ⬜ Pendiente |
+| 24 | `frontend`: Tests de `WaitingRoomPage` y `ConnectedWaitingRoom` | ⬜ Pendiente |
 | 15 | `e2e`: Test de flujo completo | ⬜ Pendiente |

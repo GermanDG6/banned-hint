@@ -43,12 +43,12 @@ export function WaitingRoomPage() {
           role: sourceData.role,
           durationSeconds: sourceData.durationSeconds,
         });
-        // Guardar sesión tras conexión exitosa
         LobbyPlayerSession.save({
           playerId: sourceData.playerId,
           playerName: sourceData.playerName,
           role: sourceData.role,
           durationSeconds: sourceData.durationSeconds,
+          lobbyCode: code,
         });
       })
       .catch((err: unknown) => {
@@ -63,13 +63,14 @@ export function WaitingRoomPage() {
       const playerId = crypto.randomUUID();
 
       await joinLobby.execute(code, playerName, 'guesser', playerId);
+
       setJoinedState({ role: 'guesser', durationSeconds: 0 });
-      // Guardar sesión tras unirse exitosamente
       LobbyPlayerSession.save({
         playerId,
         playerName,
         role: 'guesser',
         durationSeconds: 0,
+        lobbyCode: code,
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al unirse a la sala';

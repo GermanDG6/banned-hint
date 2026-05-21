@@ -6,6 +6,7 @@ describe('LobbyPlayerSession', () => {
     playerName: 'Alice',
     role: 'describer',
     durationSeconds: 180,
+    lobbyCode: 'ABC123',
   };
 
   beforeEach(() => {
@@ -70,6 +71,41 @@ describe('LobbyPlayerSession', () => {
       LobbyPlayerSession.save(guesserData);
       const loaded = LobbyPlayerSession.load();
       expect(loaded).toEqual(guesserData);
+    });
+
+    it('should persist and load lobbyCode', () => {
+      const dataWithCode: LobbyPlayerData = {
+        ...mockData,
+        lobbyCode: 'XYZ789',
+      };
+      LobbyPlayerSession.save(dataWithCode);
+      const loaded = LobbyPlayerSession.load();
+      expect(loaded?.lobbyCode).toBe('XYZ789');
+    });
+
+    it('should return null when lobbyCode is missing', () => {
+      const dataWithoutCode = {
+        playerId: 'player-123',
+        playerName: 'Alice',
+        role: 'describer',
+        durationSeconds: 180,
+      };
+      sessionStorage.setItem('lobby-player', JSON.stringify(dataWithoutCode));
+      const loaded = LobbyPlayerSession.load();
+      expect(loaded).toBeNull();
+    });
+
+    it('should return null when lobbyCode has wrong type', () => {
+      const invalidData = {
+        playerId: 'player-123',
+        playerName: 'Alice',
+        role: 'describer',
+        durationSeconds: 180,
+        lobbyCode: 123, // should be string
+      };
+      sessionStorage.setItem('lobby-player', JSON.stringify(invalidData));
+      const loaded = LobbyPlayerSession.load();
+      expect(loaded).toBeNull();
     });
   });
 
