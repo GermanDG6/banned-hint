@@ -3,12 +3,15 @@ import { LobbySocket } from '../../application/ports/lobby-socket.port';
 import { Player, PlayerRole } from '@/features/lobby/domain/models/player.model.ts';
 import { RoundSession } from '@/features/lobby/domain/models/round-session.model.ts';
 
-/**
- * SocketIOLobbySocket: implementa LobbySocket usando socket.io-client
- */
+type PendingListener = {
+  event: string;
+  handler: (...args: unknown[]) => void;
+};
+
 export class SocketIOLobbySocket implements LobbySocket {
   private socket: Socket | null = null;
   private readonly serverUrl = 'http://localhost:3000';
+  private pendingListeners: PendingListener[] = [];
 
   connect(): void {
     if (this.socket) {
@@ -22,6 +25,12 @@ export class SocketIOLobbySocket implements LobbySocket {
       reconnectionDelayMax: 5000,
       reconnectionAttempts: 5,
     });
+
+    // Registrar todos los listeners pendientes en el socket real
+    for (const { event, handler } of this.pendingListeners) {
+      this.socket.on(event, handler);
+    }
+    this.pendingListeners = [];
   }
 
   disconnect(): void {
@@ -29,6 +38,28 @@ export class SocketIOLobbySocket implements LobbySocket {
       this.socket.disconnect();
       this.socket = null;
     }
+  }
+
+  private registerListener<T extends unknown[]>(
+    event: string,
+    handler: (...args: T) => void,
+  ): () => void {
+    const untypedHandler = handler as (...args: unknown[]) => void;
+    if (this.socket) {
+      // Socket ya conectado: registrar directamente
+      this.socket.on(event, untypedHandler);
+      return () => this.socket?.off(event, untypedHandler);
+    }
+
+    // Socket no conectado: almacenar en buffer
+    this.pendingListeners.push({ event, handler: untypedHandler });
+    return () => {
+      // Limpiar del buffer y del socket si se conectó entre registrar y limpiar
+      this.pendingListeners = this.pendingListeners.filter(
+        (l) => l.handler !== untypedHandler || l.event !== event,
+      );
+      this.socket?.off(event, untypedHandler);
+    };
   }
 
   joinLobby(code: string, playerName: string, role: PlayerRole, playerId?: string): void {
@@ -69,53 +100,29 @@ export class SocketIOLobbySocket implements LobbySocket {
   }
 
   onConnect(handler: () => void): () => void {
-    if (!this.socket) {
-      throw new Error('Socket not connected. Call connect() first.');
-    }
-    this.socket.on('connect', handler);
-    return () => this.socket?.off('connect', handler);
+    return this.registerListener('connect', handler);
   }
 
   onLobbyUpdated(handler: (players: Player[]) => void): () => void {
-    if (!this.socket) {
-      throw new Error('Socket not connected. Call connect() first.');
-    }
     const wrappedHandler = (data: { players: Player[] }) => {
       handler(data.players);
     };
-    this.socket.on('lobby-updated', wrappedHandler);
-    return () => this.socket?.off('lobby-updated', wrappedHandler);
+    return this.registerListener('lobby-updated', wrappedHandler);
   }
 
   onRoundStarted(handler: (session: RoundSession) => void): () => void {
-    if (!this.socket) {
-      throw new Error('Socket not connected. Call connect() first.');
-    }
-    this.socket.on('round-started', handler);
-    return () => this.socket?.off('round-started', handler);
+    return this.registerListener('round-started', handler);
   }
 
   onCardChanged(handler: (session: RoundSession) => void): () => void {
-    if (!this.socket) {
-      throw new Error('Socket not connected. Call connect() first.');
-    }
-    this.socket.on('card-changed', handler);
-    return () => this.socket?.off('card-changed', handler);
+    return this.registerListener('card-changed', handler);
   }
 
   onGuessResult(handler: (result: { correct: boolean }) => void): () => void {
-    if (!this.socket) {
-      throw new Error('Socket not connected. Call connect() first.');
-    }
-    this.socket.on('guess-result', handler);
-    return () => this.socket?.off('guess-result', handler);
+    return this.registerListener('guess-result', handler);
   }
 
   onError(handler: (error: { message: string }) => void): () => void {
-    if (!this.socket) {
-      throw new Error('Socket not connected. Call connect() first.');
-    }
-    this.socket.on('error', handler);
-    return () => this.socket?.off('error', handler);
+    return this.registerListener('error', handler);
   }
 }

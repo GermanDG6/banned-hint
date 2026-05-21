@@ -909,7 +909,7 @@ if (activeSession) {
 | 12 | `frontend`: Nueva `GuesserPage` | ✅ Completada |
 | 13 | `frontend`: Crear `DescriberPage` para modo multijugador | ✅ Completada |
 | 14 | `frontend`: Actualizar rutas | ✅ Completada |
-| 16 | `frontend`: Hacer resiliente `SocketIOLobbySocket` (buffer de listeners) | ⬜ Pendiente |
+| 16 | `frontend`: Hacer resiliente `SocketIOLobbySocket` (buffer de listeners) | ✅ Completada |
 | 17 | `frontend`: `RoundSessionStorage` y `lobbyCode` en `LobbyPlayerSession` | ⬜ Pendiente |
 | 18 | `backend`: Emitir estado actual al reconectar (`join-lobby`) | ⬜ Pendiente |
 | 19 | `backend`: Evento `round-ended` y caso de uso `EndRound` | ⬜ Pendiente |
