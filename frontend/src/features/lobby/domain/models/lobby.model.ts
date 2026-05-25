@@ -1,4 +1,4 @@
-import { Player } from '@/features/lobby/domain/models/player.model.ts';
+import { Player } from '@/features/lobby/domain/entities/player.entity';
 
 export const LobbyStatusType = {
   Waiting: 'waiting',

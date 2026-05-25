@@ -1,4 +1,5 @@
-import { Player, PlayerRole } from '@/features/lobby/domain/models/player.model.ts';
+import { Player } from '@/features/lobby/domain/entities/player.entity';
+import { PlayerRole } from '@/features/lobby/domain/models/player.model.ts';
 import { RoundSession } from '@/features/lobby/domain/models/round-session.model.ts';
 
 export interface LobbySocket {

@@ -1,6 +1,7 @@
 import { LobbyHttpPort } from '../../application/ports/lobby-http.port';
 import { Lobby } from '../../domain/models/lobby.model';
-import { Player, PlayerRoleType } from '../../domain/models/player.model';
+import { Player } from '../../domain/entities/player.entity';
+import { PlayerRoleType } from '../../domain/models/player.model';
 import { HttpClient } from '@/shared/http/http-client.port';
 import { HttpClientException } from '@/shared/http/http-client.exception';
 import { LobbyApiResponse } from './lobby-api-response.type';
@@ -51,10 +52,10 @@ export class HttpLobbyRepository implements LobbyHttpPort {
   }
 
   private mapPlayer(p: { id: string; name: string; role: string }): Player {
-    return {
-      id: p.id,
-      name: p.name,
-      role: p.role === PlayerRoleType.Describer ? PlayerRoleType.Describer : PlayerRoleType.Guesser,
-    };
+    return Player.create(
+      p.id,
+      p.name,
+      p.role === PlayerRoleType.Describer ? PlayerRoleType.Describer : PlayerRoleType.Guesser,
+    );
   }
 }

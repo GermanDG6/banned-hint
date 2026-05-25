@@ -4,7 +4,8 @@ import { useLobby } from './use-lobby.hook';
 import { useLobbySocket } from '../../infrastructure/lobby-dependencies.context';
 import { RoundSessionStorage } from '../../infrastructure/round-session.storage';
 import { LobbySocket } from '@/features/lobby/application/ports/lobby-socket.port';
-import { Player, PlayerRoleType } from '@/features/lobby/domain/models/player.model';
+import { Player } from '@/features/lobby/domain/entities/player.entity';
+import { PlayerRoleType } from '@/features/lobby/domain/models/player.model';
 import { RoundSession } from '@/features/lobby/domain/models/round-session.model';
 
 vi.mock('../../infrastructure/lobby-dependencies.context', () => ({
@@ -140,8 +141,8 @@ describe('useLobby', () => {
     const { result } = renderHook(() => useLobby({ myRole: null }));
 
     const players: Player[] = [
-      { id: 'p1', name: 'Alice', role: PlayerRoleType.Describer },
-      { id: 'p2', name: 'Bob', role: PlayerRoleType.Guesser },
+      Player.create('p1', 'Alice', PlayerRoleType.Describer),
+      Player.create('p2', 'Bob', PlayerRoleType.Guesser),
     ];
 
     act(() => {

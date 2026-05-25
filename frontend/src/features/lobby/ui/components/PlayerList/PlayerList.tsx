@@ -1,4 +1,5 @@
-import { Player, PlayerRoleType } from '@/features/lobby/domain/models/player.model';
+import { Player } from '@/features/lobby/domain/entities/player.entity';
+import { PlayerRoleType } from '@/features/lobby/domain/models/player.model';
 import styles from './PlayerList.module.css';
 
 interface PlayerListProps {

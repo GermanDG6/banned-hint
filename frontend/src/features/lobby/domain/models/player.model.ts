@@ -4,9 +4,3 @@ export const PlayerRoleType = {
 } as const;
 
 export type PlayerRole = (typeof PlayerRoleType)[keyof typeof PlayerRoleType];
-
-export interface Player {
-  id: string;
-  name: string;
-  role: PlayerRole;
-}

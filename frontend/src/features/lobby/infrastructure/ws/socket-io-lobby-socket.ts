@@ -1,6 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { LobbySocket } from '../../application/ports/lobby-socket.port';
-import { Player, PlayerRole } from '@/features/lobby/domain/models/player.model.ts';
+import { Player } from '@/features/lobby/domain/entities/player.entity';
+import { PlayerRole } from '@/features/lobby/domain/models/player.model.ts';
 import { RoundSession } from '@/features/lobby/domain/models/round-session.model.ts';
 
 type PendingListener = {
@@ -104,11 +105,18 @@ export class SocketIOLobbySocket implements LobbySocket {
   }
 
   onLobbyUpdated(handler: (players: Player[]) => void): () => void {
-    const wrappedHandler = (data: { players: Player[] }) => {
-      handler(data.players);
+    const wrappedHandler = (data: { players: { id: string; name: string; role: string }[] }) => {
+      try {
+        const players = (data.players || []).map((playerData) =>
+          Player.create(playerData.id, playerData.name, playerData.role),
+        );
+        handler(players);
+      } catch (error) {
+        console.error('Error parsing players from server:', error);
+      }
     };
     return this.registerListener('lobby-updated', wrappedHandler);
-  }
+  } // TODO revisar si wrappedHandler es necesario
 
   onRoundStarted(handler: (session: RoundSession) => void): () => void {
     return this.registerListener('round-started', handler);

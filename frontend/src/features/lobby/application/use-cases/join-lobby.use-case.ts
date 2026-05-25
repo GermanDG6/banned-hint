@@ -19,7 +19,6 @@ export class JoinLobby {
     if (!lobby) {
       throw new LobbyNotFoundException(code);
     }
-
     this.lobbySocket.connect();
     this.lobbySocket.joinLobby(code, playerName, role, playerId);
   }

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLobbySocket } from '../../infrastructure/lobby-dependencies.context';
 import { RoundSessionStorage } from '../../infrastructure/round-session.storage';
-import { Player, PlayerRole } from '@/features/lobby/domain/models/player.model.ts';
+import { Player } from '@/features/lobby/domain/entities/player.entity';
+import { PlayerRole } from '@/features/lobby/domain/models/player.model.ts';
 import { RoundSession } from '@/features/lobby/domain/models/round-session.model.ts';
 
 interface UseLobbyOptions {
