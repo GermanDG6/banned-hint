@@ -116,4 +116,154 @@ describe('ConnectedWaitingRoom', () => {
       mockNavigate.mock.invocationCallOrder[0],
     );
   });
+
+  it('should render lobby code display and player list', () => {
+    const mockLobby = {
+      players: [
+        { id: 'player-1', name: 'Host', role: PlayerRoleType.Describer },
+        { id: 'player-2', name: 'Guest', role: PlayerRoleType.Guesser },
+      ],
+      roundSession: null,
+      isConnected: true,
+      startRound: vi.fn(),
+      nextCard: vi.fn(),
+      submitGuess: vi.fn(),
+      endRound: vi.fn(),
+      roundEnded: false,
+    };
+
+    (useLobby as ReturnType<typeof vi.fn>).mockReturnValue(mockLobby);
+
+    render(
+      <BrowserRouter>
+        <ConnectedWaitingRoom
+          code="ABC123"
+          myRole={PlayerRoleType.Describer}
+          durationSeconds={60}
+        />
+      </BrowserRouter>,
+    );
+
+    // Check that LobbyCodeDisplay is rendered with the code
+    expect(
+      document.querySelector('[class*="LobbyCodeDisplay"]') || document.body.textContent,
+    ).toContain('ABC123');
+
+    // Check that PlayerList is rendered with player names
+    expect(document.body.textContent).toContain('Host');
+    expect(document.body.textContent).toContain('Guest');
+  });
+
+  it('should render start round button only for describer', () => {
+    const mockLobby = {
+      players: [{ id: 'player-1', name: 'Host', role: PlayerRoleType.Describer }],
+      roundSession: null,
+      isConnected: true,
+      startRound: vi.fn(),
+      nextCard: vi.fn(),
+      submitGuess: vi.fn(),
+      endRound: vi.fn(),
+      roundEnded: false,
+    };
+
+    (useLobby as ReturnType<typeof vi.fn>).mockReturnValue(mockLobby);
+
+    // Render as Describer
+    const { rerender } = render(
+      <BrowserRouter>
+        <ConnectedWaitingRoom
+          code="ABC123"
+          myRole={PlayerRoleType.Describer}
+          durationSeconds={60}
+        />
+      </BrowserRouter>,
+    );
+
+    const startButton = document.querySelector('button');
+    expect(startButton).toBeDefined();
+
+    vi.clearAllMocks();
+    (useLobby as ReturnType<typeof vi.fn>).mockReturnValue(mockLobby);
+
+    // Render as Guesser
+    rerender(
+      <BrowserRouter>
+        <ConnectedWaitingRoom code="ABC123" myRole={PlayerRoleType.Guesser} durationSeconds={60} />
+      </BrowserRouter>,
+    );
+
+    const buttons = document.querySelectorAll('button');
+    const hasStartButton = Array.from(buttons).some(
+      (btn) => btn.textContent?.includes('Iniciar ronda') || false,
+    );
+    expect(hasStartButton).toBe(false);
+  });
+
+  it('should disable start round button when not connected', () => {
+    const mockLobby = {
+      players: [{ id: 'player-1', name: 'Host', role: PlayerRoleType.Describer }],
+      roundSession: null,
+      isConnected: false,
+      startRound: vi.fn(),
+      nextCard: vi.fn(),
+      submitGuess: vi.fn(),
+      endRound: vi.fn(),
+      roundEnded: false,
+    };
+
+    (useLobby as ReturnType<typeof vi.fn>).mockReturnValue(mockLobby);
+
+    render(
+      <BrowserRouter>
+        <ConnectedWaitingRoom
+          code="ABC123"
+          myRole={PlayerRoleType.Describer}
+          durationSeconds={60}
+        />
+      </BrowserRouter>,
+    );
+
+    const buttons = document.querySelectorAll('button');
+    const startButton = Array.from(buttons).find(
+      (btn) => btn.textContent?.includes('Iniciar ronda') || false,
+    ) as HTMLButtonElement;
+
+    expect(startButton?.disabled).toBe(true);
+  });
+
+  it('should call startRound with correct duration when button is clicked', async () => {
+    const mockStartRound = vi.fn();
+    const mockLobby = {
+      players: [{ id: 'player-1', name: 'Host', role: PlayerRoleType.Describer }],
+      roundSession: null,
+      isConnected: true,
+      startRound: mockStartRound,
+      nextCard: vi.fn(),
+      submitGuess: vi.fn(),
+      endRound: vi.fn(),
+      roundEnded: false,
+    };
+
+    (useLobby as ReturnType<typeof vi.fn>).mockReturnValue(mockLobby);
+
+    render(
+      <BrowserRouter>
+        <ConnectedWaitingRoom
+          code="ABC123"
+          myRole={PlayerRoleType.Describer}
+          durationSeconds={120}
+        />
+      </BrowserRouter>,
+    );
+
+    const buttons = document.querySelectorAll('button');
+    const startButton = Array.from(buttons).find(
+      (btn) => btn.textContent?.includes('Iniciar ronda') || false,
+    ) as HTMLElement;
+
+    const user = await import('@testing-library/user-event').then((m) => m.default.setup());
+    await user.click(startButton);
+
+    expect(mockStartRound).toHaveBeenCalledWith(120);
+  });
 });

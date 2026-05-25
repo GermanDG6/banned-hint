@@ -1,0 +1,182 @@
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { WaitingRoomPage } from './WaitingRoomPage';
+import { useJoinLobby } from '@/features/lobby/infrastructure/lobby-dependencies.context';
+import { LobbyPlayerSession } from '@/features/lobby/infrastructure/lobby-player.session';
+import * as ReactRouterDom from 'react-router-dom';
+
+// Mock dependencies
+vi.mock('@/features/lobby/infrastructure/lobby-dependencies.context');
+vi.mock('@/features/lobby/infrastructure/lobby-player.session');
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof ReactRouterDom>('react-router-dom');
+  return {
+    ...actual,
+    useParams: vi.fn(),
+    useLocation: vi.fn(),
+  };
+});
+
+describe('WaitingRoomPage', () => {
+  let mockJoinLobby: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    mockJoinLobby = vi.fn().mockReturnValue({
+      execute: vi.fn().mockResolvedValue(undefined),
+    });
+
+    (useJoinLobby as ReturnType<typeof vi.fn>).mockReturnValue(mockJoinLobby);
+
+    (LobbyPlayerSession.load as ReturnType<typeof vi.fn>).mockReturnValue(null);
+    (LobbyPlayerSession.save as ReturnType<typeof vi.fn>).mockImplementation(() => {});
+
+    // Mock useParams and useLocation
+    (ReactRouterDom.useParams as ReturnType<typeof vi.fn>).mockReturnValue({ code: 'ABC123' });
+    (ReactRouterDom.useLocation as ReturnType<typeof vi.fn>).mockReturnValue({
+      state: null,
+      pathname: '/lobby/ABC123',
+    });
+  });
+
+  it('should render JoinLobbyForm when no state and no session data', async () => {
+    render(
+      <MemoryRouter initialEntries={['/lobby/ABC123']}>
+        <WaitingRoomPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /Unirse a Sala/i })).toBeVisible();
+    });
+  });
+
+  it('should call LobbyPlayerSession.save with lobbyCode when host joins successfully', async () => {
+    const mockExecute = vi.fn().mockResolvedValue(undefined);
+    (useJoinLobby as ReturnType<typeof vi.fn>).mockReturnValue({
+      execute: mockExecute,
+    });
+
+    const hostState = {
+      playerId: 'host-id',
+      role: 'describer' as const,
+      playerName: 'Host',
+      durationSeconds: 60,
+    };
+
+    (ReactRouterDom.useLocation as ReturnType<typeof vi.fn>).mockReturnValue({
+      state: hostState,
+      pathname: '/lobby/ABC123',
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/lobby/ABC123']}>
+        <WaitingRoomPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(LobbyPlayerSession.save).toHaveBeenCalledWith({
+        playerId: 'host-id',
+        playerName: 'Host',
+        role: 'describer',
+        durationSeconds: 60,
+        lobbyCode: 'ABC123',
+      });
+    });
+  });
+
+  it('should call LobbyPlayerSession.save with lobbyCode when guest joins successfully', async () => {
+    const mockExecute = vi.fn().mockResolvedValue(undefined);
+    (useJoinLobby as ReturnType<typeof vi.fn>).mockReturnValue({
+      execute: mockExecute,
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/lobby/ABC123']}>
+        <WaitingRoomPage />
+      </MemoryRouter>,
+    );
+
+    // Simulate guest join via form
+    const form = screen.getByRole('heading', { name: /Unirse a Sala/i });
+    expect(form).toBeVisible();
+
+    const input = screen.getByPlaceholderText(/nombre/i);
+    const submitButton = screen.getByRole('button', { name: /unirse/i });
+
+    const user = userEvent.setup();
+    await user.type(input, 'Guest Player');
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(LobbyPlayerSession.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          playerName: 'Guest Player',
+          role: 'guesser',
+          lobbyCode: 'ABC123',
+        }),
+      );
+    });
+  });
+
+  it('should show loading state when connecting with valid session data', async () => {
+    const sessionData = {
+      playerId: 'player-id',
+      playerName: 'Player',
+      role: 'guesser' as const,
+      durationSeconds: 0,
+      lobbyCode: 'ABC123',
+    };
+
+    (LobbyPlayerSession.load as ReturnType<typeof vi.fn>).mockReturnValue(sessionData);
+
+    const mockExecute = vi.fn().mockImplementation(
+      () => new Promise((resolve) => setTimeout(resolve, 100)), // Simular demora
+    );
+    (useJoinLobby as ReturnType<typeof vi.fn>).mockReturnValue({
+      execute: mockExecute,
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/lobby/ABC123']}>
+        <WaitingRoomPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Conectando a la sala/i)).toBeVisible();
+    });
+  });
+
+  it('should show error message when connection fails', async () => {
+    const sessionData = {
+      playerId: 'player-id',
+      playerName: 'Player',
+      role: 'guesser' as const,
+      durationSeconds: 0,
+      lobbyCode: 'ABC123',
+    };
+
+    (LobbyPlayerSession.load as ReturnType<typeof vi.fn>).mockReturnValue(sessionData);
+
+    const mockError = new Error('Sala no encontrada');
+    const mockExecute = vi.fn().mockRejectedValue(mockError);
+    (useJoinLobby as ReturnType<typeof vi.fn>).mockReturnValue({
+      execute: mockExecute,
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/lobby/ABC123']}>
+        <WaitingRoomPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Sala no encontrada/i)).toBeVisible();
+    });
+  });
+});
