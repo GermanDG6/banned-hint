@@ -420,6 +420,63 @@ describe('SocketIOLobbySocket', () => {
     });
   });
 
+  describe('onRoundEnded', () => {
+    it('should register handler for round-ended event', () => {
+      socketAdapter.connect();
+      const mockSocket = vi.mocked(io).mock.results[0].value;
+      const handler = vi.fn();
+
+      socketAdapter.onRoundEnded(handler);
+
+      expect(mockSocket.on).toHaveBeenCalledWith('round-ended', handler);
+    });
+
+    it('should call handler when event fires', () => {
+      socketAdapter.connect();
+      const mockSocket = vi.mocked(io).mock.results[0].value;
+      const handler = vi.fn();
+
+      socketAdapter.onRoundEnded(handler);
+
+      const eventHandler = mockSocket.on.mock.calls[0][1] as () => void;
+      eventHandler();
+
+      expect(handler).toHaveBeenCalled();
+    });
+
+    it('should return cleanup function that calls socket.off', () => {
+      socketAdapter.connect();
+      const mockSocket = vi.mocked(io).mock.results[0].value;
+      const handler = vi.fn();
+
+      const cleanup = socketAdapter.onRoundEnded(handler);
+      cleanup();
+
+      expect(mockSocket.off).toHaveBeenCalledWith('round-ended', handler);
+    });
+
+    it('should not throw when calling onRoundEnded before connect', () => {
+      const handler = vi.fn();
+
+      expect(() => socketAdapter.onRoundEnded(handler)).not.toThrow();
+    });
+  });
+
+  describe('endRound', () => {
+    it('should emit end-round event when connected', () => {
+      socketAdapter.connect();
+      const mockSocket = vi.mocked(io).mock.results[0].value;
+
+      socketAdapter.endRound();
+
+      expect(mockSocket.emit).toHaveBeenCalledWith('end-round', {});
+    });
+
+    it('should throw error if not connected', () => {
+      expect(() => socketAdapter.endRound()).toThrow('Socket not connected');
+    });
+  });
+
   describe('resilience: register listeners before connect', () => {
     it('should register pending listeners when connect is called after on*', () => {
       const handler1 = vi.fn();

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLobbySocket } from '../../infrastructure/lobby-dependencies.context';
+import { RoundSessionStorage } from '../../infrastructure/round-session.storage';
 import { Player, PlayerRole } from '@/features/lobby/domain/models/player.model.ts';
 import { RoundSession } from '@/features/lobby/domain/models/round-session.model.ts';
 
@@ -22,20 +23,13 @@ interface UseLobbyResult {
   myRole: PlayerRole | null;
   isConnected: boolean;
   guessResult: { correct: boolean } | null;
+  roundEnded: boolean;
   startRound: (durationSeconds: number) => void;
   nextCard: () => void;
   submitGuess: (word: string) => void;
+  endRound: () => void;
 }
 
-/**
- * Hook adaptador que suscribe al LobbySocket del contexto y expone el estado de UI.
- * Gestiona los handlers de conexión y eventos, y delega las acciones al socket.
- *
- * Uso:
- * ```
- * const lobby = useLobby({ myRole: 'describer' });
- * ```
- */
 export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
   const socket = useLobbySocket();
 
@@ -43,6 +37,7 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
   const [roundSession, setRoundSession] = useState<RoundSession | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [guessResult, setGuessResult] = useState<{ correct: boolean } | null>(null);
+  const [roundEnded, setRoundEnded] = useState(false);
 
   useEffect(() => {
     // Registrar handlers y guardar sus funciones de cleanup
@@ -57,6 +52,7 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
     const cleanupRoundStarted = socket.onRoundStarted((session) => {
       setRoundSession(session);
       setGuessResult(null); // Limpiar resultado anterior al iniciar nueva ronda
+      setRoundEnded(false); // Resetear roundEnded al iniciar nueva ronda
     });
 
     const cleanupCardChanged = socket.onCardChanged((session) => {
@@ -68,6 +64,11 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
       setGuessResult(result);
     });
 
+    const cleanupRoundEnded = socket.onRoundEnded(() => {
+      RoundSessionStorage.clear();
+      setRoundEnded(true);
+    });
+
     // Cleanup: desuscribir todos los handlers al desmontar
     return () => {
       cleanupConnect();
@@ -75,6 +76,7 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
       cleanupRoundStarted();
       cleanupCardChanged();
       cleanupGuessResult();
+      cleanupRoundEnded();
     };
   }, [socket]);
 
@@ -90,14 +92,20 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
     socket.submitGuess(word);
   };
 
+  const endRound = () => {
+    socket.endRound();
+  };
+
   return {
     players,
     roundSession,
     myRole,
     isConnected,
     guessResult,
+    roundEnded,
     startRound,
     nextCard,
     submitGuess,
+    endRound,
   };
 }

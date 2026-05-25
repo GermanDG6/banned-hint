@@ -30,9 +30,11 @@ describe('GuesserPage', () => {
       myRole: 'guesser',
       isConnected: true,
       guessResult: null,
+      roundEnded: false,
       startRound: vi.fn(),
       nextCard: vi.fn(),
       submitGuess: vi.fn(),
+      endRound: vi.fn(),
     });
 
     vi.mocked(useServerSyncedCountdown).mockReturnValue({
@@ -87,9 +89,11 @@ describe('GuesserPage', () => {
       myRole: 'guesser',
       isConnected: true,
       guessResult: null,
+      roundEnded: false,
       startRound: vi.fn(),
       nextCard: vi.fn(),
       submitGuess: mockSubmitGuess,
+      endRound: vi.fn(),
     });
 
     render(
@@ -118,9 +122,11 @@ describe('GuesserPage', () => {
       myRole: 'guesser',
       isConnected: true,
       guessResult: { correct: true },
+      roundEnded: false,
       startRound: vi.fn(),
       nextCard: vi.fn(),
       submitGuess: vi.fn(),
+      endRound: vi.fn(),
     });
 
     render(
@@ -143,9 +149,11 @@ describe('GuesserPage', () => {
       myRole: 'guesser',
       isConnected: true,
       guessResult: { correct: false },
+      roundEnded: false,
       startRound: vi.fn(),
       nextCard: vi.fn(),
       submitGuess: vi.fn(),
+      endRound: vi.fn(),
     });
 
     render(

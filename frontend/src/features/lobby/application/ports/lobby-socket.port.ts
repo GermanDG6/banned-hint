@@ -25,4 +25,8 @@ export interface LobbySocket {
   onGuessResult(handler: (result: { correct: boolean }) => void): () => void;
 
   onError(handler: (error: { message: string }) => void): () => void;
+
+  onRoundEnded(handler: () => void): () => void;
+
+  endRound(): void;
 }

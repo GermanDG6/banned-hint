@@ -125,4 +125,15 @@ export class SocketIOLobbySocket implements LobbySocket {
   onError(handler: (error: { message: string }) => void): () => void {
     return this.registerListener('error', handler);
   }
+
+  onRoundEnded(handler: () => void): () => void {
+    return this.registerListener('round-ended', handler);
+  }
+
+  endRound(): void {
+    if (!this.socket) {
+      throw new Error('Socket not connected. Call connect() first.');
+    }
+    this.socket.emit('end-round', {});
+  }
 }

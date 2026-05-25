@@ -2,13 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useLobby } from './use-lobby.hook';
 import { useLobbySocket } from '../../infrastructure/lobby-dependencies.context';
+import { RoundSessionStorage } from '../../infrastructure/round-session.storage';
 import { LobbySocket } from '@/features/lobby/application/ports/lobby-socket.port';
 import { Player, PlayerRoleType } from '@/features/lobby/domain/models/player.model';
 import { RoundSession } from '@/features/lobby/domain/models/round-session.model';
 
-// Mock del contexto de dependencias
 vi.mock('../../infrastructure/lobby-dependencies.context', () => ({
   useLobbySocket: vi.fn(),
+}));
+
+vi.mock('../../infrastructure/round-session.storage', () => ({
+  RoundSessionStorage: {
+    clear: vi.fn(),
+  },
 }));
 
 type FakeLobbySocketType = LobbySocket & {
@@ -16,10 +22,6 @@ type FakeLobbySocketType = LobbySocket & {
   _getCleanups: (event: string) => Array<ReturnType<typeof vi.fn>>;
 };
 
-/**
- * Socket fake que implementa LobbySocket.
- * Cada handler on* devuelve una función cleanup que es un vi.fn().
- */
 function createFakeLobbySocket(): FakeLobbySocketType {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlers: Record<string, Array<{ callback: any; cleanup: ReturnType<typeof vi.fn> }>> = {
@@ -29,16 +31,17 @@ function createFakeLobbySocket(): FakeLobbySocketType {
     'card-changed': [],
     'guess-result': [],
     error: [],
+    'round-ended': [],
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const socket: any = {
+  const socket = {
     connect: vi.fn(),
     disconnect: vi.fn(),
     joinLobby: vi.fn(),
     startRound: vi.fn(),
     nextCard: vi.fn(),
     submitGuess: vi.fn(),
+    endRound: vi.fn(),
 
     onConnect: vi.fn((handler: () => void) => {
       const cleanup = vi.fn();
@@ -76,6 +79,12 @@ function createFakeLobbySocket(): FakeLobbySocketType {
       return cleanup;
     }),
 
+    onRoundEnded: vi.fn((handler: () => void) => {
+      const cleanup = vi.fn();
+      handlers['round-ended'].push({ callback: handler, cleanup });
+      return cleanup;
+    }),
+
     // Helper para tests: disparar un evento manualmente
     _emit: (event: string, data?: unknown) => {
       const eventHandlers = handlers[event];
@@ -104,13 +113,14 @@ describe('useLobby', () => {
     vi.mocked(useLobbySocket).mockReturnValue(fakeLobbySocket as unknown as LobbySocket);
   });
 
-  it('should initialize with empty players, null roundSession, null guessResult, and isConnected as false', () => {
+  it('should initialize with empty players, null roundSession, null guessResult, false isConnected, and false roundEnded', () => {
     const { result } = renderHook(() => useLobby({ myRole: null }));
 
     expect(result.current.players).toEqual([]);
     expect(result.current.roundSession).toBeNull();
     expect(result.current.guessResult).toBeNull();
     expect(result.current.isConnected).toBe(false);
+    expect(result.current.roundEnded).toBe(false);
   });
 
   it('should set isConnected to true when onConnect event fires', () => {
@@ -229,6 +239,30 @@ describe('useLobby', () => {
     expect(result.current.roundSession).toEqual(session);
   });
 
+  it('should reset roundEnded to false when round-started is received after round-ended', () => {
+    const { result } = renderHook(() => useLobby({ myRole: null }));
+
+    // Primero disparar round-ended
+    act(() => {
+      fakeLobbySocket._emit('round-ended');
+    });
+
+    expect(result.current.roundEnded).toBe(true);
+
+    // Luego disparar round-started que debe resetear roundEnded a false
+    const session: RoundSession = {
+      startAt: 1000,
+      durationSeconds: 60,
+    };
+
+    act(() => {
+      fakeLobbySocket._emit('round-started', session);
+    });
+
+    expect(result.current.roundEnded).toBe(false);
+    expect(result.current.roundSession).toEqual(session);
+  });
+
   it('should preserve myRole from options', () => {
     const { result } = renderHook(() => useLobby({ myRole: PlayerRoleType.Describer }));
 
@@ -265,6 +299,50 @@ describe('useLobby', () => {
     expect(fakeLobbySocket.submitGuess).toHaveBeenCalledWith('apple');
   });
 
+  it('should call socket.endRound when endRound() is called', () => {
+    const { result } = renderHook(() => useLobby({ myRole: null }));
+
+    act(() => {
+      result.current.endRound();
+    });
+
+    expect(fakeLobbySocket.endRound).toHaveBeenCalled();
+  });
+
+  it('should set roundEnded to true when round-ended event is received', () => {
+    const { result } = renderHook(() => useLobby({ myRole: null }));
+
+    expect(result.current.roundEnded).toBe(false);
+
+    act(() => {
+      fakeLobbySocket._emit('round-ended');
+    });
+
+    expect(result.current.roundEnded).toBe(true);
+  });
+
+  it('should clear RoundSessionStorage when round-ended is received', () => {
+    renderHook(() => useLobby({ myRole: null }));
+
+    act(() => {
+      fakeLobbySocket._emit('round-ended');
+    });
+
+    expect(RoundSessionStorage.clear).toHaveBeenCalled();
+  });
+
+  it('should not clear LobbyPlayerSession when round-ended is received', () => {
+    const { result } = renderHook(() => useLobby({ myRole: null }));
+
+    act(() => {
+      fakeLobbySocket._emit('round-ended');
+    });
+
+    expect(RoundSessionStorage.clear).toHaveBeenCalled();
+
+    expect(result.current.roundEnded).toBe(true);
+  });
+
   describe('cleanup', () => {
     it('should call cleanup functions on unmount', () => {
       const { unmount } = renderHook(() => useLobby({ myRole: null }));
@@ -275,6 +353,7 @@ describe('useLobby', () => {
       const roundStartedCleanups = fakeLobbySocket._getCleanups('round-started');
       const cardChangedCleanups = fakeLobbySocket._getCleanups('card-changed');
       const guessResultCleanups = fakeLobbySocket._getCleanups('guess-result');
+      const roundEndedCleanups = fakeLobbySocket._getCleanups('round-ended');
 
       // Verificar que los handlers fueron registrados
       expect(connectCleanups.length).toBeGreaterThan(0);
@@ -282,6 +361,7 @@ describe('useLobby', () => {
       expect(roundStartedCleanups.length).toBeGreaterThan(0);
       expect(cardChangedCleanups.length).toBeGreaterThan(0);
       expect(guessResultCleanups.length).toBeGreaterThan(0);
+      expect(roundEndedCleanups.length).toBeGreaterThan(0);
 
       // Desmontar el hook
       unmount();
@@ -300,6 +380,9 @@ describe('useLobby', () => {
         expect(cleanup).toHaveBeenCalled();
       });
       guessResultCleanups.forEach((cleanup) => {
+        expect(cleanup).toHaveBeenCalled();
+      });
+      roundEndedCleanups.forEach((cleanup) => {
         expect(cleanup).toHaveBeenCalled();
       });
     });

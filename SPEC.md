@@ -673,7 +673,7 @@ Recarga de /round/describe o /round/guess
 
 - **Quién lo emite**: solo el **Describer** desde el frontend mediante el evento `end-round` cuando el timer llega a cero. El Guesser nunca emite `end-round` (evita race conditions).
 - **Qué hace el backend**: el handler `end-round` en el gateway llama a `EndRound` use case (llama a `lobby.endRound()`) y emite `round-ended` a toda la sala.
-- **Qué hace el frontend**: `useLobby` escucha `round-ended`, llama a `RoundSessionStorage.clear()` (**no** limpia `LobbyPlayerSession`) y expone `roundEnded: boolean`. Las páginas navegan a `/lobby/:code` (sala de espera para la siguiente ronda).
+- **Qué hace el frontend**: `useLobby` escucha `round-ended`, llama a `RoundSessionStorage.clear()` (**no** limpia `LobbyPlayerSession`) y expone `roundEnded: boolean`. **Las páginas NO navegan**; permanecen en `/round/*` y muestran un estado de "ronda terminada". El `Describer` puede iniciar una nueva ronda desde esa misma vista; cuando el servidor emite `round-started`, `roundEnded` vuelve a `false` y la UI retoma el flujo normal de juego.
 
 ### 9.5 Contrato WebSocket ampliado
 
@@ -876,6 +876,7 @@ if (activeSession) {
 
 **`useLobby`**:
 - Añadir handler `onRoundEnded` en el `useEffect` que llama a `RoundSessionStorage.clear()` y actualiza estado `roundEnded: boolean` a `true`.
+- En el handler de `onRoundStarted` existente: **resetear `roundEnded` a `false`** para que, cuando el Describer inicie una nueva ronda, la UI recupere el estado de juego activo.
 - Exponer `roundEnded` y `endRound` en el resultado del hook.
 - **No** limpiar `LobbyPlayerSession` (los datos del jugador persisten para la siguiente ronda).
 
@@ -883,6 +884,7 @@ if (activeSession) {
 - `should set roundEnded to true when round-ended event is received`.
 - `should clear RoundSessionStorage when round-ended is received`.
 - `should not clear LobbyPlayerSession when round-ended is received`.
+- `should reset roundEnded to false when round-started is received after round-ended`.
 
 **Verificación**: `npm run test -w frontend`.
 
@@ -903,16 +905,16 @@ if (activeSession) {
 1. Si `location.state` es null: cargar `RoundSessionStorage.load()` como `roundSession` inicial y llamar `RejoinRound.execute(...)` con datos de `LobbyPlayerSession`.
 2. Si no hay ni state ni storage: navegar a `/` (sesión completamente perdida).
 3. Pasar `onExpire` a `useServerSyncedCountdown` que llama a `lobby.endRound()`.
-4. Cuando `lobby.roundEnded` sea `true`: navegar a `/lobby/:code` (sala de espera para la siguiente ronda).
+4. Cuando `lobby.roundEnded` sea `true`: **no navegar**. Mostrar un estado de "Ronda terminada" con el botón "Iniciar nueva ronda" visible. Al pulsarlo, llamar a `lobby.startRound(durationSeconds)`. Cuando el servidor responda con `round-started`, `roundEnded` volverá a `false` y la vista recuperará el flujo normal de juego.
 
 **`GuesserPage`**:
 1. Mismo patrón de restauración que `DescriberPage`.
 2. No pasa `onExpire` (el Guesser no emite `end-round`).
-3. Cuando `lobby.roundEnded` sea `true`: navegar a `/lobby/:code`.
+3. Cuando `lobby.roundEnded` sea `true`: **no navegar**. Mostrar un mensaje de "Esperando nueva ronda…". Cuando el servidor emita `round-started`, `roundEnded` volverá a `false` y la vista recuperará el flujo normal.
 
 **Tests**:
-- `DescriberPage`: `should reconnect using session data when location.state is null`, `should call endRound when countdown expires`, `should navigate to lobby when roundEnded`.
-- `GuesserPage`: `should reconnect using session data when location.state is null`, `should navigate to lobby when roundEnded`.
+- `DescriberPage`: `should reconnect using session data when location.state is null`, `should call endRound when countdown expires`, `should show round ended state when roundEnded is true`, `should call startRound when new round button is clicked`, `should return to normal view when round-started fires after roundEnded`.
+- `GuesserPage`: `should reconnect using session data when location.state is null`, `should show waiting message when roundEnded is true`, `should return to normal view when round-started fires after roundEnded`.
 
 **Verificación**: `npm run test -w frontend` + `npm run lint -w frontend`.
 
@@ -942,7 +944,7 @@ if (activeSession) {
 | 19 | `backend`: Evento `round-ended` y caso de uso `EndRound` | ✅ Completada |
 | 20 | `frontend`: Caso de uso `RejoinRound` | ✅ Completada |
 | 21 | `frontend`: Persistir `RoundSession` en `ConnectedWaitingRoom` | ✅ Completada |
-| 22 | `frontend`: `onRoundEnded` en puerto, socket y `useLobby` | ⬜ Pendiente |
+| 22 | `frontend`: `onRoundEnded` en puerto, socket y `useLobby` | ✅ Completada |
 | 23 | `frontend`: Reconexión en `DescriberPage` y `GuesserPage` | ⬜ Pendiente |
 | 24 | `frontend`: Tests de `WaitingRoomPage` y `ConnectedWaitingRoom` | ⬜ Pendiente |
 | 15 | `e2e`: Test de flujo completo | ⬜ Pendiente |

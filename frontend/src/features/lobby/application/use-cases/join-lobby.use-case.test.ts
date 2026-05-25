@@ -24,12 +24,14 @@ describe('JoinLobby', () => {
     startRound: vi.fn(),
     nextCard: vi.fn(),
     submitGuess: vi.fn(),
+    endRound: vi.fn(),
     onConnect: vi.fn(),
     onLobbyUpdated: vi.fn(),
     onRoundStarted: vi.fn(),
     onCardChanged: vi.fn(),
     onGuessResult: vi.fn(),
     onError: vi.fn(),
+    onRoundEnded: vi.fn(),
   };
 
   it('should connect to socket and join lobby when lobby exists', async () => {
@@ -63,12 +65,14 @@ describe('JoinLobby', () => {
       startRound: vi.fn(),
       nextCard: vi.fn(),
       submitGuess: vi.fn(),
+      endRound: vi.fn(),
       onConnect: vi.fn(),
       onLobbyUpdated: vi.fn(),
       onRoundStarted: vi.fn(),
       onCardChanged: vi.fn(),
       onGuessResult: vi.fn(),
       onError: vi.fn(),
+      onRoundEnded: vi.fn(),
     };
 
     const joinLobby = new JoinLobby(fakeHttpPort, localFakeSocket);
@@ -91,12 +95,14 @@ describe('JoinLobby', () => {
       startRound: vi.fn(),
       nextCard: vi.fn(),
       submitGuess: vi.fn(),
+      endRound: vi.fn(),
       onConnect: vi.fn(),
       onLobbyUpdated: vi.fn(),
       onRoundStarted: vi.fn(),
       onCardChanged: vi.fn(),
       onGuessResult: vi.fn(),
       onError: vi.fn(),
+      onRoundEnded: vi.fn(),
     };
 
     const joinLobby = new JoinLobby(fakeHttpPort, localFakeSocket);

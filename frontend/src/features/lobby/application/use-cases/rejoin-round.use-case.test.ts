@@ -10,12 +10,14 @@ describe('RejoinRound', () => {
     startRound: vi.fn(),
     nextCard: vi.fn(),
     submitGuess: vi.fn(),
+    endRound: vi.fn(),
     onConnect: vi.fn(),
     onLobbyUpdated: vi.fn(),
     onRoundStarted: vi.fn(),
     onCardChanged: vi.fn(),
     onGuessResult: vi.fn(),
     onError: vi.fn(),
+    onRoundEnded: vi.fn(),
   };
 
   it('should call connect and joinLobby with correct args', () => {
