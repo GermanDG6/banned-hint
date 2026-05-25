@@ -3,7 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { WaitingRoomPage } from './WaitingRoomPage';
-import { useJoinLobby } from '@/features/lobby/infrastructure/lobby-dependencies.context';
+import {
+  useJoinLobby,
+  useLobbySocket,
+} from '@/features/lobby/infrastructure/lobby-dependencies.context';
 import { LobbyPlayerSession } from '@/features/lobby/infrastructure/lobby-player.session';
 import * as ReactRouterDom from 'react-router-dom';
 
@@ -19,11 +22,41 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+const noopCleanup = () => {};
+
+const mockSocket = {
+  connect: vi.fn(),
+  disconnect: vi.fn(),
+  joinLobby: vi.fn(),
+  startRound: vi.fn(),
+  nextCard: vi.fn(),
+  submitGuess: vi.fn(),
+  endRound: vi.fn(),
+  onConnect: vi.fn().mockReturnValue(noopCleanup),
+  onLobbyUpdated: vi.fn().mockReturnValue(noopCleanup),
+  onRoundStarted: vi.fn().mockReturnValue(noopCleanup),
+  onCardChanged: vi.fn().mockReturnValue(noopCleanup),
+  onGuessResult: vi.fn().mockReturnValue(noopCleanup),
+  onError: vi.fn().mockReturnValue(noopCleanup),
+  onRoundEnded: vi.fn().mockReturnValue(noopCleanup),
+};
+
 describe('WaitingRoomPage', () => {
   let mockJoinLobby: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Restore noop cleanups after clearAllMocks
+    mockSocket.onConnect.mockReturnValue(noopCleanup);
+    mockSocket.onLobbyUpdated.mockReturnValue(noopCleanup);
+    mockSocket.onRoundStarted.mockReturnValue(noopCleanup);
+    mockSocket.onCardChanged.mockReturnValue(noopCleanup);
+    mockSocket.onGuessResult.mockReturnValue(noopCleanup);
+    mockSocket.onError.mockReturnValue(noopCleanup);
+    mockSocket.onRoundEnded.mockReturnValue(noopCleanup);
+
+    (useLobbySocket as ReturnType<typeof vi.fn>).mockReturnValue(mockSocket);
 
     mockJoinLobby = vi.fn().mockReturnValue({
       execute: vi.fn().mockResolvedValue(undefined),
