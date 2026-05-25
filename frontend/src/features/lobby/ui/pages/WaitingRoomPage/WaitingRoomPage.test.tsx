@@ -105,7 +105,7 @@ describe('WaitingRoomPage', () => {
     const form = screen.getByRole('heading', { name: /Unirse a Sala/i });
     expect(form).toBeVisible();
 
-    const input = screen.getByPlaceholderText(/nombre/i);
+    const input = screen.getByLabelText(/nombre/i);
     const submitButton = screen.getByRole('button', { name: /unirse/i });
 
     const user = userEvent.setup();
