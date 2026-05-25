@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:8
+    container_name: banned-hint-mongodb
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_DATABASE: banned-hint
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', 'db.runCommand("ping")']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
+

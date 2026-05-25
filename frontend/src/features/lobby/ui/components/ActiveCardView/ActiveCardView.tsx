@@ -25,7 +25,9 @@ export function ActiveCardView({ card, loading = false }: ActiveCardViewProps) {
 
   return (
     <div className={styles.card}>
-      <h2 className={styles.word}>{card.word.toUpperCase()}</h2>
+      <h2 className={styles.word} data-testid="card-word">
+        {card.word.toUpperCase()}
+      </h2>
       <div className={styles.divider} />
       <ul className={styles.bannedWordsList} aria-label="Palabras prohibidas">
         {card.bannedWords.map((bannedWord) => (

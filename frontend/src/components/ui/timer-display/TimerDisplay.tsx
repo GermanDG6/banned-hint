@@ -6,7 +6,7 @@ interface TimerDisplayProps {
 
 export function TimerDisplay({ formatted }: TimerDisplayProps) {
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="timer-display">
       <span className={styles.icon} aria-hidden="true">
         ⏱
       </span>

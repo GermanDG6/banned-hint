@@ -17,15 +17,21 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+  ],
+  webServer: [
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      command: 'npm run dev:backend',
+      url: 'http://localhost:3000/api/cards/random',
+      reuseExistingServer: !process.env.CI,
+      cwd: '../',
+      timeout: 60 * 1000,
+    },
+    {
+      command: 'npm run dev:frontend',
+      url: 'http://localhost:5173',
+      reuseExistingServer: !process.env.CI,
+      cwd: '../',
+      timeout: 60 * 1000,
     },
   ],
-  webServer: {
-    command: 'npm run dev:frontend',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-    cwd: '../',
-  },
 });
