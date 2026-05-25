@@ -19,7 +19,7 @@ export class CreateLobbyUseCase {
     const lobbyCode = LobbyCode.generate();
 
     // Create the host player as describer
-    const hostPlayer = Player.create('', input.playerName, PlayerRoleType.Describer);
+    const hostPlayer = Player.create(input.player.id, input.player.name, PlayerRoleType.Describer);
 
     // Create the lobby with the host as the first player
     const lobby = Lobby.create(lobbyCode, hostPlayer);
@@ -28,6 +28,6 @@ export class CreateLobbyUseCase {
     await this.lobbyRepository.save(lobby);
 
     // Return the response
-    return new CreateLobbyResponseDto(lobbyCode.value, hostPlayer.id, 'describer');
+    return new CreateLobbyResponseDto(lobbyCode.value, hostPlayer.id, PlayerRoleType.Describer);
   }
 }

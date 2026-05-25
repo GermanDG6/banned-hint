@@ -1,9 +1,15 @@
+interface PlayerDto {
+  id: string;
+  name: string;
+  role: string;
+}
+
 export class CreateLobbyDto {
-  playerName: string;
+  player: PlayerDto;
   durationSeconds: number;
 
-  constructor(playerName: string, durationSeconds: number) {
-    this.playerName = playerName;
+  constructor(player: PlayerDto, durationSeconds: number) {
+    this.player = player;
     this.durationSeconds = durationSeconds;
   }
 }

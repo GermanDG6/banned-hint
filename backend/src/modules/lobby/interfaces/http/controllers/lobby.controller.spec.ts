@@ -40,7 +40,7 @@ describe('LobbyController', () => {
   describe('createLobby', () => {
     it('should create a lobby and return the response', async () => {
       const dto: CreateLobbyDto = {
-        playerName: 'John Doe',
+        player: { id: 'uuid', name: 'John Doe', role: 'describer' },
         durationSeconds: 60,
       };
 

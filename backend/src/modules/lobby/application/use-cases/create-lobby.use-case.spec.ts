@@ -15,7 +15,7 @@ describe('CreateLobbyUseCase', () => {
   });
 
   it('should create a lobby with a unique code and return player id', async () => {
-    const input = new CreateLobbyDto('Alice', 60);
+    const input = new CreateLobbyDto({ id: 'uuid', name: 'Alice', role: 'describer' }, 60);
 
     const result = await useCase.execute(input);
 
@@ -26,7 +26,7 @@ describe('CreateLobbyUseCase', () => {
   });
 
   it('should generate different codes for different lobbies', async () => {
-    const input = new CreateLobbyDto('Alice', 60);
+    const input = new CreateLobbyDto({ id: 'uuid', name: 'Alice', role: 'describer' }, 60);
 
     const result1 = await useCase.execute(input);
     const result2 = await useCase.execute(input);
@@ -35,7 +35,7 @@ describe('CreateLobbyUseCase', () => {
   });
 
   it('should persist the lobby with save method', async () => {
-    const input = new CreateLobbyDto('Bob', 120);
+    const input = new CreateLobbyDto({ id: 'uuid', name: 'Bob', role: 'describer' }, 120);
 
     await useCase.execute(input);
 
@@ -47,7 +47,7 @@ describe('CreateLobbyUseCase', () => {
   });
 
   it('should return describer role for host', async () => {
-    const input = new CreateLobbyDto('Charlie', 90);
+    const input = new CreateLobbyDto({ id: 'uuid', name: 'Charlie', role: 'describer' }, 90);
 
     const result = await useCase.execute(input);
 
