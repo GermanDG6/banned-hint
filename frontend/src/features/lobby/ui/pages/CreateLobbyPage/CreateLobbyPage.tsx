@@ -65,16 +65,9 @@ export function CreateLobbyPage() {
     setIsLoading(true);
 
     try {
-      // Validar timer
-      Timer.create(data.minutes, data.seconds);
-
-      // Convertir a segundos totales
-      const durationSeconds = data.minutes * 60 + data.seconds;
-
-      // Crear lobby llamando al caso de uso
+      const durationSeconds = Timer.create(data.minutes, data.seconds).toSeconds();
       const result = await createLobby.execute(data.playerName, durationSeconds);
 
-      // Navegar a WaitingRoomPage con estado
       navigate(`/lobby/${result.code}`, {
         state: {
           playerId: result.playerId,

@@ -15,13 +15,14 @@ export class JoinLobby {
     playerName: string,
     role: PlayerRole,
     playerId?: string,
-  ): Promise<void> {
+  ): Promise<Player> {
     const lobby = await this.lobbyHttpPort.getLobby(code);
     if (!lobby) {
       throw new LobbyNotFoundException(code);
     }
     const player = Player.create(playerName, role, playerId);
     this.lobbySocket.connect();
-    this.lobbySocket.joinLobby(code, player);
+    this.lobbySocket.joinLobby(code, player.name, player.role, player.id);
+    return player;
   }
 }

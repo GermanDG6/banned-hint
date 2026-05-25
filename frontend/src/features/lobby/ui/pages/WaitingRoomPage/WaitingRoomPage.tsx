@@ -2,14 +2,14 @@ import { useParams, useLocation } from 'react-router-dom';
 import { useEffect, useState, useMemo } from 'react';
 import styles from './WaitingRoomPage.module.css';
 import { useJoinLobby } from '@/features/lobby/infrastructure/lobby-dependencies.context';
-import { PlayerRole } from '@/features/lobby/domain/models/player.model';
+import { PlayerRole, PlayerRoleType } from '@/features/lobby/domain/models/player.model';
 import { LobbyPlayerSession } from '@/features/lobby/infrastructure/lobby-player.session';
 import { JoinLobbyForm } from '../../components';
 import { ConnectedWaitingRoom } from './ConnectedWaitingRoom';
 
 interface LocationState {
   playerId: string;
-  role: 'describer' | 'guesser';
+  role: PlayerRole;
   playerName: string;
   durationSeconds: number;
 }
@@ -60,15 +60,13 @@ export function WaitingRoomPage() {
   const handleGuestJoin = async (playerName: string) => {
     if (!code) return;
     try {
-      const playerId = crypto.randomUUID();
+      const joinedGuest = await joinLobby.execute(code, playerName, PlayerRoleType.Guesser);
 
-      await joinLobby.execute(code, playerName, 'guesser', playerId);
-
-      setJoinedState({ role: 'guesser', durationSeconds: 0 });
+      setJoinedState({ role: PlayerRoleType.Guesser, durationSeconds: 0 });
       LobbyPlayerSession.save({
-        playerId,
-        playerName,
-        role: 'guesser',
+        playerId: joinedGuest.id.value,
+        playerName: joinedGuest.name,
+        role: joinedGuest.role,
         durationSeconds: 0,
         lobbyCode: code,
       });
