@@ -3,6 +3,9 @@ import { RejoinRound } from './rejoin-round.use-case';
 import { LobbySocket } from '../ports/lobby-socket.port';
 
 describe('RejoinRound', () => {
+  const validUUID1 = '550e8400-e29b-41d4-a716-446655440000';
+  const validUUID2 = '550e8400-e29b-41d4-a716-446655440001';
+
   const fakeSocket: LobbySocket = {
     connect: vi.fn(),
     disconnect: vi.fn(),
@@ -23,27 +26,27 @@ describe('RejoinRound', () => {
   it('should call connect and joinLobby with correct args', () => {
     const rejoinRound = new RejoinRound(fakeSocket);
 
-    rejoinRound.execute('ABC123', 'John Doe', 'describer', 'player-id-123');
+    rejoinRound.execute('ABC123', 'John Doe', 'describer', validUUID1);
 
     expect(fakeSocket.connect).toHaveBeenCalled();
     expect(fakeSocket.joinLobby).toHaveBeenCalledWith(
       'ABC123',
       'John Doe',
       'describer',
-      'player-id-123',
+      validUUID1,
     );
   });
 
   it('should pass playerId to joinLobby', () => {
     const rejoinRound = new RejoinRound(fakeSocket);
 
-    rejoinRound.execute('XYZ789', 'Jane Smith', 'guesser', 'player-uuid-456');
+    rejoinRound.execute('XYZ789', 'Jane Smith', 'guesser', validUUID2);
 
     expect(fakeSocket.joinLobby).toHaveBeenCalledWith(
       'XYZ789',
       'Jane Smith',
       'guesser',
-      'player-uuid-456',
+      validUUID2,
     );
     expect(fakeSocket.connect).toHaveBeenCalled();
   });

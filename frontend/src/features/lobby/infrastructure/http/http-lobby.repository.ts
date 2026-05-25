@@ -53,9 +53,9 @@ export class HttpLobbyRepository implements LobbyHttpPort {
 
   private mapPlayer(p: { id: string; name: string; role: string }): Player {
     return Player.create(
-      p.id,
       p.name,
       p.role === PlayerRoleType.Describer ? PlayerRoleType.Describer : PlayerRoleType.Guesser,
+      p.id,
     );
   }
 }

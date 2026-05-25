@@ -7,7 +7,7 @@ export interface LobbySocket {
 
   disconnect(): void;
 
-  joinLobby(code: string, playerName: string, role: PlayerRole, playerId?: string): void;
+  joinLobby(code: string, playerName: string, role: PlayerRole, playerId?: PlayerId): void;
 
   startRound(durationSeconds: number): void;
 

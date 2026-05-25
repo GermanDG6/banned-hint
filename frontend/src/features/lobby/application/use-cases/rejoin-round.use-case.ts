@@ -1,5 +1,6 @@
 import { LobbySocket } from '../ports/lobby-socket.port';
 import { PlayerRole } from '@/features/lobby/domain/models/player.model.ts';
+import { Player } from '@/features/lobby/domain/entities/player.entity.ts';
 
 /**
  * RejoinRound: caso de uso para reconectar a un lobby activo con una ronda en progreso.
@@ -17,7 +18,8 @@ export class RejoinRound {
   constructor(private readonly lobbySocket: LobbySocket) {}
 
   execute(code: string, playerName: string, role: PlayerRole, playerId: string): void {
+    const player = Player.create(playerId, playerName, role);
     this.lobbySocket.connect();
-    this.lobbySocket.joinLobby(code, playerName, role, playerId);
+    this.lobbySocket.joinLobby(code, player);
   }
 }

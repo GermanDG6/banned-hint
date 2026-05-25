@@ -1,40 +1,40 @@
 import { PlayerRoleType, PlayerRole } from '../models/player.model';
-import { InvalidPlayerIdException } from '../exceptions/invalid-player-id.exception';
+import { PlayerId } from '../value-objects/player-id.value-object';
 import { InvalidPlayerNameException } from '../exceptions/invalid-player-name.exception';
 import { InvalidPlayerRoleException } from '../exceptions/invalid-player-role.exception';
+import { InvalidPlayerIdException } from '../exceptions/invalid-player-id.exception';
 
 export class Player {
-  readonly id: string;
+  readonly id: PlayerId;
   readonly name: string;
   readonly role: PlayerRole;
 
-  private constructor(id: string, name: string, role: PlayerRole) {
+  private constructor(id: PlayerId, name: string, role: PlayerRole) {
     this.id = id;
     this.name = name;
     this.role = role;
   }
 
-  static create(id: string, name: string, role: string): Player {
-    // Validate id
-    if (typeof id !== 'string' || id.trim().length === 0) {
-      throw new InvalidPlayerIdException(id);
-    }
+  /**
+   * Crea un Player validando name y role.
+   * Si `id` no se proporciona, genera un UUID nuevo con PlayerId.generate().
+   * Si `id` se proporciona, debe ser un UUID válido; lanza InvalidPlayerIdException en caso contrario.
+   */
+  static create(name: string, role: string, id?: string): Player {
+    const playerId = id !== undefined ? PlayerId.create(id) : PlayerId.generate();
 
-    // Validate name
     if (typeof name !== 'string' || name.trim().length === 0) {
       throw new InvalidPlayerNameException(name);
     }
 
-    // Validate role
     if (role !== PlayerRoleType.Describer && role !== PlayerRoleType.Guesser) {
       throw new InvalidPlayerRoleException(role);
     }
 
-    return new Player(id.trim(), name.trim(), role as PlayerRole);
+    return new Player(playerId, name.trim(), role as PlayerRole);
   }
 
   static fromRaw(data: unknown): Player {
-    // Type guard to ensure data has the expected shape
     if (typeof data !== 'object' || data === null) {
       throw new InvalidPlayerIdException(data);
     }
@@ -61,6 +61,6 @@ export class Player {
     }
 
     // Delegate to create() for final validation and creation
-    return Player.create(id, name, role);
+    return Player.create(name, role, id);
   }
 }

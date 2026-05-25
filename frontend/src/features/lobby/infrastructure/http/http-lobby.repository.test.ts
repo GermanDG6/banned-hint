@@ -7,6 +7,9 @@ import { LobbyApiResponse } from './lobby-api-response.type';
 describe('HttpLobbyRepository', () => {
   let repository: HttpLobbyRepository;
   let httpClientMock: HttpClient;
+  const validUUID1 = '550e8400-e29b-41d4-a716-446655440000';
+  const validUUID2 = '550e8400-e29b-41d4-a716-446655440001';
+  const validUUID3 = '550e8400-e29b-41d4-a716-446655440002';
 
   beforeEach(() => {
     httpClientMock = {
@@ -63,8 +66,8 @@ describe('HttpLobbyRepository', () => {
         code: 'ABC123',
         status: 'waiting',
         players: [
-          { id: 'player-1', name: 'John', role: 'describer' },
-          { id: 'player-2', name: 'Alice', role: 'guesser' },
+          { id: validUUID1, name: 'John', role: 'describer' },
+          { id: validUUID2, name: 'Alice', role: 'guesser' },
         ],
       };
       vi.mocked(httpClientMock.get).mockResolvedValue(mockResponse);
@@ -72,14 +75,16 @@ describe('HttpLobbyRepository', () => {
       const result = await repository.getLobby('ABC123');
 
       expect(httpClientMock.get).toHaveBeenCalledWith('http://localhost:3000/api/lobby/ABC123');
-      expect(result).toEqual({
-        code: 'ABC123',
-        status: 'waiting',
-        players: [
-          { id: 'player-1', name: 'John', role: 'describer' },
-          { id: 'player-2', name: 'Alice', role: 'guesser' },
-        ],
-      });
+      expect(result).toBeDefined();
+      expect(result?.code).toBe('ABC123');
+      expect(result?.status).toBe('waiting');
+      expect(result?.players).toHaveLength(2);
+      expect(result?.players[0].id.value).toBe(validUUID1);
+      expect(result?.players[0].name).toBe('John');
+      expect(result?.players[0].role).toBe('describer');
+      expect(result?.players[1].id.value).toBe(validUUID2);
+      expect(result?.players[1].name).toBe('Alice');
+      expect(result?.players[1].role).toBe('guesser');
     });
 
     it('should return null when API returns 404', async () => {
@@ -119,9 +124,9 @@ describe('HttpLobbyRepository', () => {
         code: 'ABC123',
         status: 'playing',
         players: [
-          { id: 'p1', name: 'Player 1', role: 'describer' },
-          { id: 'p2', name: 'Player 2', role: 'guesser' },
-          { id: 'p3', name: 'Player 3', role: 'guesser' },
+          { id: validUUID1, name: 'Player 1', role: 'describer' },
+          { id: validUUID2, name: 'Player 2', role: 'guesser' },
+          { id: validUUID3, name: 'Player 3', role: 'guesser' },
         ],
       };
       vi.mocked(httpClientMock.get).mockResolvedValue(mockResponse);

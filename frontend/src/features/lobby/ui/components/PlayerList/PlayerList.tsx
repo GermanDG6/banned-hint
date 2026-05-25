@@ -15,7 +15,7 @@ export function PlayerList({ players }: PlayerListProps) {
       ) : (
         <ul className={styles.list}>
           {players.map((player) => (
-            <li key={player.id} className={styles.item}>
+            <li key={player.id.value} className={styles.item}>
               <span className={styles.name}>{player.name}</span>
               <span
                 className={`${styles.badge} ${

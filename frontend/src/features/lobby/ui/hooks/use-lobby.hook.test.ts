@@ -8,6 +8,9 @@ import { Player } from '@/features/lobby/domain/entities/player.entity';
 import { PlayerRoleType } from '@/features/lobby/domain/models/player.model';
 import { RoundSession } from '@/features/lobby/domain/models/round-session.model';
 
+const validUUID1 = '550e8400-e29b-41d4-a716-446655440000';
+const validUUID2 = '550e8400-e29b-41d4-a716-446655440001';
+
 vi.mock('../../infrastructure/lobby-dependencies.context', () => ({
   useLobbySocket: vi.fn(),
 }));
@@ -141,8 +144,8 @@ describe('useLobby', () => {
     const { result } = renderHook(() => useLobby({ myRole: null }));
 
     const players: Player[] = [
-      Player.create('p1', 'Alice', PlayerRoleType.Describer),
-      Player.create('p2', 'Bob', PlayerRoleType.Guesser),
+      Player.create('Alice', PlayerRoleType.Describer, validUUID1),
+      Player.create('Bob', PlayerRoleType.Guesser, validUUID2),
     ];
 
     act(() => {

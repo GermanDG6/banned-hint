@@ -82,7 +82,7 @@ describe('SocketIOLobbySocket', () => {
     it('should emit join-lobby event with correct data', () => {
       const mockSocket = vi.mocked(io).mock.results[0].value;
 
-      socketAdapter.joinLobby('ABC123', 'Alice', 'guesser', 'player-uuid');
+      socketAdapter.joinLobby('ABC123', 'Alice', 'guesser');
 
       expect(mockSocket.emit).toHaveBeenCalledWith('join-lobby', {
         code: 'ABC123',

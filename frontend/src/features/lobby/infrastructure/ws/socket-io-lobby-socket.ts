@@ -108,7 +108,7 @@ export class SocketIOLobbySocket implements LobbySocket {
     const wrappedHandler = (data: { players: { id: string; name: string; role: string }[] }) => {
       try {
         const players = (data.players || []).map((playerData) =>
-          Player.create(playerData.id, playerData.name, playerData.role),
+          Player.create(playerData.name, playerData.role, playerData.id),
         );
         handler(players);
       } catch (error) {

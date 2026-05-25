@@ -4,18 +4,17 @@ import { LobbyHttpPort } from '../ports/lobby-http.port';
 import { LobbySocket } from '../ports/lobby-socket.port';
 import { LobbyNotFoundException } from '../../domain/exceptions/lobby-not-found.exception';
 import { Lobby, LobbyStatusType } from '../../domain/models/lobby.model.ts';
+import { Player } from '../../domain/entities/player.entity';
+import { PlayerRoleType } from '../../domain/models/player.model';
 
 describe('JoinLobby', () => {
+  const validUUID1 = '550e8400-e29b-41d4-a716-446655440000';
+  const validUUID2 = '550e8400-e29b-41d4-a716-446655440001';
+
   const fakeLobby: Lobby = {
     code: 'ABC123',
     status: LobbyStatusType.Waiting,
-    players: [
-      {
-        id: 'player-1',
-        name: 'Host',
-        role: 'describer',
-      },
-    ],
+    players: [Player.create('Host', PlayerRoleType.Describer, validUUID1)],
   };
   const fakeSocket: LobbySocket = {
     connect: vi.fn(),
@@ -41,16 +40,11 @@ describe('JoinLobby', () => {
     };
 
     const joinLobby = new JoinLobby(fakeHttpPort, fakeSocket);
-    await joinLobby.execute('ABC123', 'Player 2', 'guesser', 'player-uuid-2');
+    await joinLobby.execute('ABC123', 'Player 2', 'guesser', validUUID2);
 
     expect(fakeHttpPort.getLobby).toHaveBeenCalledWith('ABC123');
     expect(fakeSocket.connect).toHaveBeenCalled();
-    expect(fakeSocket.joinLobby).toHaveBeenCalledWith(
-      'ABC123',
-      'Player 2',
-      'guesser',
-      'player-uuid-2',
-    );
+    expect(fakeSocket.joinLobby).toHaveBeenCalledWith('ABC123', 'Player 2', 'guesser', validUUID2);
   });
 
   it('should throw LobbyNotFoundException when lobby does not exist', async () => {
