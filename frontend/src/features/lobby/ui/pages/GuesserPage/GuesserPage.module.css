@@ -16,3 +16,6 @@
   @apply w-full flex justify-center;
 }
 
+.waitingMessage {
+  @apply text-2xl font-bold text-white text-center;
+}

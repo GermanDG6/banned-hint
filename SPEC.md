@@ -945,6 +945,6 @@ if (activeSession) {
 | 20 | `frontend`: Caso de uso `RejoinRound` | ✅ Completada |
 | 21 | `frontend`: Persistir `RoundSession` en `ConnectedWaitingRoom` | ✅ Completada |
 | 22 | `frontend`: `onRoundEnded` en puerto, socket y `useLobby` | ✅ Completada |
-| 23 | `frontend`: Reconexión en `DescriberPage` y `GuesserPage` | ⬜ Pendiente |
+| 23 | `frontend`: Reconexión en `DescriberPage` y `GuesserPage` | ✅ Completada |
 | 24 | `frontend`: Tests de `WaitingRoomPage` y `ConnectedWaitingRoom` | ⬜ Pendiente |
 | 15 | `e2e`: Test de flujo completo | ⬜ Pendiente |

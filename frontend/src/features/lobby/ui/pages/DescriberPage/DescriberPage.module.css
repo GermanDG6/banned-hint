@@ -26,3 +26,6 @@
   @apply flex gap-4 justify-center w-full max-w-2xl;
 }
 
+.roundEndedMessage {
+  @apply text-2xl font-bold text-gray-700 text-center;
+}
