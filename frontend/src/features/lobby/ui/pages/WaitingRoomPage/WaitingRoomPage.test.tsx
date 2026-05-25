@@ -123,7 +123,13 @@ describe('WaitingRoomPage', () => {
   });
 
   it('should call LobbyPlayerSession.save with lobbyCode when guest joins successfully', async () => {
-    const mockExecute = vi.fn().mockResolvedValue(undefined);
+    const validUUID = '550e8400-e29b-41d4-a716-446655440001';
+    const mockGuest = {
+      id: { value: validUUID },
+      name: 'Guest Player',
+      role: 'guesser' as const,
+    };
+    const mockExecute = vi.fn().mockResolvedValue(mockGuest);
     (useJoinLobby as ReturnType<typeof vi.fn>).mockReturnValue({
       execute: mockExecute,
     });
@@ -151,6 +157,7 @@ describe('WaitingRoomPage', () => {
           playerName: 'Guest Player',
           role: 'guesser',
           lobbyCode: 'ABC123',
+          playerId: validUUID,
         }),
       );
     });

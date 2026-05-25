@@ -15,19 +15,14 @@ export class CreateLobbyUseCase {
   ) {}
 
   async execute(input: CreateLobbyDto): Promise<CreateLobbyResponseDto> {
-    // Generate a unique lobby code
     const lobbyCode = LobbyCode.generate();
 
-    // Create the host player as describer
-    const hostPlayer = Player.create(input.player.id, input.player.name, PlayerRoleType.Describer);
+    const hostPlayer = Player.create(input.playerId, input.playerName, PlayerRoleType.Describer);
 
-    // Create the lobby with the host as the first player
     const lobby = Lobby.create(lobbyCode, hostPlayer);
 
-    // Persist the lobby
     await this.lobbyRepository.save(lobby);
 
-    // Return the response
-    return new CreateLobbyResponseDto(lobbyCode.value, hostPlayer.id, PlayerRoleType.Describer);
+    return new CreateLobbyResponseDto(lobbyCode.value, hostPlayer.id, hostPlayer.getRole());
   }
 }

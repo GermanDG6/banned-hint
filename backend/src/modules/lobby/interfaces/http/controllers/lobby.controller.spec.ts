@@ -3,6 +3,7 @@ import { LobbyController } from './lobby.controller';
 import { CreateLobbyUseCase } from '../../../application/use-cases/create-lobby.use-case';
 import { LOBBY_REPOSITORY } from '../../../domain/repositories/lobby.repository';
 import { CreateLobbyDto } from '../../../application/dtos/create-lobby.dto';
+import { LobbyNotFoundException } from '../../../domain/exceptions/lobby-not-found.exception';
 
 describe('LobbyController', () => {
   let controller: LobbyController;
@@ -40,13 +41,13 @@ describe('LobbyController', () => {
   describe('createLobby', () => {
     it('should create a lobby and return the response', async () => {
       const dto: CreateLobbyDto = {
-        player: { id: 'uuid', name: 'John Doe', role: 'describer' },
-        durationSeconds: 60,
+        playerName: 'John Doe',
+        playerId: '550e8400-e29b-41d4-a716-446655440000',
       };
 
       const response = {
         code: 'ABC123',
-        playerId: 'player-1',
+        playerId: '550e8400-e29b-41d4-a716-446655440000',
         role: 'describer',
       };
 
@@ -68,12 +69,12 @@ describe('LobbyController', () => {
           {
             id: 'player-1',
             name: 'John Doe',
-            isDescriber: jest.fn().mockReturnValue(true),
+            getRole: jest.fn().mockReturnValue('describer'),
           },
           {
             id: 'player-2',
             name: 'Jane Doe',
-            isDescriber: jest.fn().mockReturnValue(false),
+            getRole: jest.fn().mockReturnValue('guesser'),
           },
         ]),
       };
@@ -101,10 +102,10 @@ describe('LobbyController', () => {
       expect(lobbyRepository.findByCode).toHaveBeenCalledWith('ABC123');
     });
 
-    it('should throw an error when lobby does not exist', async () => {
+    it('should throw LobbyNotFoundException when lobby does not exist', async () => {
       (lobbyRepository.findByCode as jest.Mock).mockResolvedValue(null);
 
-      await expect(controller.getLobby('INVALID')).rejects.toThrow('Lobby not found');
+      await expect(controller.getLobby('INVALID')).rejects.toThrow(LobbyNotFoundException);
     });
   });
 });

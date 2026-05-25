@@ -23,4 +23,8 @@ export class Player {
   isGuesser(): boolean {
     return this.role.isGuesser();
   }
+
+  getRole(): PlayerRoleType {
+    return this.role.value;
+  }
 }

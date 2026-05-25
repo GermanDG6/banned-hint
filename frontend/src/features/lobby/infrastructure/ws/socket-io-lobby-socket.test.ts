@@ -81,14 +81,15 @@ describe('SocketIOLobbySocket', () => {
 
     it('should emit join-lobby event with correct data', () => {
       const mockSocket = vi.mocked(io).mock.results[0].value;
+      const playerId = '550e8400-e29b-41d4-a716-446655440001';
 
-      socketAdapter.joinLobby('ABC123', 'Alice', 'guesser');
+      socketAdapter.joinLobby('ABC123', 'Alice', 'guesser', playerId);
 
       expect(mockSocket.emit).toHaveBeenCalledWith('join-lobby', {
         code: 'ABC123',
         playerName: 'Alice',
         role: 'guesser',
-        playerId: 'player-uuid',
+        playerId,
       });
     });
 
@@ -225,10 +226,14 @@ describe('SocketIOLobbySocket', () => {
       socketAdapter.onLobbyUpdated(handler);
 
       const eventHandler = mockSocket.on.mock.calls[0][1] as (data: unknown) => void;
-      const players = [{ id: 'p1', name: 'Alice', role: 'describer' as const }];
-      eventHandler({ players });
+      const validUUID = '550e8400-e29b-41d4-a716-446655440001';
+      const playersData = [{ id: validUUID, name: 'Alice', role: 'describer' as const }];
+      eventHandler({ players: playersData });
 
-      expect(handler).toHaveBeenCalledWith(players);
+      expect(handler).toHaveBeenCalled();
+      const receivedPlayers = handler.mock.calls[0][0] as any[];
+      expect(receivedPlayers[0].name).toBe('Alice');
+      expect(receivedPlayers[0].role).toBe('describer');
     });
 
     it('should return cleanup function that calls socket.off', () => {

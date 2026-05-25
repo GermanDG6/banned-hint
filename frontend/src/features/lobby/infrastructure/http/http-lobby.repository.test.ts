@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { HttpLobbyRepository } from './http-lobby.repository';
 import { HttpClient } from '@/shared/http/http-client.port';
 import { HttpClientException } from '@/shared/http/http-client.exception';
+import { InvalidPlayerRoleException } from '../../domain/exceptions/invalid-player-role.exception';
 import { LobbyApiResponse } from './lobby-api-response.type';
 
 describe('HttpLobbyRepository', () => {
@@ -23,16 +24,16 @@ describe('HttpLobbyRepository', () => {
     it('should call httpClient.post with correct parameters', async () => {
       const mockResponse = {
         code: 'ABC123',
-        playerId: 'player-1',
+        playerId: validUUID1,
         role: 'describer' as const,
       };
       vi.mocked(httpClientMock.post).mockResolvedValue(mockResponse);
 
-      const result = await repository.createLobby('John', 60);
+      const result = await repository.createLobby('John', validUUID1);
 
       expect(httpClientMock.post).toHaveBeenCalledWith('http://localhost:3000/api/lobby', {
         playerName: 'John',
-        durationSeconds: 60,
+        playerId: validUUID1,
       });
       expect(result).toEqual(mockResponse);
     });
@@ -40,15 +41,15 @@ describe('HttpLobbyRepository', () => {
     it('should return { code, playerId, role } from the API', async () => {
       const expected = {
         code: 'XYZ789',
-        playerId: 'socket-id-123',
+        playerId: validUUID2,
         role: 'describer' as const,
       };
       vi.mocked(httpClientMock.post).mockResolvedValue(expected);
 
-      const result = await repository.createLobby('Alice', 90);
+      const result = await repository.createLobby('Alice', validUUID2);
 
       expect(result.code).toBe('XYZ789');
-      expect(result.playerId).toBe('socket-id-123');
+      expect(result.playerId).toBe(validUUID2);
       expect(result.role).toBe('describer');
     });
 
@@ -56,7 +57,20 @@ describe('HttpLobbyRepository', () => {
       const error = new Error('Network error');
       vi.mocked(httpClientMock.post).mockRejectedValue(error);
 
-      await expect(repository.createLobby('John', 60)).rejects.toThrow('Network error');
+      await expect(repository.createLobby('John', validUUID1)).rejects.toThrow('Network error');
+    });
+
+    it('should throw InvalidPlayerRoleException when role in API response is invalid', async () => {
+      const mockResponse = {
+        code: 'ABC123',
+        playerId: validUUID1,
+        role: 'invalid-role',
+      };
+      vi.mocked(httpClientMock.post).mockResolvedValue(mockResponse);
+
+      await expect(repository.createLobby('John', validUUID1)).rejects.toThrow(
+        InvalidPlayerRoleException,
+      );
     });
   });
 
@@ -137,6 +151,17 @@ describe('HttpLobbyRepository', () => {
       expect(result?.players[0].role).toBe('describer');
       expect(result?.players[1].role).toBe('guesser');
       expect(result?.players[2].role).toBe('guesser');
+    });
+
+    it('should throw InvalidPlayerRoleException when player role is invalid', async () => {
+      const mockResponse: LobbyApiResponse = {
+        code: 'ABC123',
+        status: 'waiting',
+        players: [{ id: validUUID1, name: 'John', role: 'invalid-role' }],
+      };
+      vi.mocked(httpClientMock.get).mockResolvedValue(mockResponse);
+
+      await expect(repository.getLobby('ABC123')).rejects.toThrow(InvalidPlayerRoleException);
     });
   });
 });

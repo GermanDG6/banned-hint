@@ -6,8 +6,8 @@ export class CreateLobby {
 
   async execute(
     playerName: string,
-    durationSeconds: number,
+    playerId: string,
   ): Promise<{ code: string; playerId: string; role: PlayerRole }> {
-    return this.lobbyHttpPort.createLobby(playerName, durationSeconds);
+    return this.lobbyHttpPort.createLobby(playerName, playerId);
   }
 }

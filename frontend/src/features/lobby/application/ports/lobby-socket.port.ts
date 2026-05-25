@@ -1,14 +1,13 @@
 import { Player } from '@/features/lobby/domain/entities/player.entity';
 import { PlayerRole } from '@/features/lobby/domain/models/player.model.ts';
 import { RoundSession } from '@/features/lobby/domain/models/round-session.model.ts';
-import { PlayerId } from '@/features/lobby/domain/value-objects/player-id.value-object.ts';
 
 export interface LobbySocket {
   connect(): void;
 
   disconnect(): void;
 
-  joinLobby(code: string, playerName: string, role: PlayerRole, playerId?: PlayerId): void;
+  joinLobby(code: string, playerName: string, role: PlayerRole, playerId?: string): void;
 
   startRound(durationSeconds: number): void;
 

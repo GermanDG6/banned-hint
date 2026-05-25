@@ -66,7 +66,8 @@ export function CreateLobbyPage() {
 
     try {
       const durationSeconds = Timer.create(data.minutes, data.seconds).toSeconds();
-      const result = await createLobby.execute(data.playerName, durationSeconds);
+      const playerId = crypto.randomUUID();
+      const result = await createLobby.execute(data.playerName, playerId);
 
       navigate(`/lobby/${result.code}`, {
         state: {

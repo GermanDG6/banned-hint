@@ -1,10 +1,17 @@
 import { LobbyHttpPort } from '../../application/ports/lobby-http.port';
 import { Lobby } from '../../domain/models/lobby.model';
 import { Player } from '../../domain/entities/player.entity';
-import { PlayerRoleType } from '../../domain/models/player.model';
+import { PlayerRoleType, PlayerRole } from '../../domain/models/player.model';
 import { HttpClient } from '@/shared/http/http-client.port';
 import { HttpClientException } from '@/shared/http/http-client.exception';
+import { InvalidPlayerRoleException } from '../../domain/exceptions/invalid-player-role.exception';
 import { LobbyApiResponse } from './lobby-api-response.type';
+
+type CreateLobbyApiResponse = {
+  code: string;
+  playerId: string;
+  role: string;
+};
 
 export class HttpLobbyRepository implements LobbyHttpPort {
   private readonly baseUrl = 'http://localhost:3000/api';
@@ -13,20 +20,22 @@ export class HttpLobbyRepository implements LobbyHttpPort {
 
   async createLobby(
     playerName: string,
-    durationSeconds: number,
+    playerId: string,
   ): Promise<{
     code: string;
     playerId: string;
-    role: 'describer';
+    role: PlayerRole;
   }> {
-    return this.httpClient.post<{
-      code: string;
-      playerId: string;
-      role: 'describer';
-    }>(`${this.baseUrl}/lobby`, {
+    const response = await this.httpClient.post<CreateLobbyApiResponse>(`${this.baseUrl}/lobby`, {
       playerName,
-      durationSeconds,
+      playerId,
     });
+
+    return {
+      code: response.code,
+      playerId: response.playerId,
+      role: this.mapRole(response.role),
+    };
   }
 
   async getLobby(code: string): Promise<Lobby | null> {
@@ -52,10 +61,13 @@ export class HttpLobbyRepository implements LobbyHttpPort {
   }
 
   private mapPlayer(p: { id: string; name: string; role: string }): Player {
-    return Player.create(
-      p.name,
-      p.role === PlayerRoleType.Describer ? PlayerRoleType.Describer : PlayerRoleType.Guesser,
-      p.id,
-    );
+    return Player.create(p.name, this.mapRole(p.role), p.id);
+  }
+
+  private mapRole(role: string): PlayerRole {
+    if (role === PlayerRoleType.Describer || role === PlayerRoleType.Guesser) {
+      return role as PlayerRole;
+    }
+    throw new InvalidPlayerRoleException(role);
   }
 }

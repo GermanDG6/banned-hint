@@ -15,18 +15,18 @@ describe('CreateLobbyUseCase', () => {
   });
 
   it('should create a lobby with a unique code and return player id', async () => {
-    const input = new CreateLobbyDto({ id: 'uuid', name: 'Alice', role: 'describer' }, 60);
+    const input = new CreateLobbyDto('Alice', '550e8400-e29b-41d4-a716-446655440000');
 
     const result = await useCase.execute(input);
 
     expect(result.code).toMatch(/^[A-Z0-9]{6}$/);
-    expect(result.playerId).toBeDefined();
+    expect(result.playerId).toBe('550e8400-e29b-41d4-a716-446655440000');
     expect(result.role).toBe('describer');
     expect(lobbyRepositoryMock.save).toHaveBeenCalledTimes(1);
   });
 
   it('should generate different codes for different lobbies', async () => {
-    const input = new CreateLobbyDto({ id: 'uuid', name: 'Alice', role: 'describer' }, 60);
+    const input = new CreateLobbyDto('Alice', '550e8400-e29b-41d4-a716-446655440000');
 
     const result1 = await useCase.execute(input);
     const result2 = await useCase.execute(input);
@@ -35,7 +35,7 @@ describe('CreateLobbyUseCase', () => {
   });
 
   it('should persist the lobby with save method', async () => {
-    const input = new CreateLobbyDto({ id: 'uuid', name: 'Bob', role: 'describer' }, 120);
+    const input = new CreateLobbyDto('Bob', '550e8400-e29b-41d4-a716-446655440001');
 
     await useCase.execute(input);
 
@@ -47,7 +47,7 @@ describe('CreateLobbyUseCase', () => {
   });
 
   it('should return describer role for host', async () => {
-    const input = new CreateLobbyDto({ id: 'uuid', name: 'Charlie', role: 'describer' }, 90);
+    const input = new CreateLobbyDto('Charlie', '550e8400-e29b-41d4-a716-446655440002');
 
     const result = await useCase.execute(input);
 
