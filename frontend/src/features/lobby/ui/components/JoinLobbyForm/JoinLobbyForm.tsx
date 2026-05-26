@@ -3,6 +3,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useState } from 'react';
 import styles from './JoinLobbyForm.module.css';
+import { FormField } from '@/components/ui/form-field/FormField';
+import { TextInput } from '@/components/ui/text-input/TextInput';
+import { CTAButton } from '@/components/ui/cta-button/CTAButton';
 
 const joinLobbySchema = z.object({
   playerName: z
@@ -43,24 +46,20 @@ export function JoinLobbyForm({ onJoin, onError, code }: JoinLobbyFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-      <div className={styles.formGroup}>
-        <label htmlFor="playerName" className={styles.label}>
-          Tu nombre
-        </label>
-        <input
+      <FormField label="Tu nombre" htmlFor="playerName" error={errors.playerName?.message}>
+        <TextInput
           id="playerName"
           type="text"
           placeholder="Ej: Juan"
-          className={`${styles.input} ${errors.playerName ? styles.inputError : ''}`}
+          hasError={!!errors.playerName}
           {...register('playerName')}
           disabled={isLoading}
         />
-        {errors.playerName && <p className={styles.error}>{errors.playerName.message}</p>}
-      </div>
+      </FormField>
 
-      <button type="submit" className={styles.submitButton} disabled={isLoading}>
-        {isLoading ? 'Uniéndose...' : '✓ Unirse a la sala'}
-      </button>
+      <CTAButton onClick={handleSubmit(onSubmit)} disabled={isLoading} icon="✓">
+        {isLoading ? 'Uniéndose...' : 'Unirse a la sala'}
+      </CTAButton>
 
       <p className={styles.hint}>
         Código de sala: <strong>{code}</strong>
