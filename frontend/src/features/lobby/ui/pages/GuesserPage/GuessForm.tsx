@@ -2,6 +2,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import styles from './GuessForm.module.css';
+import { TextInput } from '@/components/ui/text-input/TextInput';
+import { Alert } from '@/components/ui/alert/Alert';
 
 const guessSchema = z.object({
   word: z
@@ -31,31 +33,29 @@ export function GuessForm({ onSubmit, guessResult }: GuessFormProps) {
     onSubmit(data.word);
     reset();
   };
+
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className={styles.form}>
       <div className={styles.inputGroup}>
-        <input
-          {...register('word')}
-          type="text"
+        <TextInput
+          variant="on-dark"
           placeholder="Escribe tu intento..."
-          className={styles.input}
+          hasError={!!errors.word}
           disabled={guessResult?.correct}
+          {...register('word')}
         />
         {errors.word && <p className={styles.error}>{errors.word.message}</p>}
       </div>
 
-      <button type="submit" className={styles.button} disabled={guessResult?.correct}>
-        📤 Enviar
+      <button type="submit" disabled={guessResult?.correct} className={styles.submitButton}>
+        <span>📤</span>
+        Enviar
       </button>
 
       {guessResult && (
-        <div
-          className={`${styles.feedback} ${
-            guessResult.correct ? styles.correct : styles.incorrect
-          }`}
-        >
+        <Alert variant={guessResult.correct ? 'success' : 'error'}>
           {guessResult.correct ? '✅ ¡Correcto!' : '❌ Inténtalo de nuevo'}
-        </div>
+        </Alert>
       )}
     </form>
   );
