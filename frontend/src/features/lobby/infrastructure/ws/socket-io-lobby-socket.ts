@@ -71,7 +71,7 @@ export class SocketIOLobbySocket implements LobbySocket {
       code,
       playerName,
       role,
-      ...(playerId && { playerId }),
+      playerId,
     });
   }
 

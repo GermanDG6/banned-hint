@@ -48,7 +48,6 @@ export class LobbyGateway implements OnGatewayDisconnect {
   ) {
     try {
       const { code, playerName, role, playerId } = payload;
-
       let connectedPlayerId: string;
       let lobby = await this.lobbyRepository.findByCode(code);
 
@@ -59,9 +58,9 @@ export class LobbyGateway implements OnGatewayDisconnect {
 
       if (role === 'describer') {
         // NOTE: MVP limitation - no authentication; any client can claim the describer role
-        lobby.assignDescriberId(client.id);
+        lobby.assignDescriberId(playerId);
         await this.lobbyRepository.save(lobby);
-        connectedPlayerId = client.id;
+        connectedPlayerId = playerId;
       } else {
         const existingGuesser = playerId ? lobby.findGuesserById(playerId) : undefined;
         if (existingGuesser) {
@@ -70,7 +69,7 @@ export class LobbyGateway implements OnGatewayDisconnect {
           const result = await this.joinLobbyUseCase.execute({
             code,
             playerName,
-            playerId: playerId || '',
+            playerId,
           });
           connectedPlayerId = result.playerId;
         }
