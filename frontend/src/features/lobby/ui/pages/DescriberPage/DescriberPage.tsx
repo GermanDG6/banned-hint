@@ -5,8 +5,9 @@ import { useLobby } from '@/features/lobby/ui/hooks';
 import { useRejoinRound } from '@/features/lobby/infrastructure/lobby-dependencies.context';
 import { useServerSyncedCountdown } from '@/shared/hooks/use-server-synced-countdown.hook';
 import { TimerDisplay } from '@/components/ui/timer-display/TimerDisplay';
-import { ActiveCardView } from '@/features/lobby/ui/components';
+import { CardComponent } from '@/components/ui/card-component/CardComponent';
 import { CTAButton } from '@/components/ui/cta-button/CTAButton';
+import { GameLayout } from '@/components/ui/game-layout/GameLayout';
 import { RoundSession } from '@/features/lobby/domain/models/round-session.model';
 import { LobbyPlayerSession } from '@/features/lobby/infrastructure/lobby-player.session';
 import { RoundSessionStorage } from '@/features/lobby/infrastructure/round-session.storage';
@@ -65,41 +66,35 @@ export function DescriberPage() {
       storedPlayerDataRef.current?.durationSeconds ?? activeSession.durationSeconds;
 
     return (
-      <main className={styles.page}>
-        <header className={styles.header}>
-          <h1 className={styles.brand}>BANNED HINT</h1>
-        </header>
+      <GameLayout>
         <div className={styles.centerContent}>
           <p className={styles.roundEndedMessage}>¡Ronda terminada!</p>
           <CTAButton onClick={() => lobby.startRound(durationSeconds)} icon="▶">
             Iniciar nueva ronda
           </CTAButton>
         </div>
-      </main>
+      </GameLayout>
     );
   }
 
   return (
-    <main className={styles.page}>
-      <header className={styles.header}>
-        <h1 className={styles.brand}>BANNED HINT</h1>
-      </header>
+    <GameLayout>
+      <section className={styles.timerSection}>
+        <TimerDisplay formatted={formatted} />
+      </section>
 
-      <div className={styles.centerContent}>
-        <section className={styles.timerSection}>
-          <TimerDisplay formatted={formatted} />
-        </section>
+      <section className={styles.cardSection}>
+        <CardComponent
+          word={activeSession.card?.word ?? ''}
+          bannedWords={activeSession.card?.bannedWords ?? []}
+        />
+      </section>
 
-        <section className={styles.cardSection}>
-          <ActiveCardView card={activeSession.card} />
-        </section>
-
-        <section className={styles.actions}>
-          <CTAButton onClick={() => lobby.nextCard()} icon="⊙">
-            SIGUIENTE
-          </CTAButton>
-        </section>
-      </div>
-    </main>
+      <section className={styles.actions}>
+        <CTAButton onClick={() => lobby.nextCard()} icon="⊙">
+          SIGUIENTE
+        </CTAButton>
+      </section>
+    </GameLayout>
   );
 }

@@ -1,17 +1,5 @@
-.page {
-  @apply min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col;
-}
-
-.header {
-  @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 shadow-lg;
-}
-
-.brand {
-  @apply text-2xl font-bold tracking-wider;
-}
-
 .centerContent {
-  @apply flex-1 flex flex-col items-center justify-center gap-8 px-4 py-8;
+  @apply flex flex-col items-center justify-center gap-8;
 }
 
 .timerSection {
@@ -27,5 +15,5 @@
 }
 
 .roundEndedMessage {
-  @apply text-2xl font-bold text-gray-700 text-center;
+  @apply text-2xl font-bold text-gray-700 text-center mb-4;
 }
