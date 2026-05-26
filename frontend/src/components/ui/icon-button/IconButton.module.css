@@ -1,0 +1,13 @@
+.root {
+  @apply bg-transparent border-none cursor-pointer text-2xl font-bold transition-all duration-200 hover:scale-110;
+  padding: 0.5rem;
+}
+
+.danger {
+  @apply text-danger;
+}
+
+.default {
+  @apply text-foreground;
+}
+
