@@ -6,6 +6,8 @@ import { PlayerRole, PlayerRoleType } from '@/features/lobby/domain/models/playe
 import { LobbyPlayerSession } from '@/features/lobby/infrastructure/lobby-player.session';
 import { JoinLobbyForm } from '../../components';
 import { ConnectedWaitingRoom } from './components/ConectedWaitingRoom/ConnectedWaitingRoom.tsx';
+import { PageLayout } from '@/components/ui/page-layout/PageLayout';
+import { Alert } from '@/components/ui/alert/Alert';
 
 interface LocationState {
   playerId: string;
@@ -79,32 +81,30 @@ export function WaitingRoomPage() {
   if (!joinedState) {
     if (!state && !sessionData) {
       return (
-        <main className={styles.page}>
-          <div className={styles.container}>
-            <div className={styles.header}>
-              <h1 className={styles.title}>Unirse a Sala</h1>
-            </div>
-
-            {connectionError && <div className={styles.errorAlert}>{connectionError}</div>}
-
-            {code && (
-              <JoinLobbyForm code={code} onJoin={handleGuestJoin} onError={setConnectionError} />
-            )}
+        <PageLayout>
+          <div className={styles.header}>
+            <h1 className={styles.title}>Unirse a Sala</h1>
           </div>
-        </main>
+
+          {connectionError && <Alert variant="error">{connectionError}</Alert>}
+
+          {code && (
+            <JoinLobbyForm code={code} onJoin={handleGuestJoin} onError={setConnectionError} />
+          )}
+        </PageLayout>
       );
     }
 
     return (
-      <main className={styles.page}>
+      <PageLayout>
         <div className={styles.loadingContainer}>
           {connectionError ? (
-            <p className={styles.errorAlert}>{connectionError}</p>
+            <Alert variant="error">{connectionError}</Alert>
           ) : (
             <p className={styles.loadingText}>Conectando a la sala...</p>
           )}
         </div>
-      </main>
+      </PageLayout>
     );
   }
 

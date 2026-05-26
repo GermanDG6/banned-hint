@@ -1,21 +1,9 @@
-/* WaitingRoomPage.module.css */
-
-.page {
-  height: 100dvh;
-  overflow: auto;
-  @apply bg-background flex flex-col items-center justify-center px-4 py-8;
-}
-
-.container {
-  @apply w-full max-w-sm;
-}
-
 .header {
   @apply text-center mb-6;
 }
 
 .title {
-  @apply text-3xl font-bold text-brand mb-2;
+  @apply text-2xl font-bold text-brand mb-1;
 }
 
 .loadingContainer {
@@ -26,6 +14,3 @@
   @apply text-foreground text-lg font-semibold;
 }
 
-.errorAlert {
-  @apply bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg text-sm font-medium mb-4;
-}
