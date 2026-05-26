@@ -117,12 +117,13 @@ describe('LobbyGateway', () => {
       mockLobbyRepository.findByCode.mockResolvedValue(mockLobby);
 
       await gateway.handleJoinLobby(mockSocket, {
+        playerId: 'uuid',
         code: 'ABC123',
         playerName: 'John',
         role: 'describer',
       });
 
-      expect(mockLobby.assignDescriberId).toHaveBeenCalledWith('socket-1');
+      expect(mockLobby.assignDescriberId).toHaveBeenCalledWith('uuid');
       expect(mockLobbyRepository.save).toHaveBeenCalledWith(mockLobby);
       expect(mockSocket.join).toHaveBeenCalledWith('ABC123');
     });
@@ -184,6 +185,7 @@ describe('LobbyGateway', () => {
       mockLobbyRepository.findByCode.mockResolvedValue(null);
 
       await gateway.handleJoinLobby(mockSocket, {
+        playerId: 'uuid',
         code: 'INVALID',
         playerName: 'John',
         role: 'describer',
@@ -221,6 +223,7 @@ describe('LobbyGateway', () => {
         code: 'ABC123',
         playerName: 'John',
         role: 'describer',
+        playerId: 'player-2',
       });
 
       const roundStartedCall = mockSocket.emit.mock.calls.find(

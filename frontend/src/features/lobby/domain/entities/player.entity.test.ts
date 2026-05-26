@@ -14,7 +14,7 @@ describe('Player', () => {
     it('should create a Player with valid name and role (describer)', () => {
       const player = Player.create('Alice', PlayerRoleType.Describer, validUUID1);
 
-      expect(player.id.value).toBe(validUUID1.toLowerCase());
+      expect(player.getId()).toBe(validUUID1.toLowerCase());
       expect(player.name).toBe('Alice');
       expect(player.role).toBe(PlayerRoleType.Describer);
     });
@@ -22,7 +22,7 @@ describe('Player', () => {
     it('should create a Player with valid name and role (guesser)', () => {
       const player = Player.create('Bob', PlayerRoleType.Guesser, validUUID2);
 
-      expect(player.id.value).toBe(validUUID2.toLowerCase());
+      expect(player.getId()).toBe(validUUID2.toLowerCase());
       expect(player.name).toBe('Bob');
       expect(player.role).toBe(PlayerRoleType.Guesser);
     });
@@ -30,14 +30,14 @@ describe('Player', () => {
     it('should trim whitespace from id and name', () => {
       const player = Player.create('  Alice  ', PlayerRoleType.Describer, `  ${validUUID1}  `);
 
-      expect(player.id.value).toBe(validUUID1.toLowerCase());
+      expect(player.getId()).toBe(validUUID1.toLowerCase());
       expect(player.name).toBe('Alice');
     });
 
     it('should generate a UUID when id is not provided', () => {
       const player = Player.create('Alice', PlayerRoleType.Describer);
 
-      expect(uuidRegex.test(player.id.value)).toBe(true);
+      expect(uuidRegex.test(player.getId())).toBe(true);
       expect(player.name).toBe('Alice');
       expect(player.role).toBe(PlayerRoleType.Describer);
     });

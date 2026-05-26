@@ -22,7 +22,7 @@ export class JoinLobby {
     }
     const player = Player.create(playerName, role, playerId);
     this.lobbySocket.connect();
-    this.lobbySocket.joinLobby(code, player.name, player.role, player.id.value);
+    this.lobbySocket.joinLobby(code, player.name, player.role, player.getId());
     return player;
   }
 }

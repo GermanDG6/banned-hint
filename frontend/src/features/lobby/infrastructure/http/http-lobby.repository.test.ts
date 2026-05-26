@@ -93,10 +93,10 @@ describe('HttpLobbyRepository', () => {
       expect(result?.code).toBe('ABC123');
       expect(result?.status).toBe('waiting');
       expect(result?.players).toHaveLength(2);
-      expect(result?.players[0].id.value).toBe(validUUID1);
+      expect(result?.players[0].getId()).toBe(validUUID1);
       expect(result?.players[0].name).toBe('John');
       expect(result?.players[0].role).toBe('describer');
-      expect(result?.players[1].id.value).toBe(validUUID2);
+      expect(result?.players[1].getId()).toBe(validUUID2);
       expect(result?.players[1].name).toBe('Alice');
       expect(result?.players[1].role).toBe('guesser');
     });

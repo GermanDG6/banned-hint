@@ -8,18 +8,18 @@ describe('PlayerId', () => {
 
   it('should create a valid PlayerId with a valid UUID', () => {
     const playerId = PlayerId.create(validUUID);
-    expect(playerId.value).toBe(validUUID.toLowerCase());
+    expect(playerId.value()).toBe(validUUID.toLowerCase());
   });
 
   it('should normalize UUID to lowercase', () => {
     const uppercaseUUID = '550E8400-E29B-41D4-A716-446655440000';
     const playerId = PlayerId.create(uppercaseUUID);
-    expect(playerId.value).toBe(validUUID.toLowerCase());
+    expect(playerId.value()).toBe(validUUID.toLowerCase());
   });
 
   it('should trim whitespace from UUID', () => {
     const playerId = PlayerId.create(`  ${validUUID}  `);
-    expect(playerId.value).toBe(validUUID.toLowerCase());
+    expect(playerId.value()).toBe(validUUID.toLowerCase());
   });
 
   it('should throw InvalidPlayerIdException when UUID is empty', () => {
@@ -65,7 +65,7 @@ describe('PlayerId', () => {
   describe('generate', () => {
     it('should generate a PlayerId with valid UUID format', () => {
       const playerId = PlayerId.generate();
-      expect(uuidRegex.test(playerId.value)).toBe(true);
+      expect(uuidRegex.test(playerId.value())).toBe(true);
     });
 
     it('should generate unique PlayerId on each call', () => {
@@ -76,7 +76,7 @@ describe('PlayerId', () => {
 
     it('should generate a lowercase UUID', () => {
       const playerId = PlayerId.generate();
-      expect(playerId.value).toBe(playerId.value.toLowerCase());
+      expect(playerId.value()).toBe(playerId.value().toLowerCase());
     });
   });
 });

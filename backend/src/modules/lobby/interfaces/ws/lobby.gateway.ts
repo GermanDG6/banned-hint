@@ -44,7 +44,7 @@ export class LobbyGateway implements OnGatewayDisconnect {
   @SubscribeMessage('join-lobby')
   async handleJoinLobby(
     client: Socket,
-    payload: { code: string; playerName: string; role: 'describer' | 'guesser'; playerId?: string },
+    payload: { code: string; playerName: string; role: 'describer' | 'guesser'; playerId: string },
   ) {
     try {
       const { code, playerName, role, playerId } = payload;
