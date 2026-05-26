@@ -1,0 +1,12 @@
+.root {
+  @apply font-bold tracking-widest text-center;
+}
+
+.dark {
+  @apply text-brand text-3xl;
+}
+
+.light {
+  @apply text-game-text text-xl;
+}
+
