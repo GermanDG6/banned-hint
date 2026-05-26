@@ -157,6 +157,7 @@ describe('HttpLobbyRepository', () => {
       const mockResponse: LobbyApiResponse = {
         code: 'ABC123',
         status: 'waiting',
+        // @ts-expect-error - intentionally invalid role to test error handling
         players: [{ id: validUUID1, name: 'John', role: 'invalid-role' }],
       };
       vi.mocked(httpClientMock.get).mockResolvedValue(mockResponse);

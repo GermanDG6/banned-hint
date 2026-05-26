@@ -31,7 +31,6 @@ export function GuessForm({ onSubmit, guessResult }: GuessFormProps) {
     onSubmit(data.word);
     reset();
   };
-
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className={styles.form}>
       <div className={styles.inputGroup}>
@@ -40,12 +39,12 @@ export function GuessForm({ onSubmit, guessResult }: GuessFormProps) {
           type="text"
           placeholder="Escribe tu intento..."
           className={styles.input}
-          disabled={guessResult !== null}
+          disabled={guessResult?.correct}
         />
         {errors.word && <p className={styles.error}>{errors.word.message}</p>}
       </div>
 
-      <button type="submit" className={styles.button} disabled={guessResult !== null}>
+      <button type="submit" className={styles.button} disabled={guessResult?.correct}>
         📤 Enviar
       </button>
 
