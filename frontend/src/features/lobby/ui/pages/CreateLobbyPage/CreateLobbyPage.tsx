@@ -8,6 +8,11 @@ import { Timer } from '@/features/round/domain/value-objects/timer.value-object'
 import { InvalidTimerException } from '@/features/round/domain/exceptions/invalid-timer.exception';
 import { useCreateLobby } from '@/features/lobby/infrastructure/lobby-dependencies.context';
 import { CTAButton } from '@/components/ui/cta-button/CTAButton';
+import { PageLayout } from '@/components/ui/page-layout/PageLayout';
+import { FormField } from '@/components/ui/form-field/FormField';
+import { TextInput } from '@/components/ui/text-input/TextInput';
+import { TimerPicker } from '@/components/ui/timer-picker/TimerPicker';
+import { Alert } from '@/components/ui/alert/Alert';
 
 const createLobbySchema = z.object({
   playerName: z
@@ -89,85 +94,47 @@ export function CreateLobbyPage() {
   };
 
   return (
-    <main className={styles.page}>
-      <div className={styles.container}>
-        <CTAButton variant="secondary" onClick={() => navigate('/')} className={styles.backButton}>
-          ← Volver
-        </CTAButton>
+    <PageLayout>
+      <CTAButton variant="secondary" onClick={() => navigate('/')} className={styles.backButton}>
+        ← Volver
+      </CTAButton>
 
-        <div className={styles.header}>
-          <h1 className={styles.title}>Crear Sala</h1>
-          <p className={styles.subtitle}>Inicia una nueva partida multijugador</p>
-        </div>
-
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-          {error && <div className={styles.errorAlert}>{error}</div>}
-
-          <div className={styles.formGroup}>
-            <label htmlFor="playerName" className={styles.label}>
-              Tu nombre
-            </label>
-            <input
-              id="playerName"
-              type="text"
-              placeholder="Ej: Juan"
-              className={`${styles.input} ${errors.playerName ? styles.inputError : ''}`}
-              {...register('playerName')}
-              disabled={isLoading}
-            />
-            {errors.playerName && <p className={styles.error}>{errors.playerName.message}</p>}
-          </div>
-
-          <div className={styles.timerSection}>
-            <label className={styles.timerLabel}>
-              <span className={styles.timerIcon}>⏱️</span>
-              Tiempo de la ronda
-            </label>
-
-            <div className={styles.timerRow}>
-              <div className={styles.timerInputWrapper}>
-                <input
-                  type="number"
-                  min="0"
-                  max="59"
-                  className={styles.timerInput}
-                  aria-label="Minutos"
-                  {...register('minutes', { valueAsNumber: true })}
-                  disabled={isLoading}
-                />
-                <span className={styles.unitLabel}>MIN</span>
-              </div>
-
-              <div className={styles.separator}>:</div>
-
-              <div className={styles.timerInputWrapper}>
-                <input
-                  type="number"
-                  min="0"
-                  max="59"
-                  className={styles.timerInput}
-                  aria-label="Segundos"
-                  {...register('seconds', { valueAsNumber: true })}
-                  disabled={isLoading}
-                />
-                <span className={styles.unitLabel}>SEG</span>
-              </div>
-            </div>
-            {(errors.minutes || errors.seconds) && (
-              <p className={styles.error}>Configuración de tiempo inválida</p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={!isValidTimer() || isLoading}
-            title={!isValidTimer() ? 'Debes establecer un tiempo válido' : ''}
-          >
-            {isLoading ? 'Creando sala...' : '➕ Crear sala'}
-          </button>
-        </form>
+      <div className={styles.header}>
+        <h2 className={styles.title}>Crear Sala</h2>
+        <p className={styles.subtitle}>Inicia una nueva partida multijugador</p>
       </div>
-    </main>
+
+      <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+        {error && <Alert variant="error">{error}</Alert>}
+
+        <FormField label="Tu nombre" htmlFor="playerName" error={errors.playerName?.message}>
+          <TextInput
+            id="playerName"
+            type="text"
+            placeholder="Ej: Juan"
+            hasError={!!errors.playerName}
+            {...register('playerName')}
+            disabled={isLoading}
+          />
+        </FormField>
+
+        <TimerPicker
+          registerMinutes={register('minutes', { valueAsNumber: true })}
+          registerSeconds={register('seconds', { valueAsNumber: true })}
+          disabled={isLoading}
+        />
+        {(errors.minutes || errors.seconds) && (
+          <p className={styles.error}>Configuración de tiempo inválida</p>
+        )}
+
+        <CTAButton
+          onClick={handleSubmit(onSubmit)}
+          disabled={!isValidTimer() || isLoading}
+          icon={isLoading ? undefined : '➕'}
+        >
+          {isLoading ? 'Creando sala...' : 'Crear sala'}
+        </CTAButton>
+      </form>
+    </PageLayout>
   );
 }
