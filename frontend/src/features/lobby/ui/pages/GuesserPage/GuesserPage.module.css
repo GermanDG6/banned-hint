@@ -1,12 +1,5 @@
 /* frontend/src/features/lobby/ui/pages/GuesserPage/GuesserPage.module.css */
 
-.page {
-  @apply min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white p-4;
-}
-
-.container {
-  @apply max-w-2xl mx-auto flex flex-col h-screen gap-8 justify-center items-center;
-}
 
 .timerSection {
   @apply w-full flex justify-center;

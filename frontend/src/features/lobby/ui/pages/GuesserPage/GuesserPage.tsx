@@ -6,6 +6,7 @@ import { useRejoinRound } from '@/features/lobby/infrastructure/lobby-dependenci
 import { useServerSyncedCountdown } from '@/shared/hooks/use-server-synced-countdown.hook';
 import { TimerDisplay } from '@/components/ui/timer-display/TimerDisplay';
 import { GuessForm } from './GuessForm';
+import { GameLayout } from '@/components/ui/game-layout/GameLayout';
 import { RoundSession } from '@/features/lobby/domain/models/round-session.model';
 import { LobbyPlayerSession } from '@/features/lobby/infrastructure/lobby-player.session';
 import { RoundSessionStorage } from '@/features/lobby/infrastructure/round-session.storage';
@@ -61,25 +62,21 @@ export function GuesserPage() {
 
   if (lobby.roundEnded) {
     return (
-      <main className={styles.page}>
-        <div className={styles.container}>
-          <p className={styles.waitingMessage}>Esperando nueva ronda…</p>
-        </div>
-      </main>
+      <GameLayout>
+        <p className={styles.waitingMessage}>Esperando nueva ronda…</p>
+      </GameLayout>
     );
   }
 
   return (
-    <main className={styles.page}>
-      <div className={styles.container}>
-        <section className={styles.timerSection}>
-          <TimerDisplay formatted={formatted} />
-        </section>
+    <GameLayout>
+      <section className={styles.timerSection}>
+        <TimerDisplay formatted={formatted} />
+      </section>
 
-        <section className={styles.formSection}>
-          <GuessForm onSubmit={(word) => lobby.submitGuess(word)} guessResult={lobby.guessResult} />
-        </section>
-      </div>
-    </main>
+      <section className={styles.formSection}>
+        <GuessForm onSubmit={(word) => lobby.submitGuess(word)} guessResult={lobby.guessResult} />
+      </section>
+    </GameLayout>
   );
 }
