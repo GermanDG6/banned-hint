@@ -24,6 +24,13 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
+    --brand: 263 70% 56%;
+    --cta: 167 75% 27%;
+    --game-bg: 263 74% 35%;
+    --game-header: 263 70% 40%;
+    --game-text: 54 97% 59%;
+    --danger: 0 72% 51%;
+    --success: 142 71% 45%;
   }
 
   .dark {
@@ -55,5 +62,32 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .screen-setup {
+    @apply flex flex-col items-center justify-center px-4 bg-background;
+    height: 100dvh;
+    overflow: auto;
+  }
+
+  .screen-container {
+    @apply w-full max-w-sm;
+  }
+
+  .page-heading {
+    @apply text-3xl font-bold text-brand mb-2;
+  }
+
+  .alert-error {
+    @apply bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg text-sm font-medium;
+  }
+
+  .btn-primary {
+    @apply w-full h-14 bg-cta text-white font-bold text-lg rounded-full;
+    @apply transition-all duration-200;
+    @apply hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply flex items-center justify-center gap-2;
   }
 }
