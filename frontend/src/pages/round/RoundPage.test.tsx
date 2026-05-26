@@ -29,6 +29,7 @@ function renderRoundPage() {
     <MemoryRouter initialEntries={['/round']}>
       <Routes>
         <Route path="/" element={<div>Home</div>} />
+        <Route path="/local/setup" element={<div>LocalSetup</div>} />
         <Route path="/round" element={<RoundPage />} />
       </Routes>
     </MemoryRouter>,
@@ -54,10 +55,10 @@ describe('RoundPage', () => {
     });
   });
 
-  it('should redirect to home when no config in sessionStorage', () => {
+  it('should redirect to local setup when no config in sessionStorage', () => {
     vi.mocked(RoundConfigSession.load).mockReturnValue(null);
     renderRoundPage();
-    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.getByText('LocalSetup')).toBeInTheDocument();
   });
 
   it('should render timer display with formatted time', () => {
@@ -136,7 +137,7 @@ describe('RoundPage', () => {
     expect(resume).toHaveBeenCalledTimes(1);
   });
 
-  it('should clear session and navigate to home when exit button is clicked', async () => {
+  it('should clear session and navigate to local setup when exit button is clicked', async () => {
     const user = userEvent.setup();
     vi.mocked(RoundConfigSession.load).mockReturnValue({ minutes: 1, seconds: 30 });
 
@@ -144,6 +145,6 @@ describe('RoundPage', () => {
     await user.click(screen.getByLabelText('Finalizar partida'));
 
     expect(vi.mocked(RoundConfigSession.clear)).toHaveBeenCalledTimes(1);
-    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.getByText('LocalSetup')).toBeInTheDocument();
   });
 });

@@ -7,6 +7,7 @@ import styles from './CreateLobbyPage.module.css';
 import { Timer } from '@/features/round/domain/value-objects/timer.value-object';
 import { InvalidTimerException } from '@/features/round/domain/exceptions/invalid-timer.exception';
 import { useCreateLobby } from '@/features/lobby/infrastructure/lobby-dependencies.context';
+import { CTAButton } from '@/components/ui/cta-button/CTAButton';
 
 const createLobbySchema = z.object({
   playerName: z
@@ -90,6 +91,10 @@ export function CreateLobbyPage() {
   return (
     <main className={styles.page}>
       <div className={styles.container}>
+        <CTAButton variant="secondary" onClick={() => navigate('/')} className={styles.backButton}>
+          ← Volver
+        </CTAButton>
+
         <div className={styles.header}>
           <h1 className={styles.title}>Crear Sala</h1>
           <p className={styles.subtitle}>Inicia una nueva partida multijugador</p>

@@ -55,6 +55,11 @@ describe('CTAButton', () => {
     expect(screen.getByText('Start Game')).toBeInTheDocument();
     expect(screen.getByText('🎮')).toBeInTheDocument();
   });
+
+  it('should apply custom className when provided', () => {
+    render(<CTAButton className="custom-class">Click me</CTAButton>);
+    expect(screen.getByRole('button')).toHaveClass('custom-class');
+  });
 });
 
 

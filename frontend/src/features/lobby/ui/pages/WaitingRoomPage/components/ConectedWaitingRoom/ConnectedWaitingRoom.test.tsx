@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { RoundSessionStorage } from '@/features/lobby/infrastructure/round-session.storage.ts';
 import { PlayerRoleType } from '@/features/lobby/domain/models/player.model.ts';
 import { RoundSession } from '@/features/lobby/domain/models/round-session.model.ts';
+import { Player } from '@/features/lobby/domain/entities/player.entity.ts';
 
 // Mock dependencies
 vi.mock('@/features/lobby/ui/hooks/use-lobby.hook');
@@ -44,7 +45,7 @@ describe('ConnectedWaitingRoom', () => {
 
   it('should save RoundSession to storage before navigating to describer page', async () => {
     const mockLobby = {
-      players: [{ id: 'player-1', name: 'Host', role: PlayerRoleType.Describer }],
+      players: [Player.create('Host', PlayerRoleType.Describer)],
       roundSession: mockRoundSession,
       isConnected: true,
       startRound: vi.fn(),
@@ -83,8 +84,8 @@ describe('ConnectedWaitingRoom', () => {
   it('should save RoundSession to storage before navigating to guesser page', async () => {
     const mockLobby = {
       players: [
-        { id: 'player-1', name: 'Host', role: PlayerRoleType.Describer },
-        { id: 'player-2', name: 'Guest', role: PlayerRoleType.Guesser },
+        Player.create('Host', PlayerRoleType.Describer),
+        Player.create('Guest', PlayerRoleType.Guesser),
       ],
       roundSession: mockRoundSession,
       isConnected: true,
@@ -120,8 +121,8 @@ describe('ConnectedWaitingRoom', () => {
   it('should render lobby code display and player list', () => {
     const mockLobby = {
       players: [
-        { id: 'player-1', name: 'Host', role: PlayerRoleType.Describer },
-        { id: 'player-2', name: 'Guest', role: PlayerRoleType.Guesser },
+        Player.create('Host', PlayerRoleType.Describer),
+        Player.create('Guest', PlayerRoleType.Guesser),
       ],
       roundSession: null,
       isConnected: true,
@@ -156,7 +157,7 @@ describe('ConnectedWaitingRoom', () => {
 
   it('should render start round button only for describer', () => {
     const mockLobby = {
-      players: [{ id: 'player-1', name: 'Host', role: PlayerRoleType.Describer }],
+      players: [Player.create('Host', PlayerRoleType.Describer)],
       roundSession: null,
       isConnected: true,
       startRound: vi.fn(),
@@ -201,7 +202,7 @@ describe('ConnectedWaitingRoom', () => {
 
   it('should disable start round button when not connected', () => {
     const mockLobby = {
-      players: [{ id: 'player-1', name: 'Host', role: PlayerRoleType.Describer }],
+      players: [Player.create('Host', PlayerRoleType.Describer)],
       roundSession: null,
       isConnected: false,
       startRound: vi.fn(),
@@ -234,7 +235,7 @@ describe('ConnectedWaitingRoom', () => {
   it('should call startRound with correct duration when button is clicked', async () => {
     const mockStartRound = vi.fn();
     const mockLobby = {
-      players: [{ id: 'player-1', name: 'Host', role: PlayerRoleType.Describer }],
+      players: [Player.create('Host', PlayerRoleType.Describer)],
       roundSession: null,
       isConnected: true,
       startRound: mockStartRound,

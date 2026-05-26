@@ -7,6 +7,7 @@ interface CTAButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   variant?: 'primary' | 'secondary';
+  className?: string;
 }
 
 export function CTAButton({
@@ -15,8 +16,10 @@ export function CTAButton({
   onClick,
   disabled = false,
   variant = 'primary',
+  className,
 }: CTAButtonProps) {
-  const buttonClass = variant === 'secondary' ? styles.buttonSecondary : styles.button;
+  const baseClass = variant === 'secondary' ? styles.buttonSecondary : styles.button;
+  const buttonClass = className ? `${baseClass} ${className}` : baseClass;
 
   return (
     <button onClick={onClick} disabled={disabled} className={buttonClass}>

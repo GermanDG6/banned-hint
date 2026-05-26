@@ -15,7 +15,7 @@ export function RoundPage() {
 
   useEffect(() => {
     if (!config) {
-      navigate('/', { replace: true });
+      navigate('/local/setup', { replace: true });
     }
   }, [config, navigate]);
 
@@ -45,7 +45,7 @@ export function RoundPage() {
 
   const handleExit = () => {
     RoundConfigSession.clear();
-    navigate('/', { replace: true });
+    navigate('/local/setup', { replace: true });
   };
 
   if (!config) return null;
