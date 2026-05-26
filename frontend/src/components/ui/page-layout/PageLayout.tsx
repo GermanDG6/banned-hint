@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './PageLayout.module.css';
+import { BrandHeader } from '@/components/ui/brand-header/BrandHeader.tsx';
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -11,6 +12,7 @@ export function PageLayout({ children, className }: PageLayoutProps) {
 
   return (
     <main className={styles.page}>
+      <BrandHeader />
       <div className={containerClass}>{children}</div>
     </main>
   );

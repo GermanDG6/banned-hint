@@ -1,5 +1,5 @@
 .page {
-  @apply flex flex-col items-center justify-center px-4 bg-background;
+  @apply flex flex-col items-center justify-evenly px-4 bg-background;
   height: 100dvh;
   overflow: auto;
 }
