@@ -6,8 +6,10 @@ import { Timer } from '@/features/round/domain/value-objects/timer.value-object'
 import { useCountdown } from '@/features/round/ui/hooks/use-countdown.hook';
 import { useRandomCard } from '@/features/card/ui/hooks/use-get-random-card.hook';
 import { TimerDisplay } from '@/components/ui/timer-display/TimerDisplay';
-import { GameCard } from '@/features/card/ui/components/GameCard/GameCard';
+import { CardComponent } from '@/components/ui/card-component/CardComponent';
 import { CTAButton } from '@/components/ui/cta-button/CTAButton';
+import { GameLayout } from '@/components/ui/game-layout/GameLayout';
+import { IconButton } from '@/components/ui/icon-button/IconButton';
 
 export function RoundPage() {
   const navigate = useNavigate();
@@ -51,31 +53,33 @@ export function RoundPage() {
   if (!config) return null;
 
   return (
-    <main className={styles.page}>
-      <header className={styles.header}>
-        <h1 className={styles.brand}>BANNED HINT</h1>
-        <button className={styles.exitButton} onClick={handleExit} aria-label="Finalizar partida">
+    <GameLayout
+      exitButton={
+        <IconButton variant="danger" aria-label="Finalizar partida" onClick={handleExit}>
           ✕
-        </button>
-      </header>
+        </IconButton>
+      }
+    >
+      <section className={styles.timerSection}>
+        <TimerDisplay formatted={formatted} />
+      </section>
 
-      <div className={styles.centerContent}>
-        <section className={styles.timerSection}>
-          <TimerDisplay formatted={formatted} />
-        </section>
+      <section className={styles.cardSection}>
+        <CardComponent
+          word={card?.word.value ?? ''}
+          bannedWords={card?.bannedWords.toArray() ?? []}
+          loading={loading}
+        />
+      </section>
 
-        <section className={styles.cardSection}>
-          <GameCard card={card} loading={loading} />
-        </section>
-        <section className={styles.actions}>
-          <CTAButton onClick={handleNext} icon="⊙">
-            SIGUIENTE
-          </CTAButton>
-          <CTAButton onClick={handlePauseResume} variant="secondary" icon={isRunning ? '⏸' : '▶'}>
-            {isRunning ? 'PAUSA' : 'CONTINUAR'}
-          </CTAButton>
-        </section>
-      </div>
-    </main>
+      <section className={styles.actions}>
+        <CTAButton onClick={handleNext} icon="⊙">
+          SIGUIENTE
+        </CTAButton>
+        <CTAButton onClick={handlePauseResume} variant="secondary" icon={isRunning ? '⏸' : '▶'}>
+          {isRunning ? 'PAUSA' : 'CONTINUAR'}
+        </CTAButton>
+      </section>
+    </GameLayout>
   );
 }
