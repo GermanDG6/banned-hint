@@ -32,7 +32,15 @@ npm run test:watch -w frontend
 npm run test:cov -w frontend
 ```
 
-Antes de dar por terminado cualquier cambio: `lint` + `test` del workspace deben pasar sin errores.
+**Antes de dar por terminado cualquier cambio:**
+
+- ✅ `npm run lint -w frontend` — sin errores ni warnings de linting.
+- ✅ `npm run test -w frontend` — todos los tests en verde, sin tests pendientes.
+- ✅ `npm run build -w frontend` — build limpio sin errores de TypeScript.
+
+**Cambios en design system o componentes compartidos** también requieren verificar que todos los consumidores siguen compilando sin errores:
+
+- ✅ `npm run build -w frontend` — recompila todos los módulos con los cambios.
 
 ---
 
@@ -137,7 +145,17 @@ El frontend sigue principios **OOP** (Object-Oriented Programming) en el dominio
 
 ---
 
-## CSS Modules + Tailwind CSS
+## Estilos y Design System
+
+### Fuente de verdad
+
+El design system del frontend se centraliza en dos archivos:
+
+- **Tokens semánticos**: `src/index.css` (bloque `:root` con variables CSS HSL). Todos los colores, espaciados, border-radius, sombras y tipografía se definen aquí como variables reutilizables.
+- **Configuración Tailwind**: `tailwind.config.ts` referencia las variables de `index.css` mediante la función `hsl(var(--token-name))`.
+- **Componentes compartidos**: `src/components/ui/` contiene componentes reutilizables entre features que implementan el design system (botones, inputs, tarjetas, layouts, etc.).
+
+### Tokens y CSS Modules
 
 - **Nunca** escribas clases de Tailwind directamente en el JSX. Las clases de utilidad viven exclusivamente dentro de archivos `.module.css`.
 - Cada componente React tiene su archivo `.module.css` asociado con clases **semánticas** que usan `@apply` internamente para aplicar utilidades de Tailwind. Ejemplo:
@@ -165,9 +183,50 @@ El frontend sigue principios **OOP** (Object-Oriented Programming) en el dominio
   }
   ```
 
-- Si un patrón de `@apply` se repite más de dos veces, extráelo a una clase global en `globals.css` (usando el selector de clase de Tailwind).
-- Sigue siempre los tokens de diseño definidos en `tailwind.config.ts` (colores, tipografía, espaciados); no uses valores arbitrarios (`[valor]`) dentro de `@apply`.
-- **Excepción única permitida**: `style={{ }}` con valores completamente dinámicos imposibles de expresar en CSS estático (ej. colores generados en runtime). Documenta tales excepciones con un comentario explicando por qué no pueden resolverse en el `.module.css`.
+- Si un patrón de `@apply` se repite más de dos veces, extráelo a una clase global en `index.css` (dentro de `@layer components`) para que los módulos CSS la apliquen reutilizable.
+- Sigue siempre los tokens de diseño definidos en `src/index.css` (colores, tipografía, espaciados); no uses valores arbitrarios (`[valor]`) dentro de `@apply`.
+- **Excepción única permitida**: `style={{ }}` con valores completamente dinámicos imposibles de expresar en CSS estático (ej. colores generados en runtime). 
+
+### Reglas de implementación del design system
+
+- **Antes de crear UI nueva**, revisar componentes existentes en `components/ui/` y reutilizar el más cercano.
+- **No hardcodear valores**: colores, spacing, border-radius, sombras, z-index ni tipografía. Usar únicamente tokens semánticos del sistema.
+- **No copiar estilos** en páginas o features si pueden vivir en un componente compartido o clase global en `index.css`.
+- **Si un patrón se repite 2 o más veces**, extraerlo al design system (bien como componente en `components/ui/`, bien como clase global en `index.css`).
+- **Variantes**: implementarlas extendiendo componentes existentes (props `variant`, condicionales en CSS) antes de crear componentes nuevos.
+- **Separación de responsabilidades**:
+  - Tokens: variables CSS en `:root` de `index.css`.
+  - Primitivos: clases base globales para conceptos transversales (p.ej. `.screen-setup`, `.button-base`).
+  - Componentes compuestos: React components en `components/ui/`.
+  - Estilos de vista: CSS módular en cada página o feature.
+
+### Accesibilidad
+
+- Todo componente interactivo debe ser operable por teclado: inputs enfocables, botones con `tab`, selectores con navegación de flecha.
+- **Focus visible obligatorio**: todo elemento interactivo debe tener un indicador visual claro cuando recibe foco (`:focus-visible` o ring de Tailwind).
+- **Contraste mínimo WCAG AA**: colores de texto y fondo garantizan suficiente contraste para cumplir con WCAG AA (ratio ≥4.5:1 para texto).
+- **Input + Label**: todo campo de formulario requiere una etiqueta `<label>` asociada mediante `htmlFor`.
+- **Estados obligatorios en componentes reutilizables**: cada componente del design system debe soportar al menos estos estados:
+  - `loading`: esqueletos animados o spinner mientras se cargan datos.
+  - `error`: mensaje de error visible, color de alerta.
+  - `disabled`: estado deshabilitado con estilos claros y operaciones bloqueadas.
+  - `empty` (si aplica): mensaje cuando no hay contenido.
+
+### Responsive
+
+- **Diseña mobile-first**: los estilos base son para pantalla móvil; los breakpoints añaden estilos para pantallas más grandes.
+- **Solo breakpoints del sistema**: usar únicamente los puntos de ruptura definidos en `tailwind.config.ts` (`sm`, `md`, `lg`, `xl`, `2xl`); prohibido usar breakpoints ad hoc o `[custom]`.
+- **Touch targets mínimos**: garantizar que elementos interactivos tienen al menos 44px × 44px en pantallas táctiles; respetar los espaciados mínimos del sistema.
+
+### Contribución al design system
+
+Crear un componente nuevo en `components/ui/` solo si se cumplen **todos** estos criterios:
+
+1. **No existe un componente equivalente** en `components/ui/` que resuelva el mismo caso de uso.
+2. **No es una simple variante** de un componente existente (las variantes se implementan con props `variant` o condicionales CSS).
+3. **Se documenta su API completa**: props, tipos, comportamiento esperado, estados soportados.
+4. **Se documenta la accesibilidad**: roles ARIA, labeling, navegación por teclado.
+5. **Se incluyen tests unitarios**: cubre comportamiento visible, manejo de props, estados.
 
 ---
 
@@ -275,12 +334,24 @@ export class PlayerRole {
   - Debe estar alineada con las reglas descritas en `docs/`.
   - Si introduce nuevas reglas, actualiza primero `docs/` y anótalo en `frontend/README.md`.
 
+---
+
 ## Reglas adicionales
+
+### Arquitectura y dependencias
 
 - **Importaciones entre capas**: Los componentes e `ui/hooks/` importan de `application/` (casos de uso, ports si es estrictamente necesario). Nunca importan directamente de `infrastructure/`. La inyección de dependencias de adaptadores concretos ocurre en la raíz de la aplicación o en un fichero de configuración central.
 - **Componentes compartidos**: Los componentes del design system en `components/ui/` se importan desde cualquier feature mediante `@/components/ui/<component-name>`. No tienen dependencias de features específicas.
 - No importes nada de `backend`. Si en el futuro se crea un paquete compartido (ej. `shared/`), será el único importable entre workspaces.
 - Las llamadas a la API van exclusivamente en `infrastructure/api/` (adaptadores que implementan los ports); nunca hagas `fetch` dentro de un componente, página o caso de uso.
 - Gestión de estado global solo cuando sea imprescindible y la feature lo justifique explícitamente; preferir estado local y composición.
-- Accesibilidad mínima: elementos interactivos con atributos ARIA cuando sean necesarios, imágenes con `alt`, formularios con `label` asociado.
 - No uses `useEffect` para derivar estado; usa `useMemo` o calcula directamente en el render.
+
+### Prohibiciones del design system
+
+- **No usar estilos inline** salvo en casos justificados por dinamismos imposibles de expresar en CSS estático. Todo uso de `style={{ }}` debe estar acompañado de un comentario explicativo.
+- **No introducir librerías UI nuevas** sin aprobación explícita en el equipo. La prioridad es reutilizar componentes existentes en `components/ui/` o implementar nuevas variantes mediante props.
+- **No cambiar tokens globales** (variables CSS en `src/index.css`) para resolver un caso local de una página o feature. Si un token no cubre un caso de uso legítimo, propón su extensión documentando el cambio.
+- **No romper naming conventions** del sistema. Los componentes, valores CSS, clases globales y props siguen el patrón establecido; cambios de convención requieren consenso explícito.
+
+
