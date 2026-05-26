@@ -6,18 +6,17 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   hasError?: boolean;
 }
 
-export function TextInput({
-  variant = 'default',
-  hasError = false,
-  className,
-  ...rest
-}: TextInputProps) {
-  const variantClass = variant === 'on-dark' ? styles.onDark : styles.default;
-  const errorClass = hasError ? styles.error : '';
-  const inputClass = className
-    ? `${styles.input} ${variantClass} ${errorClass} ${className}`
-    : `${styles.input} ${variantClass} ${errorClass}`;
+ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
+  ({ variant = 'default', hasError = false, className, ...rest }, ref) => {
+    const variantClass = variant === 'on-dark' ? styles.onDark : styles.default;
+    const errorClass = hasError ? styles.error : '';
+    const inputClass = className
+      ? `${styles.input} ${variantClass} ${errorClass} ${className}`
+      : `${styles.input} ${variantClass} ${errorClass}`;
 
-  return <input className={inputClass} {...rest} />;
-}
+    return <input ref={ref} className={inputClass} {...rest} />;
+  }
+);
+
+TextInput.displayName = 'TextInput';
 
