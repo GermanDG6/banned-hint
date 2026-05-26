@@ -1,0 +1,13 @@
+.root {
+  @apply p-4 rounded-lg text-sm font-medium;
+}
+
+.error {
+  @apply bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg text-sm font-medium;
+}
+
+.success {
+  @apply bg-green-100 border border-green-300 text-success;
+}
+
+
