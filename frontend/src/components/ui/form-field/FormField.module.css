@@ -1,0 +1,12 @@
+.root {
+  @apply space-y-2;
+}
+
+.label {
+  @apply block text-sm font-semibold text-foreground;
+}
+
+.error {
+  @apply text-sm text-danger font-medium;
+}
+
