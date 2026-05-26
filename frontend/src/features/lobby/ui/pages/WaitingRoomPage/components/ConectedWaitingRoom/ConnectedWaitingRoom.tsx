@@ -5,6 +5,9 @@ import { useLobby } from '@/features/lobby/ui/hooks/use-lobby.hook.ts';
 import { PlayerRoleType, PlayerRole } from '@/features/lobby/domain/models/player.model.ts';
 import { LobbyCodeDisplay, PlayerList } from '../../../../components';
 import { RoundSessionStorage } from '@/features/lobby/infrastructure/round-session.storage.ts';
+import { PageLayout } from '@/components/ui/page-layout/PageLayout';
+import { CTAButton } from '@/components/ui/cta-button/CTAButton';
+import { StatusBadge } from '@/components/ui/status-badge/StatusBadge';
 
 interface ConnectedWaitingRoomProps {
   code: string;
@@ -36,38 +39,26 @@ export function ConnectedWaitingRoom({ code, myRole, durationSeconds }: Connecte
   };
 
   return (
-    <main className={styles.page}>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Sala de Espera</h1>
-        </div>
+    <PageLayout>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Sala de Espera</h1>
+      </div>
 
-        <div className={styles.content}>
-          <LobbyCodeDisplay code={code} />
+      <div className={styles.content}>
+        <LobbyCodeDisplay code={code} />
 
-          <PlayerList players={lobby.players} />
+        <PlayerList players={lobby.players} />
 
-          {myRole === PlayerRoleType.Describer && (
-            <button
-              onClick={handleStartRound}
-              className={styles.startButton}
-              disabled={!lobby.isConnected}
-            >
-              🎬 Iniciar ronda
-            </button>
-          )}
+        {myRole === PlayerRoleType.Describer && (
+          <CTAButton onClick={handleStartRound} disabled={!lobby.isConnected} icon="🎬">
+            Iniciar ronda
+          </CTAButton>
+        )}
 
-          <div className={styles.statusBar}>
-            <div
-              className={`${styles.statusIndicator} ${
-                lobby.isConnected ? styles.statusConnected : styles.statusDisconnected
-              }`}
-            >
-              {lobby.isConnected ? '✓ Conectado' : '✗ Desconectado'}
-            </div>
-          </div>
+        <div className={styles.statusBar}>
+          <StatusBadge status={lobby.isConnected ? 'connected' : 'disconnected'} />
         </div>
       </div>
-    </main>
+    </PageLayout>
   );
 }

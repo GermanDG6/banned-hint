@@ -1,47 +1,19 @@
 /* ConnectedWaitingRoom.module.css */
 
-.page {
-  height: 100dvh;
-  overflow: auto;
-  @apply bg-background flex flex-col items-center justify-center px-4 py-8;
-}
-
-.container {
-  @apply w-full max-w-sm;
-}
-
 .header {
   @apply text-center mb-6;
 }
 
 .title {
-  @apply text-3xl font-bold text-brand mb-2;
+  @apply text-2xl font-bold text-brand mb-1;
 }
 
 .content {
   @apply space-y-4;
 }
 
-.startButton {
-  @apply w-full h-14 bg-cta text-white font-bold text-lg rounded-full;
-  @apply transition-all duration-200;
-  @apply hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed;
-  @apply flex items-center justify-center gap-2;
-}
-
 .statusBar {
   @apply flex justify-center pt-4;
 }
 
-.statusIndicator {
-  @apply text-sm font-semibold px-4 py-2 rounded-full;
-}
-
-.statusConnected {
-  @apply bg-green-100 text-green-700;
-}
-
-.statusDisconnected {
-  @apply bg-red-100 text-red-700;
-}
 
