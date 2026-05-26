@@ -1,0 +1,12 @@
+.root {
+  @apply text-sm font-semibold px-4 py-2 rounded-full;
+}
+
+.connected {
+  @apply bg-green-100 text-success;
+}
+
+.disconnected {
+  @apply bg-red-100 text-danger;
+}
+
