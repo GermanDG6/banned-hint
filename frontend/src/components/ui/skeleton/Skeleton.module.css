@@ -1,0 +1,4 @@
+.root {
+  @apply bg-muted animate-pulse rounded-lg;
+}
+
