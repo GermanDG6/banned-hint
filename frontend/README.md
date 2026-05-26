@@ -2,11 +2,11 @@
 
 ## Estado actual
 
-Implementadas las features `card` y `round` con arquitectura DDD completa, más dos pantallas enrutadas y un design system básico.
+Implementadas las features `card` y `round`, dos modos de juego, y un design system básico.
 
 - **Feature `card`**: dominio (`Card`, `CardId`, `Word`, `BannedWords`, excepciones), caso de uso `GetRandomCard`, adaptador HTTP (`HttpCardRepository`) e inyección de dependencias via contexto (`CardDependenciesProvider`).
 - **Feature `round`**: value object `Timer` con validación, excepción `InvalidTimerException`, hook de cuenta regresiva (`useCountdown`) y componente `TimerDisplay`.
-- **Sesión**: `RoundConfigSession` persiste la `RoundConfig` (minutos y segundos del timer) en `sessionStorage` entre la pantalla de inicio y la ronda.
+- **Sesión**: `RoundConfigSession` persiste la `RoundConfig` (minutos y segundos del timer) en `sessionStorage` entre `LocalSetupPage` y `RoundPage`.
 
 ### Estructura actual
 
@@ -22,7 +22,8 @@ src/
 │       ├── domain/          # Timer (value object), InvalidTimerException
 │       └── ui/              # Componente TimerDisplay, hook useCountdown
 ├── pages/
-│   ├── home/                # HomePage — configuración del timer e inicio de ronda
+│   ├── home/                # HomePage — selección de modo de juego
+│   ├── local-setup/         # LocalSetupPage — configuración del timer (Modo Local)
 │   └── round/               # RoundPage — pantalla principal del juego
 ├── components/
 │   └── ui/                  # Componentes del design system (CTAButton, …)
@@ -39,18 +40,17 @@ src/
 
 ## Objetivo
 
-Proporcionar la interfaz para jugar a Banned Hint:
+Proporcionar la interfaz para jugar a Banned Hint en dos modos:
 
-- Permitir al jugador configurar la duración de la ronda (`RoundConfig`).
-- Mostrar la `Card` actual (palabra objetivo y palabras prohibidas).
-- Gestionar el cronómetro (`Timer`).
-- Permitir pasar a la siguiente carta y pausar/reanudar la ronda.
+- **Modo Local**: un solo dispositivo. El jugador configura la duración de la ronda (`RoundConfig`) en `/local/setup` y luego juega en `/round`.
+- **Modo Sala**: multijugador. El host crea un `Lobby` en `/lobby/new`; el flujo multijugador sigue la descripción en la [documentación de dominio](../docs/overview.md).
 
 ## Pantallas implementadas
 
 | Página | Ruta | Descripción |
 | --- | --- | --- |
-| `HomePage` | `/` | El jugador configura los minutos y segundos del `Timer` y pulsa «Jugar» |
+| `HomePage` | `/` | Selección de modo de juego (Modo Local o Modo Sala) |
+| `LocalSetupPage` | `/local/setup` | Configuración del `Timer` antes de iniciar una ronda en Modo Local |
 | `RoundPage` | `/round` | Muestra el `Timer`, la `GameCard` y acciones (Siguiente, Pausa/Continuar, Salir) |
 
 ## Componentes implementados
@@ -65,9 +65,8 @@ Proporcionar la interfaz para jugar a Banned Hint:
 
 Según la [documentación de dominio](../docs/overview.md):
 
-- El jugador debe configurar una duración válida (> 0) antes de iniciar la ronda; en caso contrario el botón «Jugar» queda deshabilitado.
-- El cronómetro de la ronda se ejecuta solo en el cliente.
-- Cuando el tiempo llega a 0, se carga automáticamente una nueva carta y el cronómetro se reinicia.
+- **En `LocalSetupPage`**: el jugador debe configurar una duración válida (> 0) antes de iniciar la ronda; en caso contrario el botón «¡JUGAR!» queda deshabilitado.
+- **En `RoundPage` (Modo Local)**: el cronómetro de la ronda se ejecuta solo en el cliente. Cuando el tiempo llega a 0, se carga automáticamente una nueva carta y el cronómetro se reinicia.
 - El frontend nunca modifica la estructura de una `Card`: solo consume el contrato definido por el backend.
 
 ## Próximos pasos

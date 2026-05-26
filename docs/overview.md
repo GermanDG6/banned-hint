@@ -4,6 +4,38 @@
 
 Un jugador (`Describer`) debe conseguir que el resto (`Guessers`) adivinen la palabra objetivo de una carta sin decir ninguna de las palabras prohibidas, dentro de un tiempo limitado.
 
+## Modos de juego
+
+### Modo Local
+
+Un único dispositivo, un único jugador. El flujo es:
+
+1. El jugador accede a la pantalla de inicio (`/`) y selecciona **Modo Local**.
+2. Redirige a `/local/setup`, donde configura la duración de la ronda (`Timer`) en minutos y segundos.
+3. Pulsa «¡JUGAR!» y accede a `/round`.
+4. En `/round` ve la `Card` activa (palabra objetivo y palabras prohibidas), el cronómetro y los controles (Siguiente, Pausa/Continuar, Salir).
+5. Cuando pulsa «Siguiente», se carga una nueva `Card` aleatoria y se reinicia el cronómetro.
+6. Cuando el cronómetro llega a 0, se carga automáticamente una nueva `Card`.
+7. Al pulsar «Salir» o navegar fuera, se limpia la sesión y redirige a `/local/setup`.
+
+### Modo Sala (Multijugador)
+
+Múltiples dispositivos conectados mediante WebSocket. El flujo es:
+
+1. El host accede a la pantalla de inicio (`/`) y selecciona **Modo Sala**.
+2. Redirige a `/lobby/new` (pantalla de creación de sala).
+3. El host introduce su nombre y la duración de la ronda, luego pulsa «Crear sala».
+4. El servidor genera un `LobbyCode` único, asigna al host el rol `Describer` y crea el `Lobby`.
+5. El host comparte el `LobbyCode` con el resto de jugadores.
+6. Los demás jugadores entran a `/lobby/<code>` introduciendo el `LobbyCode` y su nombre (rol `Guesser`).
+7. El `Describer` pulsa «Iniciar ronda». Se selecciona una `Card` aleatoria y se emite un evento `round-started` con la `ActiveCard`, el `startAt` (timestamp en ms) y la `durationSeconds`.
+8. Cada cliente redirige automáticamente según su rol:
+   - `Describer` → `/round`: ve la `word` y las `bannedWords`.
+   - `Guesser` → `/round/guess`: ve solo el cronómetro y un campo de texto.
+9. Los `Guessers` escriben intentos. El servidor valida y responde con `{ correct: boolean }` solo al emisor.
+10. El `Describer` pulsa «Siguiente» para cargar una nueva `Card`.
+11. Cuando el cronómetro llega a 0, el servidor emite automáticamente `card-changed`.
+
 ## Flujo de una partida multijugador
 
 1. El host crea un `Lobby` en la pantalla de inicio e introduce su nombre de jugador y la duración de la ronda (`RoundConfig`).
