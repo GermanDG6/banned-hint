@@ -1,0 +1,11 @@
+.page {
+  @apply flex flex-col items-center justify-center px-4 bg-background;
+  height: 100dvh;
+  overflow: auto;
+}
+
+.container {
+  @apply w-full max-w-sm;
+}
+
+
