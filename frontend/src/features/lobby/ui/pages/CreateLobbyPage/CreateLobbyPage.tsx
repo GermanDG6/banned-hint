@@ -95,10 +95,6 @@ export function CreateLobbyPage() {
 
   return (
     <PageLayout>
-      <CTAButton variant="secondary" onClick={() => navigate('/')} className={styles.backButton}>
-        ← Volver
-      </CTAButton>
-
       <div className={styles.header}>
         <h2 className={styles.title}>Crear Sala</h2>
         <p className={styles.subtitle}>Inicia una nueva partida multijugador</p>
@@ -126,15 +122,18 @@ export function CreateLobbyPage() {
         {(errors.minutes || errors.seconds) && (
           <p className={styles.error}>Configuración de tiempo inválida</p>
         )}
-
-        <CTAButton
-          onClick={handleSubmit(onSubmit)}
-          disabled={!isValidTimer() || isLoading}
-          icon={isLoading ? undefined : '➕'}
-        >
-          {isLoading ? 'Creando sala...' : 'Crear sala'}
-        </CTAButton>
       </form>
+
+      <CTAButton
+        onClick={handleSubmit(onSubmit)}
+        disabled={!isValidTimer() || isLoading}
+        icon={isLoading ? undefined : '➕'}
+      >
+        {isLoading ? 'Creando sala...' : 'Crear sala'}
+      </CTAButton>
+      <CTAButton variant="secondary" onClick={() => navigate('/')} className={styles.backButton}>
+        ← Volver
+      </CTAButton>
     </PageLayout>
   );
 }

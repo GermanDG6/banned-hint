@@ -5,7 +5,7 @@
 }
 
 .container {
-  @apply w-full max-w-sm;
+  @apply w-full max-w-sm flex flex-col gap-5;
 }
 
 
