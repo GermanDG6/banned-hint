@@ -35,7 +35,6 @@ export function WaitingRoomPage() {
 
     const sourceData = state || sessionData;
     if (!sourceData) return;
-
     joinLobby
       .execute(code, sourceData.playerName, sourceData.role, sourceData.playerId)
       .then(() => {
@@ -64,7 +63,7 @@ export function WaitingRoomPage() {
 
       setJoinedState({ role: PlayerRoleType.Guesser, durationSeconds: 0 });
       LobbyPlayerSession.save({
-        playerId: joinedGuest.id.value,
+        playerId: joinedGuest.getId(),
         playerName: joinedGuest.name,
         role: joinedGuest.role,
         durationSeconds: 0,

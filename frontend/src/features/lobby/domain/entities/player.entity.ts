@@ -15,11 +15,6 @@ export class Player {
     this.role = role;
   }
 
-  /**
-   * Crea un Player validando name y role.
-   * Si `id` no se proporciona, genera un UUID nuevo con PlayerId.generate().
-   * Si `id` se proporciona, debe ser un UUID válido; lanza InvalidPlayerIdException en caso contrario.
-   */
   static create(name: string, role: string, id?: string): Player {
     const playerId = id !== undefined ? PlayerId.create(id) : PlayerId.generate();
 
@@ -35,6 +30,7 @@ export class Player {
   }
 
   static fromRaw(data: unknown): Player {
+    //TODO DELETE METHOD
     if (typeof data !== 'object' || data === null) {
       throw new InvalidPlayerIdException(data);
     }
@@ -62,5 +58,9 @@ export class Player {
 
     // Delegate to create() for final validation and creation
     return Player.create(name, role, id);
+  }
+
+  getId() {
+    return this.id.value();
   }
 }

@@ -1,10 +1,10 @@
 import { InvalidPlayerIdException } from '../exceptions/invalid-player-id.exception';
 
 export class PlayerId {
-  readonly value: string;
+  private readonly _value: string;
 
   private constructor(value: string) {
-    this.value = value;
+    this._value = value;
   }
 
   static create(value: string): PlayerId {
@@ -24,10 +24,13 @@ export class PlayerId {
   }
 
   equals(other: PlayerId): boolean {
-    return this.value === other.value;
+    return this._value === other._value;
   }
 
   toString(): string {
-    return this.value;
+    return this._value;
+  }
+  value(): string {
+    return this._value;
   }
 }
