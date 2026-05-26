@@ -1,0 +1,64 @@
+/* LocalSetupPage.module.css */
+
+.page {
+  height: 100dvh;
+  overflow: hidden;
+  @apply bg-background flex flex-col items-center justify-center px-4;
+}
+
+.container {
+  @apply w-full max-w-sm;
+}
+
+.header {
+  @apply text-center mb-3;
+}
+
+.title {
+  @apply text-3xl font-bold text-brand mb-2;
+}
+
+.subtitle {
+  @apply text-sm text-foreground text-center;
+}
+
+.timerSection {
+  @apply mb-3 py-3;
+}
+
+.timerLabel {
+  @apply text-sm font-semibold text-foreground mb-2 flex items-center gap-2;
+}
+
+.timerIcon {
+  @apply w-5 h-5 text-brand;
+}
+
+.timerRow {
+  @apply flex items-center justify-center gap-2;
+}
+
+.timerInput {
+  @apply w-16 h-12 text-center text-2xl font-bold border-2 border-border rounded-lg;
+  @apply focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand;
+  @apply bg-background text-foreground;
+}
+
+.separator {
+  @apply text-3xl font-bold text-foreground;
+}
+
+.unitLabel {
+  @apply text-xs font-semibold text-muted-foreground absolute;
+  bottom: -1.5rem;
+}
+
+.timerInputWrapper {
+  @apply relative;
+}
+
+.actionsSection {
+  @apply flex flex-col gap-3 mt-6;
+}
+
+

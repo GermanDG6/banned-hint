@@ -20,6 +20,10 @@ const DescriberPage = lazy(() =>
   import('../features/lobby/ui/pages').then((m) => ({ default: m.DescriberPage })),
 );
 
+const LocalSetupPage = lazy(() =>
+  import('../pages/local-setup/LocalSetupPage').then((m) => ({ default: m.LocalSetupPage })),
+);
+
 const RoundPage = lazy(() =>
   import('../pages/round/RoundPage').then((m) => ({ default: m.RoundPage })),
 );
@@ -32,6 +36,14 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: 'local/setup',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <LocalSetupPage />
+          </Suspense>
+        ),
       },
       {
         path: 'lobby/new',

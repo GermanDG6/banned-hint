@@ -36,83 +36,40 @@ describe('HomePage', () => {
     expect(image.src).toContain('thinking.png');
   });
 
-  it('renders timer label with icon', () => {
+  it('renders the MODO LOCAL button', () => {
     render(<HomePage />);
-    expect(screen.getByText('Tiempo de la ronda')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /MODO LOCAL/i })).toBeInTheDocument();
   });
 
-  it('renders minutes and seconds input fields with default values', () => {
+  it('renders the MODO SALA button', () => {
     render(<HomePage />);
-    const minutesInput = screen.getByLabelText('Minutos') as HTMLInputElement;
-    const secondsInput = screen.getByLabelText('Segundos') as HTMLInputElement;
-
-    expect(minutesInput).toHaveValue(0);
-    expect(secondsInput).toHaveValue(30);
+    expect(screen.getByRole('button', { name: /MODO SALA/i })).toBeInTheDocument();
   });
 
-  it('renders the play button', () => {
+  it('navigates to /local/setup when MODO LOCAL button is clicked', () => {
     render(<HomePage />);
-    expect(screen.getByRole('button', { name: /¡JUGAR!/i })).toBeInTheDocument();
+    const localButton = screen.getByRole('button', { name: /MODO LOCAL/i });
+
+    fireEvent.click(localButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith('/local/setup');
   });
 
-  it('play button is enabled with default valid timer values', () => {
+  it('navigates to /lobby/new when MODO SALA button is clicked', () => {
     render(<HomePage />);
-    const playButton = screen.getByRole('button', { name: /¡JUGAR!/i }) as HTMLButtonElement;
-    expect(playButton.disabled).toBe(false);
+    const lobbyButton = screen.getByRole('button', { name: /MODO SALA/i });
+
+    fireEvent.click(lobbyButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith('/lobby/new');
   });
 
-  it('play button is disabled when both minutes and seconds are 0', () => {
+  it('both mode buttons are always enabled', () => {
     render(<HomePage />);
-    const minutesInput = screen.getByLabelText('Minutos') as HTMLInputElement;
-    const secondsInput = screen.getByLabelText('Segundos') as HTMLInputElement;
-    const playButton = screen.getByRole('button', { name: /¡JUGAR!/i }) as HTMLButtonElement;
+    const localButton = screen.getByRole('button', { name: /MODO LOCAL/i }) as HTMLButtonElement;
+    const lobbyButton = screen.getByRole('button', { name: /MODO SALA/i }) as HTMLButtonElement;
 
-    fireEvent.change(minutesInput, { target: { value: '0' } });
-    fireEvent.change(secondsInput, { target: { value: '0' } });
-
-    expect(playButton.disabled).toBe(true);
-  });
-
-  it('restricts seconds input to maximum 59', () => {
-    render(<HomePage />);
-    const secondsInput = screen.getByLabelText('Segundos') as HTMLInputElement;
-
-    fireEvent.change(secondsInput, { target: { value: '75' } });
-
-    expect(secondsInput.value).toBe('59');
-  });
-
-  it('allows valid seconds values between 0 and 59', () => {
-    render(<HomePage />);
-    const secondsInput = screen.getByLabelText('Segundos') as HTMLInputElement;
-
-    fireEvent.change(secondsInput, { target: { value: '45' } });
-    expect(secondsInput.value).toBe('45');
-
-    fireEvent.change(secondsInput, { target: { value: '0' } });
-    expect(secondsInput.value).toBe('00');
-
-    fireEvent.change(secondsInput, { target: { value: '59' } });
-    expect(secondsInput.value).toBe('59');
-  });
-
-  it('allows any non-negative minutes value', () => {
-    render(<HomePage />);
-    const minutesInput = screen.getByLabelText('Minutos') as HTMLInputElement;
-
-    fireEvent.change(minutesInput, { target: { value: '5' } });
-    expect(minutesInput.value).toBe('05');
-
-    fireEvent.change(minutesInput, { target: { value: '0' } });
-    expect(minutesInput.value).toBe('00');
-  });
-
-  it('navigates to /round when play button is clicked with valid timer', () => {
-    render(<HomePage />);
-    const playButton = screen.getByRole('button', { name: /¡JUGAR!/i });
-
-    fireEvent.click(playButton);
-
-    expect(mockNavigate).toHaveBeenCalledWith('/round');
+    expect(localButton.disabled).toBe(false);
+    expect(lobbyButton.disabled).toBe(false);
   });
 });
