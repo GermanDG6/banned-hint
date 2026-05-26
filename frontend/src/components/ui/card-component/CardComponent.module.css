@@ -1,0 +1,43 @@
+.card {
+  @apply w-full bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center gap-4;
+}
+
+.word {
+  @apply text-4xl font-bold text-brand text-center uppercase;
+}
+
+.divider {
+  @apply w-full h-px bg-border;
+}
+
+.bannedWordsList {
+  @apply w-full flex flex-col gap-2 list-none;
+  padding: 0;
+  margin: 0;
+}
+
+.bannedWord {
+  @apply w-full text-center font-semibold text-foreground py-3 px-4;
+  @apply border border-border rounded-xl bg-white;
+}
+
+.skeletonContainer {
+  @apply w-full flex flex-col items-center gap-4;
+}
+
+.skeletonWord {
+  @apply h-10 w-3/4 rounded-lg;
+}
+
+.skeletonDivider {
+  @apply w-full h-px;
+}
+
+.skeletonList {
+  @apply w-full flex flex-col gap-2;
+}
+
+.skeletonBannedWord {
+  @apply h-12 w-full rounded-xl;
+}
+
