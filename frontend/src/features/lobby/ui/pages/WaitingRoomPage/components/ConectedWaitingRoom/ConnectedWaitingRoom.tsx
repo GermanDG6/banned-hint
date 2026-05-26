@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import styles from './ConnectedWaitingRoom.module.css';
-import { useLobby } from '@/features/lobby/ui/hooks/use-lobby.hook';
-import { PlayerRoleType, PlayerRole } from '@/features/lobby/domain/models/player.model';
-import { LobbyCodeDisplay, PlayerList } from '../../components';
-import { RoundSessionStorage } from '@/features/lobby/infrastructure/round-session.storage';
+import { useLobby } from '@/features/lobby/ui/hooks/use-lobby.hook.ts';
+import { PlayerRoleType, PlayerRole } from '@/features/lobby/domain/models/player.model.ts';
+import { LobbyCodeDisplay, PlayerList } from '../../../../components';
+import { RoundSessionStorage } from '@/features/lobby/infrastructure/round-session.storage.ts';
 
 interface ConnectedWaitingRoomProps {
   code: string;

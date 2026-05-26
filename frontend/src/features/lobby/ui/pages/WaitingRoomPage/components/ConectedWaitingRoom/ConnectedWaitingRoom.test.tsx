@@ -1,12 +1,12 @@
 import { render, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ConnectedWaitingRoom } from './ConnectedWaitingRoom';
-import { useLobby } from '@/features/lobby/ui/hooks/use-lobby.hook';
+import { ConnectedWaitingRoom } from './ConnectedWaitingRoom.tsx';
+import { useLobby } from '@/features/lobby/ui/hooks/use-lobby.hook.ts';
 import { useNavigate } from 'react-router-dom';
-import { RoundSessionStorage } from '@/features/lobby/infrastructure/round-session.storage';
-import { PlayerRoleType } from '@/features/lobby/domain/models/player.model';
-import { RoundSession } from '@/features/lobby/domain/models/round-session.model';
+import { RoundSessionStorage } from '@/features/lobby/infrastructure/round-session.storage.ts';
+import { PlayerRoleType } from '@/features/lobby/domain/models/player.model.ts';
+import { RoundSession } from '@/features/lobby/domain/models/round-session.model.ts';
 
 // Mock dependencies
 vi.mock('@/features/lobby/ui/hooks/use-lobby.hook');

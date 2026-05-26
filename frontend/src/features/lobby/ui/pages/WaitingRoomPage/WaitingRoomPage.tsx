@@ -5,7 +5,7 @@ import { useJoinLobby } from '@/features/lobby/infrastructure/lobby-dependencies
 import { PlayerRole, PlayerRoleType } from '@/features/lobby/domain/models/player.model';
 import { LobbyPlayerSession } from '@/features/lobby/infrastructure/lobby-player.session';
 import { JoinLobbyForm } from '../../components';
-import { ConnectedWaitingRoom } from './ConnectedWaitingRoom';
+import { ConnectedWaitingRoom } from './components/ConectedWaitingRoom/ConnectedWaitingRoom.tsx';
 
 interface LocationState {
   playerId: string;
