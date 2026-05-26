@@ -231,7 +231,7 @@ describe('SocketIOLobbySocket', () => {
       eventHandler({ players: playersData });
 
       expect(handler).toHaveBeenCalled();
-      const receivedPlayers = handler.mock.calls[0][0] as any[];
+      const receivedPlayers = handler.mock.calls[0][0] as { name: string; role: string }[];
       expect(receivedPlayers[0].name).toBe('Alice');
       expect(receivedPlayers[0].role).toBe('describer');
     });
