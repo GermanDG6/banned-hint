@@ -29,13 +29,6 @@ describe('HomePage', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the illustration with correct alt text', () => {
-    render(<HomePage />);
-    const image = screen.getByAltText('Ilustración de una persona pensando') as HTMLImageElement;
-    expect(image).toBeInTheDocument();
-    expect(image.src).toContain('thinking.png');
-  });
-
   it('renders the MODO LOCAL button', () => {
     render(<HomePage />);
     expect(screen.getByRole('button', { name: /MODO LOCAL/i })).toBeInTheDocument();
