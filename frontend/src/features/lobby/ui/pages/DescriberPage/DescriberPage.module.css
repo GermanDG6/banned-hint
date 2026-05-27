@@ -3,11 +3,11 @@
 }
 
 .timerSection {
-  @apply w-full max-w-md;
+  @apply w-full max-w-md mb-4;
 }
 
 .cardSection {
-  @apply w-full max-w-2xl;
+  @apply w-full max-w-2xl mb-4;
 }
 
 .actions {
