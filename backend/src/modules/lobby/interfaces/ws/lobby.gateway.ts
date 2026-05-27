@@ -161,11 +161,13 @@ export class LobbyGateway implements OnGatewayDisconnect {
 
       client.emit('card-changed', {
         startAt: result.startAt,
+        durationSeconds: result.durationSeconds,
         card: result.card,
       });
 
       client.to(context.lobbyCode).emit('card-changed', {
         startAt: result.startAt,
+        durationSeconds: result.durationSeconds,
       });
     } catch (error) {
       client.emit('error', { message: error.message });

@@ -120,7 +120,7 @@ describe('Lobby', () => {
       expect(newRoundSession.word).toBe('banana');
       expect(newRoundSession.bannedWords).toEqual(['yellow', 'peel', 'monkey', 'soft']);
       expect(newRoundSession.durationSeconds).toBe(60); // Duration stays the same
-      expect(newRoundSession.startAt).toBeGreaterThanOrEqual(originalRoundSession.startAt);
+      expect(newRoundSession.startAt).toBe(originalRoundSession.startAt); // startAt does not change
     });
 
     it('should keep status as playing after nextCard', () => {

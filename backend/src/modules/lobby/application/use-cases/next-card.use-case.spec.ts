@@ -34,6 +34,7 @@ describe('NextCardUseCase', () => {
     const secondCard = CardMother.withWord('banana');
 
     lobby.startRound(firstCard.id.value, firstCard.word.value, firstCard.bannedWords.toArray(), 60);
+    const originalStartAt = lobby.getRoundSession()!.startAt;
 
     lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
     cardRepositoryMock.findRandom.mockResolvedValue(secondCard);
@@ -44,7 +45,7 @@ describe('NextCardUseCase', () => {
     });
 
     expect(result.card?.word).toBe('banana');
-    expect(parseInt(result.startAt.toString())).toBeCloseTo(Date.now(), -3); // Within ~1 second
+    expect(result.startAt).toBe(originalStartAt); // startAt should remain the same
   });
 
   it('should keep the same duration when moving to next card', async () => {

@@ -413,6 +413,73 @@ describe('LobbyGateway', () => {
     });
   });
 
+  describe('handleNextCard', () => {
+    it('should emit card-changed with durationSeconds to describer', async () => {
+      const result = {
+        startAt: Date.now(),
+        durationSeconds: 60,
+        card: { id: 'card-2', word: 'banana', bannedWords: ['yellow', 'peel'] },
+      };
+
+      mockNextCard.execute.mockResolvedValue(result);
+
+      // Manually set socket context
+      (gateway as any).socketMap.set('socket-1', {
+        lobbyCode: 'ABC123',
+        playerId: 'player-1',
+      });
+
+      await gateway.handleNextCard(mockSocket);
+
+      // Check describer receives card-changed with card and durationSeconds
+      expect(mockSocket.emit).toHaveBeenCalledWith(
+        'card-changed',
+        expect.objectContaining({
+          startAt: result.startAt,
+          durationSeconds: result.durationSeconds,
+          card: result.card,
+        }),
+      );
+
+      // Check others receive card-changed with durationSeconds but no card
+      expect(mockSocket.to).toHaveBeenCalledWith('ABC123');
+      const broadcastCall = mockSocket.to('ABC123').emit.mock.calls[0];
+      expect(broadcastCall[0]).toBe('card-changed');
+      expect(broadcastCall[1]).toMatchObject({
+        startAt: result.startAt,
+        durationSeconds: result.durationSeconds,
+      });
+      expect(broadcastCall[1]).not.toHaveProperty('card');
+    });
+
+    it('should emit error when socket not registered', async () => {
+      await gateway.handleNextCard(mockSocket);
+
+      expect(mockSocket.emit).toHaveBeenCalledWith(
+        'error',
+        expect.objectContaining({
+          message: 'Socket not registered',
+        }),
+      );
+    });
+
+    it('should emit error when use-case throws exception', async () => {
+      const error = new Error('Only the describer can perform this action');
+      mockNextCard.execute.mockRejectedValue(error);
+
+      (gateway as any).socketMap.set('socket-1', {
+        lobbyCode: 'ABC123',
+        playerId: 'player-2',
+      });
+
+      await gateway.handleNextCard(mockSocket);
+
+      expect(mockSocket.emit).toHaveBeenCalledWith('error', {
+        message: 'Only the describer can perform this action',
+      });
+    });
+  });
+
   describe('handleDisconnect', () => {
     it('should remove socket from map on disconnect', () => {
       // Manually set socket context

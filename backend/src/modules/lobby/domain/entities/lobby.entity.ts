@@ -92,7 +92,7 @@ export class Lobby {
     this.roundSession = {
       cardId,
       word,
-      startAt: Date.now(),
+      startAt: this.roundSession.startAt,
       durationSeconds: this.roundSession.durationSeconds,
       bannedWords,
     };
