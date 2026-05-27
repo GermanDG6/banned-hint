@@ -24,13 +24,11 @@ export function RoundPage() {
   const initialSeconds = config ? Timer.create(config.minutes, config.seconds).toSeconds() : 0;
 
   const { card, loading, reload } = useRandomCard();
-  const { formatted, isRunning, pause, resume, reset } = useCountdown({
+  const { formatted, remainingSeconds, isRunning, pause, resume, reset } = useCountdown({
     initialSeconds,
-    onExpire: () => {
-      reload();
-      reset();
-    },
   });
+
+  const isExpired = remainingSeconds === 0;
 
   const handlePauseResume = () => {
     if (isRunning) {
@@ -45,6 +43,11 @@ export function RoundPage() {
     navigate('/local/setup', { replace: true });
   };
 
+  const handleStartNewRound = () => {
+    reload();
+    reset();
+  };
+
   if (!config) return null;
 
   return (
@@ -55,31 +58,46 @@ export function RoundPage() {
         </IconButton>
       }
     >
-      <section className={styles.timerSection}>
-        <TimerDisplay formatted={formatted} />
-      </section>
+      {isExpired ? (
+        <div className={styles.centerContent}>
+          <p className={styles.roundEndedMessage}>¡Ronda terminada!</p>
+          <CTAButton onClick={handleStartNewRound} icon="▶">
+            Iniciar nueva ronda
+          </CTAButton>
+        </div>
+      ) : (
+        <>
+          <section className={styles.timerSection}>
+            <TimerDisplay formatted={formatted} />
+          </section>
 
-      <section className={styles.cardSection}>
-        <CardComponent
-          word={card?.word.value ?? ''}
-          bannedWords={card?.bannedWords.toArray() ?? []}
-          loading={loading}
-        />
-      </section>
+          <section className={styles.cardSection}>
+            <CardComponent
+              word={card?.word.value ?? ''}
+              bannedWords={card?.bannedWords.toArray() ?? []}
+              loading={loading}
+            />
+          </section>
 
-      <section className={styles.actions}>
-        <CTAButton
-          onClick={() => {
-            reload();
-          }}
-          icon="⊙"
-        >
-          SIGUIENTE
-        </CTAButton>
-        <CTAButton onClick={handlePauseResume} variant="secondary" icon={isRunning ? '⏸' : '▶'}>
-          {isRunning ? 'PAUSA' : 'CONTINUAR'}
-        </CTAButton>
-      </section>
+          <section className={styles.actions}>
+            <CTAButton
+              onClick={() => {
+                reload();
+              }}
+              icon="⊙"
+            >
+              SIGUIENTE
+            </CTAButton>
+            <CTAButton
+              onClick={handlePauseResume}
+              variant="secondary"
+              icon={isRunning ? '⏸' : '▶'}
+            >
+              {isRunning ? 'PAUSA' : 'CONTINUAR'}
+            </CTAButton>
+          </section>
+        </>
+      )}
     </GameLayout>
   );
 }

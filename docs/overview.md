@@ -15,7 +15,7 @@ A single device, a single player acting as Describer. The group guesses out loud
 3. Taps "PLAY!" and is taken to `/round`.
 4. In `/round`, they see the active `Card` (target word and banned words), the countdown timer, and the controls (Next, Pause/Resume, Exit).
 5. When they tap "Next", a new random `Card` is loaded and the timer resets.
-6. When the timer reaches 0, a new `Card` is automatically loaded.
+6. When the timer reaches 0, the round ends: the timer, card, and controls are hidden, and a message "¡Ronda terminada!" is shown with a button to start a new round. Tapping this button loads a new random `Card` and resets the timer.
 7. When they tap "Exit" or navigate away, the session is cleared and they are redirected to `/local/setup`.
 
 ### Room Mode (Multiplayer)

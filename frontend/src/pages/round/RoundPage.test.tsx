@@ -137,4 +137,50 @@ describe('RoundPage', () => {
     expect(vi.mocked(RoundConfigSession.clear)).toHaveBeenCalledTimes(1);
     expect(screen.getByText('LocalSetup')).toBeInTheDocument();
   });
+
+  it('should show round ended message and hide timer and card when remainingSeconds is 0', () => {
+    vi.mocked(RoundConfigSession.load).mockReturnValue({ minutes: 1, seconds: 30 });
+    vi.mocked(useCountdown).mockReturnValue({
+      remainingSeconds: 0,
+      formatted: '00:00',
+      isRunning: false,
+      pause: vi.fn(),
+      resume: vi.fn(),
+      reset: vi.fn(),
+    });
+
+    renderRoundPage();
+
+    expect(screen.getByText('¡Ronda terminada!')).toBeInTheDocument();
+    expect(screen.getByText('Iniciar nueva ronda')).toBeInTheDocument();
+    expect(screen.queryByText('SIGUIENTE')).not.toBeInTheDocument();
+    expect(screen.queryByText('PAUSA')).not.toBeInTheDocument();
+  });
+
+  it('should reset countdown and reload card when "Iniciar nueva ronda" is clicked', async () => {
+    const user = userEvent.setup();
+    const reset = vi.fn();
+    const reload = vi.fn();
+    vi.mocked(RoundConfigSession.load).mockReturnValue({ minutes: 1, seconds: 30 });
+    vi.mocked(useCountdown).mockReturnValue({
+      remainingSeconds: 0,
+      formatted: '00:00',
+      isRunning: false,
+      pause: vi.fn(),
+      resume: vi.fn(),
+      reset,
+    });
+    vi.mocked(useRandomCard).mockReturnValue({
+      card: CardMother.valid(),
+      loading: false,
+      error: null,
+      reload,
+    });
+
+    renderRoundPage();
+    await user.click(screen.getByText('Iniciar nueva ronda'));
+
+    expect(reload).toHaveBeenCalledTimes(1);
+    expect(reset).toHaveBeenCalledTimes(1);
+  });
 });

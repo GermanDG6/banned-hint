@@ -1,5 +1,9 @@
 /* frontend/src/pages/round/RoundPage.module.css */
 
+.centerContent {
+  @apply flex flex-col items-center justify-center gap-8;
+}
+
 .timerSection {
   @apply w-full flex justify-center py-4 mb-4;
 }
@@ -12,4 +16,6 @@
   @apply w-full max-w-sm sm:max-w-md flex flex-col gap-3;
 }
 
-
+.roundEndedMessage {
+  @apply text-2xl font-bold text-white text-center mb-4;
+}
