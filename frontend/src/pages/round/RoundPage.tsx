@@ -32,11 +32,6 @@ export function RoundPage() {
     },
   });
 
-  const handleNext = () => {
-    reload();
-    reset();
-  };
-
   const handlePauseResume = () => {
     if (isRunning) {
       pause();
@@ -73,7 +68,12 @@ export function RoundPage() {
       </section>
 
       <section className={styles.actions}>
-        <CTAButton onClick={handleNext} icon="⊙">
+        <CTAButton
+          onClick={() => {
+            reload();
+          }}
+          icon="⊙"
+        >
           SIGUIENTE
         </CTAButton>
         <CTAButton onClick={handlePauseResume} variant="secondary" icon={isRunning ? '⏸' : '▶'}>

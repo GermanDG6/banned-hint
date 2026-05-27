@@ -73,10 +73,9 @@ describe('RoundPage', () => {
     expect(screen.getByText('MARTE')).toBeInTheDocument();
   });
 
-  it('should call reload and reset when SIGUIENTE is clicked', async () => {
+  it('should call reload when SIGUIENTE is clicked', async () => {
     const user = userEvent.setup();
     const reload = vi.fn();
-    const reset = vi.fn();
     vi.mocked(RoundConfigSession.load).mockReturnValue({ minutes: 1, seconds: 30 });
     vi.mocked(useRandomCard).mockReturnValue({
       card: CardMother.valid(),
@@ -84,20 +83,11 @@ describe('RoundPage', () => {
       error: null,
       reload,
     });
-    vi.mocked(useCountdown).mockReturnValue({
-      remainingSeconds: 90,
-      formatted: '01:30',
-      isRunning: true,
-      pause: vi.fn(),
-      resume: vi.fn(),
-      reset,
-    });
 
     renderRoundPage();
     await user.click(screen.getByText('SIGUIENTE'));
 
     expect(reload).toHaveBeenCalledTimes(1);
-    expect(reset).toHaveBeenCalledTimes(1);
   });
 
   it('should call pause when PAUSA is clicked and timer is running', async () => {
