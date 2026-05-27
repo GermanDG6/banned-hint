@@ -1,11 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { GameLayout } from './GameLayout';
+
+const noop = () => {};
 
 describe('GameLayout', () => {
   it('should render children', () => {
     render(
-      <GameLayout>
+      <GameLayout onExit={noop}>
         <p>Test content</p>
       </GameLayout>
     );
@@ -15,7 +18,7 @@ describe('GameLayout', () => {
 
   it('should render BANNED HINT header', () => {
     render(
-      <GameLayout>
+      <GameLayout onExit={noop}>
         <p>Content</p>
       </GameLayout>
     );
@@ -23,26 +26,28 @@ describe('GameLayout', () => {
     expect(screen.getByText('BANNED HINT')).toBeInTheDocument();
   });
 
-  it('should render exit button when provided', () => {
+  it('should render exit button', () => {
     render(
-      <GameLayout exitButton={<button>Exit</button>}>
+      <GameLayout onExit={noop}>
         <p>Content</p>
       </GameLayout>
     );
 
-    expect(screen.getByRole('button', { name: /exit/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /finalizar partida/i })).toBeInTheDocument();
   });
 
-  it('should not render exit slot when exitButton is not provided', () => {
+  it('should call onExit when exit button is clicked', async () => {
+    const user = userEvent.setup();
+    const mockExit = vi.fn();
+
     render(
-      <GameLayout>
+      <GameLayout onExit={mockExit}>
         <p>Content</p>
       </GameLayout>
     );
 
-    const buttons = screen.queryAllByRole('button');
-    expect(buttons.length).toBe(0);
+    await user.click(screen.getByRole('button', { name: /finalizar partida/i }));
+
+    expect(mockExit).toHaveBeenCalledTimes(1);
   });
 });
-
-

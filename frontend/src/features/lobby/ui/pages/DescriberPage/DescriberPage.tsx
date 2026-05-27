@@ -57,6 +57,11 @@ export function DescriberPage() {
     onExpire: () => lobby.endRound(),
   });
 
+  const handleExit = () => {
+    const playerData = LobbyPlayerSession.load();
+    navigate(playerData ? `/lobby/${playerData.lobbyCode}` : '/');
+  };
+
   if (!activeSession) {
     return null;
   }
@@ -66,7 +71,7 @@ export function DescriberPage() {
       storedPlayerDataRef.current?.durationSeconds ?? activeSession.durationSeconds;
 
     return (
-      <GameLayout>
+      <GameLayout onExit={handleExit}>
         <div className={styles.centerContent}>
           <p className={styles.roundEndedMessage}>¡Ronda terminada!</p>
           <CTAButton onClick={() => lobby.startRound(durationSeconds)} icon="▶">
@@ -78,7 +83,7 @@ export function DescriberPage() {
   }
 
   return (
-    <GameLayout>
+    <GameLayout onExit={handleExit}>
       <section className={styles.timerSection}>
         <TimerDisplay formatted={formatted} />
       </section>

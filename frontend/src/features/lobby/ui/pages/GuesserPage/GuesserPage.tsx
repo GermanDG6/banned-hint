@@ -56,20 +56,25 @@ export function GuesserPage() {
     durationSeconds: activeSession?.durationSeconds ?? 0,
   });
 
+  const handleExit = () => {
+    const playerData = LobbyPlayerSession.load();
+    navigate(playerData ? `/lobby/${playerData.lobbyCode}` : '/');
+  };
+
   if (!activeSession) {
     return null;
   }
 
   if (lobby.roundEnded) {
     return (
-      <GameLayout>
+      <GameLayout onExit={handleExit}>
         <p className={styles.waitingMessage}>Esperando nueva ronda…</p>
       </GameLayout>
     );
   }
 
   return (
-    <GameLayout>
+    <GameLayout onExit={handleExit}>
       <section className={styles.timerSection}>
         <TimerDisplay formatted={formatted} />
       </section>

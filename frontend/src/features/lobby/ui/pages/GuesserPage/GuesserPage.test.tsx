@@ -337,4 +337,47 @@ describe('GuesserPage', () => {
       mockPlayerData.playerId,
     );
   });
+
+  it('should render exit button', () => {
+    render(
+      <MemoryRouter
+        initialEntries={[{ pathname: '/round/guess', state: { roundSession: mockRoundSession } }]}
+      >
+        <Routes>
+          <Route path="/round/guess" element={<GuesserPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('button', { name: /finalizar partida/i })).toBeInTheDocument();
+  });
+
+  it('should navigate to waiting room when exit button is clicked', async () => {
+    const user = userEvent.setup();
+    const mockPlayerData = {
+      playerId: 'player-456',
+      playerName: 'Bob',
+      role: 'guesser' as const,
+      durationSeconds: 60,
+      lobbyCode: 'XYZ789',
+    };
+    vi.mocked(LobbyPlayerSession.load).mockReturnValue(mockPlayerData);
+
+    render(
+      <MemoryRouter
+        initialEntries={[{ pathname: '/round/guess', state: { roundSession: mockRoundSession } }]}
+      >
+        <Routes>
+          <Route path="/round/guess" element={<GuesserPage />} />
+          <Route path="/lobby/:code" element={<div>Sala de espera</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole('button', { name: /finalizar partida/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Sala de espera')).toBeInTheDocument();
+    });
+  });
 });

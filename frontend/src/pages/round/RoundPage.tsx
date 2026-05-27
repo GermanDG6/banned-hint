@@ -9,7 +9,6 @@ import { TimerDisplay } from '@/components/ui/timer-display/TimerDisplay';
 import { CardComponent } from '@/components/ui/card-component/CardComponent';
 import { CTAButton } from '@/components/ui/cta-button/CTAButton';
 import { GameLayout } from '@/components/ui/game-layout/GameLayout';
-import { IconButton } from '@/components/ui/icon-button/IconButton';
 
 export function RoundPage() {
   const navigate = useNavigate();
@@ -51,13 +50,7 @@ export function RoundPage() {
   if (!config) return null;
 
   return (
-    <GameLayout
-      exitButton={
-        <IconButton variant="danger" aria-label="Finalizar partida" onClick={handleExit}>
-          ✕
-        </IconButton>
-      }
-    >
+    <GameLayout onExit={handleExit}>
       {isExpired ? (
         <div className={styles.centerContent}>
           <p className={styles.roundEndedMessage}>¡Ronda terminada!</p>

@@ -431,7 +431,7 @@ describe('DescriberPage', () => {
     expect(screen.getByText('TIERRA')).toBeInTheDocument();
   });
 
-  it('should render BANNED HINT header', () => {
+  it('should render exit button', () => {
     render(
       <MemoryRouter
         initialEntries={[
@@ -444,6 +444,37 @@ describe('DescriberPage', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByText('BANNED HINT')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /finalizar partida/i })).toBeInTheDocument();
+  });
+
+  it('should navigate to waiting room when exit button is clicked', async () => {
+    const user = userEvent.setup();
+    const mockPlayerData = {
+      playerId: 'player-123',
+      playerName: 'Alice',
+      role: 'describer' as const,
+      durationSeconds: 60,
+      lobbyCode: 'ABC123',
+    };
+    vi.mocked(LobbyPlayerSession.load).mockReturnValue(mockPlayerData);
+
+    render(
+      <MemoryRouter
+        initialEntries={[
+          { pathname: '/round/describe', state: { roundSession: mockRoundSession } },
+        ]}
+      >
+        <Routes>
+          <Route path="/round/describe" element={<DescriberPage />} />
+          <Route path="/lobby/:code" element={<div>Sala de espera</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole('button', { name: /finalizar partida/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Sala de espera')).toBeInTheDocument();
+    });
   });
 });
