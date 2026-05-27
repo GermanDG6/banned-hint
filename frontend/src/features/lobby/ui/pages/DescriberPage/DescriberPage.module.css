@@ -15,5 +15,5 @@
 }
 
 .roundEndedMessage {
-  @apply text-2xl font-bold text-gray-700 text-center mb-4;
+  @apply text-2xl font-bold text-white text-center mb-4;
 }
