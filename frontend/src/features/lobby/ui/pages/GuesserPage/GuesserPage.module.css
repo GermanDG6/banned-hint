@@ -1,12 +1,9 @@
-/* frontend/src/features/lobby/ui/pages/GuesserPage/GuesserPage.module.css */
-
-
 .timerSection {
-  @apply w-full flex justify-center;
+  @apply w-full flex justify-center mb-4;
 }
 
 .formSection {
-  @apply w-full flex justify-center;
+  @apply w-full flex justify-center mb-4;
 }
 
 .waitingMessage {
