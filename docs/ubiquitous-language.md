@@ -1,19 +1,19 @@
-# Lenguaje ubicuo
+# Ubiquitous Language
 
-- **Card**: tarjeta con la palabra objetivo (`word`) y una lista de palabras prohibidas (`bannedWords`).
-- **CardId**: identificador único de una `Card`, representado como un UUID.
-- **Word**: palabra que el equipo debe adivinar a partir de las pistas.
-- **Banned word**: palabra que el jugador que describe no puede pronunciar al dar pistas.
-- **Round**: intervalo de tiempo en el que se juega con una carta y un cronómetro activo.
-- **Timer**: límite de tiempo de una `Round`, expresado en minutos y segundos. En modo multijugador el servidor emite un `startAt` (Unix timestamp en ms) y un `durationSeconds`; cada cliente calcula el tiempo restante como `durationSeconds - (Date.now() - startAt) / 1000`.
-- **RoundConfig**: configuración elegida por el jugador antes de iniciar una ronda; contiene los minutos y segundos del `Timer`. Se persiste en `sessionStorage` durante la partida y se descarta al salir.
-- **InvalidTimer**: excepción de dominio que se lanza cuando la configuración del `Timer` no es válida (valores negativos, fuera de rango o duración total igual a cero).
-- **Lobby**: sala identificada por un `LobbyCode` donde los jugadores se reúnen antes de iniciar una `Round`. Contiene la lista de `Player`s y el estado de la partida (`waiting` | `playing`).
-- **LobbyCode**: código alfanumérico único de 6 caracteres en mayúsculas (A-Z, 0-9) que identifica un `Lobby` y se comparte con otros jugadores para que se unan.
-- **Player**: participante conectado a un `Lobby`. Tiene un nombre (`playerName`) y un rol asignado (`PlayerRole`).
-- **PlayerRole**: rol asignado a un `Player`. Puede ser `describer` o `guesser`. Solo puede haber un `describer` por `Lobby` al mismo tiempo.
-- **Describer**: `Player` con rol `describer`. Es el único que ve la `Card` activa (la `word` y las `bannedWords`) y da pistas al resto. Puede avanzar a la siguiente carta.
-- **Guesser**: `Player` con rol `guesser`. No ve la `Card`. Escribe su intento en un campo de texto para intentar acertar la `word` activa.
-- **Guess**: intento de un `Guesser` de acertar la `word` activa. La validación de si es correcto ocurre en el servidor; la `word` nunca se envía al cliente `Guesser`.
-- **ActiveCard**: la `Card` que está en juego durante una `Round` dentro de un `Lobby`. Solo es visible para el `Describer`.
-- **RoundSession**: estado de una ronda activa dentro de un `Lobby`. Contiene la `ActiveCard`, el `startAt` (Unix timestamp en ms del momento en que el servidor arrancó la ronda) y la `durationSeconds`.
+- **Card**: a card with the target word (`word`) and a list of banned words (`bannedWords`).
+- **CardId**: unique identifier for a `Card`, represented as a UUID.
+- **Word**: the word the team must guess based on the clues given by the `Describer`.
+- **Banned word**: a word the `Describer` cannot say when giving clues.
+- **Round**: the time interval during which a `Card` is in play with an active countdown.
+- **Timer**: the time limit for a `Round`, expressed in minutes and seconds. In Room mode, the server emits a `startAt` (Unix timestamp in ms) and a `durationSeconds`; each client computes the remaining time as `durationSeconds - (Date.now() - startAt) / 1000`.
+- **RoundConfig**: the configuration chosen by the player before starting a round; contains the minutes and seconds of the `Timer`. It is persisted in `sessionStorage` during the game and discarded when the player exits.
+- **InvalidTimer**: a domain exception thrown when the `Timer` configuration is invalid (negative values, out of range, or total duration equal to zero).
+- **Lobby**: a room identified by a `LobbyCode` where players gather before starting a `Round`. Contains the list of `Player`s and the game state (`waiting` | `playing`).
+- **LobbyCode**: a unique 6-character alphanumeric code in uppercase (A–Z, 0–9) that identifies a `Lobby` and is shared with other players so they can join.
+- **Player**: a participant connected to a `Lobby`. Has a name (`playerName`) and an assigned role (`PlayerRole`).
+- **PlayerRole**: the role assigned to a `Player`. Can be `describer` or `guesser`. Only one `describer` is allowed per `Lobby` at the same time.
+- **Describer**: a `Player` with the `describer` role. The only player who sees the active `Card` (the `word` and the `bannedWords`) and gives clues to the rest. Can advance to the next card.
+- **Guesser**: a `Player` with the `guesser` role. Does not see the `Card`. Types their attempt in a text field to try to guess the active `word`.
+- **Guess**: an attempt by a `Guesser` to guess the active `word`. Validation of whether it is correct happens on the server; the `word` is never sent to the `Guesser` client.
+- **ActiveCard**: the `Card` in play during a `Round` within a `Lobby`. Only visible to the `Describer`.
+- **RoundSession**: the state of an active round within a `Lobby`. Contains the `ActiveCard`, the `startAt` (Unix timestamp in ms at the moment the server started the round), and the `durationSeconds`.

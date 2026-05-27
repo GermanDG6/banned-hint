@@ -1,64 +1,64 @@
-# Dominio del juego Banned Hint
+# Game Domain — Banned Hint
 
-## Objetivo
+## Objective
 
-Un jugador (`Describer`) debe conseguir que el resto (`Guessers`) adivinen la palabra objetivo de una carta sin decir ninguna de las palabras prohibidas, dentro de un tiempo limitado.
+One player (the `Describer`) must get the rest of the players (`Guessers`) to guess the target word on a card without saying any of the banned words, within a time limit.
 
-## Modos de juego
+## Game Modes
 
-### Modo Local
+### Local Mode
 
-Un único dispositivo, un único jugador. El flujo es:
+A single device, a single player acting as Describer. The group guesses out loud — in person or over a call. The flow is:
 
-1. El jugador accede a la pantalla de inicio (`/`) y selecciona **Modo Local**.
-2. Redirige a `/local/setup`, donde configura la duración de la ronda (`Timer`) en minutos y segundos.
-3. Pulsa «¡JUGAR!» y accede a `/round`.
-4. En `/round` ve la `Card` activa (palabra objetivo y palabras prohibidas), el cronómetro y los controles (Siguiente, Pausa/Continuar, Salir).
-5. Cuando pulsa «Siguiente», se carga una nueva `Card` aleatoria y se reinicia el cronómetro.
-6. Cuando el cronómetro llega a 0, se carga automáticamente una nueva `Card`.
-7. Al pulsar «Salir» o navegar fuera, se limpia la sesión y redirige a `/local/setup`.
+1. The player accesses the home screen (`/`) and selects **Local Mode**.
+2. Redirects to `/local/setup`, where they configure the round duration (`Timer`) in minutes and seconds.
+3. Taps "PLAY!" and is taken to `/round`.
+4. In `/round`, they see the active `Card` (target word and banned words), the countdown timer, and the controls (Next, Pause/Resume, Exit).
+5. When they tap "Next", a new random `Card` is loaded and the timer resets.
+6. When the timer reaches 0, a new `Card` is automatically loaded.
+7. When they tap "Exit" or navigate away, the session is cleared and they are redirected to `/local/setup`.
 
-### Modo Sala (Multijugador)
+### Room Mode (Multiplayer)
 
-Múltiples dispositivos conectados mediante WebSocket. El flujo es:
+Multiple devices connected via WebSocket. Each player has their own screen. The flow is:
 
-1. El host accede a la pantalla de inicio (`/`) y selecciona **Modo Sala**.
-2. Redirige a `/lobby/new` (pantalla de creación de sala).
-3. El host introduce su nombre y la duración de la ronda, luego pulsa «Crear sala».
-4. El servidor genera un `LobbyCode` único, asigna al host el rol `Describer` y crea el `Lobby`.
-5. El host comparte el `LobbyCode` con el resto de jugadores.
-6. Los demás jugadores entran a `/lobby/<code>` introduciendo el `LobbyCode` y su nombre (rol `Guesser`).
-7. El `Describer` pulsa «Iniciar ronda». Se selecciona una `Card` aleatoria y se emite un evento `round-started` con la `ActiveCard`, el `startAt` (timestamp en ms) y la `durationSeconds`.
-8. Cada cliente redirige automáticamente según su rol:
-   - `Describer` → `/round`: ve la `word` y las `bannedWords`.
-   - `Guesser` → `/round/guess`: ve solo el cronómetro y un campo de texto.
-9. Los `Guessers` escriben intentos. El servidor valida y responde con `{ correct: boolean }` solo al emisor.
-10. El `Describer` pulsa «Siguiente» para cargar una nueva `Card`.
-11. Cuando el cronómetro llega a 0, el servidor emite automáticamente `card-changed`.
+1. The host accesses the home screen (`/`) and selects **Room Mode**.
+2. Redirects to `/lobby/new` (room creation screen).
+3. The host enters their name and the round duration, then taps "Create Room".
+4. The server generates a unique `LobbyCode`, assigns the host the `Describer` role, and creates the `Lobby`.
+5. The host shares the `LobbyCode` with the other players.
+6. Other players go to `/lobby/<code>`, enter the `LobbyCode` and their name (assigned the `Guesser` role).
+7. The `Describer` taps "Start Round". A random `Card` is selected and a `round-started` event is emitted with the `ActiveCard`, the `startAt` (timestamp in ms), and the `durationSeconds`.
+8. Each client is automatically redirected based on their role:
+   - `Describer` → `/round`: sees the `word` and the `bannedWords`.
+   - `Guesser` → `/round/guess`: sees only the timer and a text field.
+9. `Guessers` type their attempts. The server validates and responds with `{ correct: boolean }` only to the sender.
+10. The `Describer` taps "Next" to load a new `Card`.
+11. When the timer reaches 0, the server automatically emits `card-changed`.
 
-## Flujo de una partida multijugador
+## Multiplayer Game Flow
 
-1. El host crea un `Lobby` en la pantalla de inicio e introduce su nombre de jugador y la duración de la ronda (`RoundConfig`).
-2. El servidor genera un `LobbyCode` único y asigna al host el rol `Describer`.
-3. El host comparte el `LobbyCode` con el resto de jugadores.
-4. Los demás jugadores entran a la sala de espera (`WaitingRoom`) introduciendo el `LobbyCode` y su nombre. Se les asigna el rol `Guesser`.
-5. El `Describer` pulsa «Iniciar ronda». El servidor selecciona una `Card` aleatoria y emite un evento `round-started` con la `ActiveCard`, el `startAt` (timestamp en ms) y la `durationSeconds`.
-6. Cada cliente redirige automáticamente según su rol:
-   - `Describer` → pantalla `/round`: ve la `word` y las `bannedWords`.
-   - `Guesser` → pantalla `/round/guess`: ve solo el cronómetro y un campo de texto.
-7. Los `Guessers` escriben sus intentos (`Guess`). El servidor valida cada intento y responde con `{ correct: boolean }` solo al `Guesser` emisor.
-8. Si un `Guesser` acierta, ve la confirmación en pantalla.
-9. El `Describer` pulsa «Siguiente» para cargar una nueva `Card`. El servidor emite `card-changed` con la nueva `ActiveCard` y un nuevo `startAt`.
-10. Cuando el `Timer` llega a cero (calculado localmente por cada cliente a partir de `startAt + durationSeconds`), el servidor emite automáticamente un nuevo `card-changed`.
+1. The host creates a `Lobby` on the home screen, enters their player name and the round duration (`RoundConfig`).
+2. The server generates a unique `LobbyCode` and assigns the host the `Describer` role.
+3. The host shares the `LobbyCode` with the other players.
+4. Other players enter the waiting room (`WaitingRoom`) by entering the `LobbyCode` and their name. They are assigned the `Guesser` role.
+5. The `Describer` taps "Start Round". The server selects a random `Card` and emits a `round-started` event with the `ActiveCard`, the `startAt` (timestamp in ms), and the `durationSeconds`.
+6. Each client is automatically redirected based on their role:
+   - `Describer` → `/round` screen: sees the `word` and the `bannedWords`.
+   - `Guesser` → `/round/guess` screen: sees only the timer and a text field.
+7. `Guessers` type their attempts (`Guess`). The server validates each attempt and responds with `{ correct: boolean }` only to the `Guesser` who sent it.
+8. If a `Guesser` guesses correctly, they see a confirmation on their screen.
+9. The `Describer` taps "Next" to load a new `Card`. The server emits `card-changed` with the new `ActiveCard` and a new `startAt`.
+10. When the `Timer` reaches zero (computed locally by each client from `startAt + durationSeconds`), the server automatically emits a new `card-changed`.
 
-## Reglas principales
+## Main Rules
 
-- La duración de la ronda debe ser mayor que cero (minutos ≥ 0, segundos ≥ 0, total > 0).
-- Cada `Card` debe tener:
-  - Una `word` no vacía.
-  - Al menos 4 palabras en `bannedWords`.
-- El `Describer` no puede usar ninguna palabra incluida en `bannedWords`.
-- Solo puede haber un `Describer` por `Lobby`.
-- La `Card` activa (word + bannedWords) **nunca** se envía al cliente con rol `Guesser`. La validación de un `Guess` ocurre en el servidor.
-- El `Timer` se sincroniza entre clientes mediante el `startAt` emitido por el servidor: cada cliente calcula el tiempo restante como `durationSeconds - (Date.now() - startAt) / 1000`. No hay tick del servidor.
-- Solo el `Describer` puede emitir los eventos `start-round` y `next-card`. El servidor rechaza estos eventos si el emisor tiene rol `Guesser`.
+- The round duration must be greater than zero (minutes ≥ 0, seconds ≥ 0, total > 0).
+- Each `Card` must have:
+  - A non-empty `word`.
+  - At least 4 words in `bannedWords`.
+- The `Describer` cannot use any word listed in `bannedWords`.
+- Only one `Describer` is allowed per `Lobby`.
+- The active `Card` (word + bannedWords) is **never** sent to a `Guesser` client. `Guess` validation happens on the server.
+- The `Timer` is synchronized between clients using the `startAt` emitted by the server: each client computes the remaining time as `durationSeconds - (Date.now() - startAt) / 1000`. There is no server tick.
+- Only the `Describer` can emit the `start-round` and `next-card` events. The server rejects these events if the sender has the `Guesser` role.
