@@ -24,6 +24,7 @@ interface UseLobbyResult {
   myRole: PlayerRole | null;
   isConnected: boolean;
   guessResult: { correct: boolean } | null;
+  wordGuessed: { playerName: string; word: string } | null;
   roundEnded: boolean;
   startRound: (durationSeconds: number) => void;
   nextCard: () => void;
@@ -38,6 +39,7 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
   const [roundSession, setRoundSession] = useState<RoundSession | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [guessResult, setGuessResult] = useState<{ correct: boolean } | null>(null);
+  const [wordGuessed, setWordGuessed] = useState<{ playerName: string; word: string } | null>(null);
   const [roundEnded, setRoundEnded] = useState(false);
 
   useEffect(() => {
@@ -52,8 +54,9 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
 
     const cleanupRoundStarted = socket.onRoundStarted((session) => {
       setRoundSession(session);
-      setGuessResult(null); // Limpiar resultado anterior al iniciar nueva ronda
-      setRoundEnded(false); // Resetear roundEnded al iniciar nueva ronda
+      setGuessResult(null);
+      setWordGuessed(null);
+      setRoundEnded(false);
     });
 
     const cleanupCardChanged = socket.onCardChanged((session) => {
@@ -63,6 +66,11 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
 
     const cleanupGuessResult = socket.onGuessResult((result) => {
       setGuessResult(result);
+    });
+
+    const cleanupWordGuessed = socket.onWordGuessed((data) => {
+      setWordGuessed(data);
+      setRoundEnded(true);
     });
 
     const cleanupRoundEnded = socket.onRoundEnded(() => {
@@ -77,6 +85,7 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
       cleanupRoundStarted();
       cleanupCardChanged();
       cleanupGuessResult();
+      cleanupWordGuessed();
       cleanupRoundEnded();
     };
   }, [socket]);
@@ -103,6 +112,7 @@ export function useLobby({ myRole }: UseLobbyOptions): UseLobbyResult {
     myRole,
     isConnected,
     guessResult,
+    wordGuessed,
     roundEnded,
     startRound,
     nextCard,

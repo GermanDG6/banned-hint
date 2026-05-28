@@ -39,6 +39,7 @@ const mockSocket = {
   onRoundStarted: vi.fn().mockReturnValue(noopCleanup),
   onCardChanged: vi.fn().mockReturnValue(noopCleanup),
   onGuessResult: vi.fn().mockReturnValue(noopCleanup),
+  onWordGuessed: vi.fn().mockReturnValue(noopCleanup),
   onError: vi.fn().mockReturnValue(noopCleanup),
   onRoundEnded: vi.fn().mockReturnValue(noopCleanup),
 };
@@ -55,6 +56,7 @@ describe('WaitingRoomPage', () => {
     mockSocket.onRoundStarted.mockReturnValue(noopCleanup);
     mockSocket.onCardChanged.mockReturnValue(noopCleanup);
     mockSocket.onGuessResult.mockReturnValue(noopCleanup);
+    mockSocket.onWordGuessed.mockReturnValue(noopCleanup);
     mockSocket.onError.mockReturnValue(noopCleanup);
     mockSocket.onRoundEnded.mockReturnValue(noopCleanup);
 

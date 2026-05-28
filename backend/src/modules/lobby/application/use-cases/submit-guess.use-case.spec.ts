@@ -21,7 +21,9 @@ describe('SubmitGuessUseCase', () => {
   it('should return correct=true when guess matches the word', async () => {
     const code = LobbyCode.from('TEST01');
     const describer = Player.create('socket-1', 'Alice', 'describer');
+    const guesser = Player.create('socket-2', 'Bob', 'guesser');
     const lobby = Lobby.create(code, describer);
+    lobby.join(guesser);
     const card = CardMother.withWord('apple');
 
     lobby.startRound(card.id.value, card.word.value, card.bannedWords.toArray(), 60);
@@ -30,10 +32,13 @@ describe('SubmitGuessUseCase', () => {
 
     const result = await useCase.execute({
       lobbyCode: 'TEST01',
+      playerId: 'socket-2',
       word: 'apple',
     });
 
     expect(result.correct).toBe(true);
+    expect(result.playerName).toBe('Bob');
+    expect(lobbyRepositoryMock.save).toHaveBeenCalled();
   });
 
   it('should return correct=false when guess does not match', async () => {
@@ -48,40 +53,58 @@ describe('SubmitGuessUseCase', () => {
 
     const result = await useCase.execute({
       lobbyCode: 'TEST01',
+      playerId: 'socket-2',
       word: 'banana',
     });
 
     expect(result.correct).toBe(false);
+    expect(result.playerName).toBeUndefined();
+    expect(lobbyRepositoryMock.save).not.toHaveBeenCalled();
   });
 
   it('should be case-insensitive', async () => {
     const code = LobbyCode.from('TEST01');
     const describer = Player.create('socket-1', 'Alice', 'describer');
-    const lobby = Lobby.create(code, describer);
+    const guesser = Player.create('socket-2', 'Bob', 'guesser');
     const card = CardMother.withWord('Apple');
 
-    lobby.startRound(card.id.value, card.word.value, card.bannedWords.toArray(), 60);
+    // First test with lowercase
+    const lobby1 = Lobby.create(code, describer);
+    lobby1.join(guesser);
+    lobby1.startRound(card.id.value, card.word.value, card.bannedWords.toArray(), 60);
 
-    lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
+    lobbyRepositoryMock.findByCode.mockResolvedValue(lobby1);
 
     const result1 = await useCase.execute({
       lobbyCode: 'TEST01',
+      playerId: 'socket-2',
       word: 'apple',
     });
 
+    expect(result1.correct).toBe(true);
+
+    // Second test with uppercase (need a new lobby since first one ended)
+    const lobby2 = Lobby.create(code, describer);
+    lobby2.join(guesser);
+    lobby2.startRound(card.id.value, card.word.value, card.bannedWords.toArray(), 60);
+
+    lobbyRepositoryMock.findByCode.mockResolvedValue(lobby2);
+
     const result2 = await useCase.execute({
       lobbyCode: 'TEST01',
+      playerId: 'socket-2',
       word: 'APPLE',
     });
 
-    expect(result1.correct).toBe(true);
     expect(result2.correct).toBe(true);
   });
 
   it('should trim whitespace', async () => {
     const code = LobbyCode.from('TEST01');
     const describer = Player.create('socket-1', 'Alice', 'describer');
+    const guesser = Player.create('socket-2', 'Bob', 'guesser');
     const lobby = Lobby.create(code, describer);
+    lobby.join(guesser);
     const card = CardMother.withWord('apple');
 
     lobby.startRound(card.id.value, card.word.value, card.bannedWords.toArray(), 60);
@@ -90,6 +113,7 @@ describe('SubmitGuessUseCase', () => {
 
     const result = await useCase.execute({
       lobbyCode: 'TEST01',
+      playerId: 'socket-2',
       word: '  apple  ',
     });
 
@@ -102,6 +126,7 @@ describe('SubmitGuessUseCase', () => {
     await expect(
       useCase.execute({
         lobbyCode: 'INVALID',
+        playerId: 'socket-2',
         word: 'apple',
       }),
     ).rejects.toThrow(LobbyNotFoundException);
@@ -117,8 +142,29 @@ describe('SubmitGuessUseCase', () => {
     await expect(
       useCase.execute({
         lobbyCode: 'TEST01',
+        playerId: 'socket-2',
         word: 'apple',
       }),
     ).rejects.toThrow('No active round session');
+  });
+
+  it('should use fallback playerName when guesser is not found', async () => {
+    const code = LobbyCode.from('TEST01');
+    const describer = Player.create('socket-1', 'Alice', 'describer');
+    const lobby = Lobby.create(code, describer);
+    const card = CardMother.withWord('apple');
+
+    lobby.startRound(card.id.value, card.word.value, card.bannedWords.toArray(), 60);
+
+    lobbyRepositoryMock.findByCode.mockResolvedValue(lobby);
+
+    const result = await useCase.execute({
+      lobbyCode: 'TEST01',
+      playerId: 'unknown-socket-id',
+      word: 'apple',
+    });
+
+    expect(result.correct).toBe(true);
+    expect(result.playerName).toBe('Desconocido');
   });
 });

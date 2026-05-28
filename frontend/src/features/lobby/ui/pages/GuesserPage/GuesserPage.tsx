@@ -66,9 +66,13 @@ export function GuesserPage() {
   }
 
   if (lobby.roundEnded) {
+    const message = lobby.wordGuessed
+      ? `¡${lobby.wordGuessed.playerName} adivinó la palabra!`
+      : 'Esperando nueva ronda…';
+
     return (
       <GameLayout onExit={handleExit}>
-        <p className={styles.waitingMessage}>Esperando nueva ronda…</p>
+        <p className={styles.waitingMessage}>{message}</p>
       </GameLayout>
     );
   }

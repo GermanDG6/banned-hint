@@ -47,8 +47,8 @@ Multiple devices connected via WebSocket. Each player has their own screen. The 
     - `Describer` → `/round` screen: sees the `word` and the `bannedWords`.
     - `Guesser` → `/round/guess` screen: sees only the timer and a text field.
 7. `Guessers` type their attempts (`Guess`). The server validates each attempt and responds with `{ correct: boolean }` only to the `Guesser` who sent it.
-8. If a `Guesser` guesses correctly, they see a confirmation on their screen.
-9. The `Describer` taps "Next" to load a new `Card`. The server emits `card-changed` with the new `ActiveCard` but the same `startAt` (the countdown timer continues from the remaining time, does not reset).
+8. If a `Guesser` guesses correctly, the server emits `word-guessed` to the entire room with the `playerName` and `word`, and automatically emits `round-ended` to end the round.
+9. If a `Guesser` guesses incorrectly, they receive `correct: false` on their screen and can continue trying. The `Describer` taps "Next" to load a new `Card`. The server emits `card-changed` with the new `ActiveCard` but the same `startAt` (the countdown timer continues from the remaining time, does not reset).
 10. When the `Timer` reaches zero (computed locally by each client from `startAt + durationSeconds`), the server automatically emits `round-ended`.
 
 ## Main Rules
@@ -62,3 +62,4 @@ Multiple devices connected via WebSocket. Each player has their own screen. The 
 - The active `Card` (word + bannedWords) is **never** sent to a `Guesser` client. `Guess` validation happens on the server.
 - The `Timer` is synchronized between clients using the `startAt` emitted by the server at the beginning of the round: each client computes the remaining time as `durationSeconds - (Date.now() - startAt) / 1000`. The `startAt` remains constant throughout the round even when new cards are loaded. There is no server tick.
 - Only the `Describer` can emit the `start-round` and `next-card` events. The server rejects these events if the sender has the `Guesser` role.
+- When a `Guesser` guesses the `word` correctly, the round **automatically ends**: the server emits `word-guessed` to the entire room and then `round-ended`. No explicit "end-round" action from the `Describer` is needed in this case.

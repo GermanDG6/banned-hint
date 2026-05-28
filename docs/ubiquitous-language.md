@@ -17,3 +17,4 @@
 - **Guess**: an attempt by a `Guesser` to guess the active `word`. Validation of whether it is correct happens on the server; the `word` is never sent to the `Guesser` client.
 - **ActiveCard**: the `Card` in play during a `Round` within a `Lobby`. Only visible to the `Describer`.
 - **RoundSession**: the state of an active round within a `Lobby`. Contains the `ActiveCard`, the `startAt` (Unix timestamp in ms at the moment the server started the round), and the `durationSeconds`.
+- **WordGuessed**: a WebSocket event emitted by the server to all participants in a room when a `Guesser` correctly guesses the active `word`. Contains the `playerName` of the guesser and the `word` that was guessed. Emission of this event triggers an automatic `round-ended` event.

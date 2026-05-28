@@ -25,6 +25,8 @@ export interface LobbySocket {
 
   onGuessResult(handler: (result: { correct: boolean }) => void): () => void;
 
+  onWordGuessed(handler: (data: { playerName: string; word: string }) => void): () => void;
+
   onError(handler: (error: { message: string }) => void): () => void;
 
   onRoundEnded(handler: () => void): () => void;

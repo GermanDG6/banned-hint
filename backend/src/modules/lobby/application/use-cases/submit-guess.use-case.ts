@@ -4,11 +4,13 @@ import { LobbyNotFoundException } from '../../domain/exceptions/lobby-not-found.
 
 export interface SubmitGuessInput {
   lobbyCode: string;
+  playerId: string;
   word: string;
 }
 
 export interface SubmitGuessOutput {
   correct: boolean;
+  playerName?: string;
 }
 
 @Injectable()
@@ -37,8 +39,24 @@ export class SubmitGuessUseCase {
 
     const isCorrect = normalizedGuess === normalizedWord;
 
+    // If the guess is correct, end the round automatically
+    if (isCorrect) {
+      // Find the guesser by playerId to get their name
+      const guesser = lobby.findGuesserById(input.playerId);
+      const playerName = guesser?.name ?? 'Desconocido';
+
+      // End the round
+      lobby.endRound();
+      await this.lobbyRepository.save(lobby);
+
+      return {
+        correct: true,
+        playerName,
+      };
+    }
+
     return {
-      correct: isCorrect,
+      correct: false,
     };
   }
 }

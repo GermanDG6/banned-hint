@@ -34,6 +34,7 @@ function createFakeLobbySocket(): FakeLobbySocketType {
     'round-started': [],
     'card-changed': [],
     'guess-result': [],
+    'word-guessed': [],
     error: [],
     'round-ended': [],
   };
@@ -74,6 +75,12 @@ function createFakeLobbySocket(): FakeLobbySocketType {
     onGuessResult: vi.fn((handler: (result: { correct: boolean }) => void) => {
       const cleanup = vi.fn();
       handlers['guess-result'].push({ callback: handler, cleanup });
+      return cleanup;
+    }),
+
+    onWordGuessed: vi.fn((handler: (data: { playerName: string; word: string }) => void) => {
+      const cleanup = vi.fn();
+      handlers['word-guessed'].push({ callback: handler, cleanup });
       return cleanup;
     }),
 

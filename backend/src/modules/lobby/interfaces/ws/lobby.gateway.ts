@@ -185,12 +185,25 @@ export class LobbyGateway implements OnGatewayDisconnect {
 
       const result = await this.submitGuessUseCase.execute({
         lobbyCode: context.lobbyCode,
+        playerId: context.playerId,
         word: payload.word,
       });
 
-      client.emit('guess-result', {
-        correct: result.correct,
-      });
+      if (result.correct) {
+        // Emit word-guessed to the entire room
+        this.server.to(context.lobbyCode).emit('word-guessed', {
+          playerName: result.playerName,
+          word: payload.word,
+        });
+
+        // Then emit round-ended to the entire room
+        this.server.to(context.lobbyCode).emit('round-ended', {});
+      } else {
+        // Only incorrect attempts emit guess-result to the guesser
+        client.emit('guess-result', {
+          correct: result.correct,
+        });
+      }
     } catch (error) {
       client.emit('error', { message: error.message });
     }

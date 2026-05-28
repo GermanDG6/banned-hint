@@ -130,6 +130,10 @@ export class SocketIOLobbySocket implements LobbySocket {
     return this.registerListener('guess-result', handler);
   }
 
+  onWordGuessed(handler: (data: { playerName: string; word: string }) => void): () => void {
+    return this.registerListener('word-guessed', handler);
+  }
+
   onError(handler: (error: { message: string }) => void): () => void {
     return this.registerListener('error', handler);
   }

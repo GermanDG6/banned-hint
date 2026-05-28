@@ -29,6 +29,7 @@ describe('JoinLobby', () => {
     onRoundStarted: vi.fn(),
     onCardChanged: vi.fn(),
     onGuessResult: vi.fn(),
+    onWordGuessed: vi.fn(),
     onError: vi.fn(),
     onRoundEnded: vi.fn(),
   };
@@ -65,6 +66,7 @@ describe('JoinLobby', () => {
       onRoundStarted: vi.fn(),
       onCardChanged: vi.fn(),
       onGuessResult: vi.fn(),
+      onWordGuessed: vi.fn(),
       onError: vi.fn(),
       onRoundEnded: vi.fn(),
     };
@@ -95,6 +97,7 @@ describe('JoinLobby', () => {
       onRoundStarted: vi.fn(),
       onCardChanged: vi.fn(),
       onGuessResult: vi.fn(),
+      onWordGuessed: vi.fn(),
       onError: vi.fn(),
       onRoundEnded: vi.fn(),
     };

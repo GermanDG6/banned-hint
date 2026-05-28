@@ -70,10 +70,14 @@ export function DescriberPage() {
     const durationSeconds =
       storedPlayerDataRef.current?.durationSeconds ?? activeSession.durationSeconds;
 
+    const endMessage = lobby.wordGuessed
+      ? `¡${lobby.wordGuessed.playerName} adivinó "${lobby.wordGuessed.word}"!`
+      : '¡Ronda terminada!';
+
     return (
       <GameLayout onExit={handleExit}>
         <div className={styles.centerContent}>
-          <p className={styles.roundEndedMessage}>¡Ronda terminada!</p>
+          <p className={styles.roundEndedMessage}>{endMessage}</p>
           <CTAButton onClick={() => lobby.startRound(durationSeconds)} icon="▶">
             Iniciar nueva ronda
           </CTAButton>

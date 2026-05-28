@@ -351,8 +351,8 @@ describe('LobbyGateway', () => {
   });
 
   describe('handleSubmitGuess', () => {
-    it('should emit guess-result only to the guesser', async () => {
-      mockSubmitGuess.execute.mockResolvedValue({ correct: true });
+    it('should emit guess-result only to the guesser when guess is incorrect', async () => {
+      mockSubmitGuess.execute.mockResolvedValue({ correct: false });
 
       // Manually set socket context
       (gateway as any).socketMap.set('socket-1', {
@@ -362,11 +362,39 @@ describe('LobbyGateway', () => {
 
       await gateway.handleSubmitGuess(mockSocket, { word: 'test' });
 
-      expect(mockSocket.emit).toHaveBeenCalledWith('guess-result', { correct: true });
+      expect(mockSocket.emit).toHaveBeenCalledWith('guess-result', { correct: false });
       expect(mockSubmitGuess.execute).toHaveBeenCalledWith({
         lobbyCode: 'ABC123',
+        playerId: 'player-2',
         word: 'test',
       });
+      // Verify word-guessed and round-ended were NOT emitted
+      expect(mockSocket.to).not.toHaveBeenCalled();
+    });
+
+    it('should emit word-guessed and round-ended to the room when guess is correct', async () => {
+      mockSubmitGuess.execute.mockResolvedValue({ correct: true, playerName: 'Bob' });
+
+      // Manually set socket context
+      (gateway as any).socketMap.set('socket-1', {
+        lobbyCode: 'ABC123',
+        playerId: 'player-2',
+      });
+
+      await gateway.handleSubmitGuess(mockSocket, { word: 'apple' });
+
+      // Verify word-guessed is emitted to the room
+      expect(mockServer.to).toHaveBeenCalledWith('ABC123');
+      const emitCalls = mockServer.to('ABC123').emit.mock.calls;
+      expect(emitCalls[0][0]).toBe('word-guessed');
+      expect(emitCalls[0][1]).toEqual({
+        playerName: 'Bob',
+        word: 'apple',
+      });
+
+      // Verify round-ended is emitted to the room
+      expect(emitCalls[1][0]).toBe('round-ended');
+      expect(emitCalls[1][1]).toEqual({});
     });
   });
 
